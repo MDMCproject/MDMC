@@ -1,6 +1,6 @@
 module handler_class
 use flib_sax
-use common_block_class, only : my_configuration => common_configuration
+use common_block_class 
 use moldyn_control_class
 use structure_reader_class
 
@@ -10,16 +10,13 @@ use structure_reader_class
   public :: start_document, end_document
   
 
-  !type (configuration)  :: my_configuration
-
-
   ! Used to 'simulate' dynamical polymorphism, see module
   ! configuration_class. I may not need to use targets here
   ! but could instead allocate memery directly from the
-  ! constraint pointer in my_configuration rather than using
+  ! constraint pointer in common_configuration rather than using
   ! target, but not convinced that this would work so for
   ! now do it using targets (I would be easy to change later)
-  type (fnc_constraint), target, private :: my_fnc_constraint
+  !type (fnc_constraint), target, private :: my_fnc_constraint
 
 
   logical, private  :: in_constraints
@@ -42,10 +39,11 @@ contains
 
     select case(name)
       case("structure")
+        write (*,*) "in hander - structure element"
         call get_value(attributes,"filename",filename,status)
         call make_structure(filename)
         ! get attributes
-        ! my_configuration%my_structure = make_structure()
+        ! common_configuration%my_structure = make_structure()
 
       case("constraints")
         in_constraints = .true.
@@ -55,7 +53,7 @@ contains
 	
 	select case(control_object_name)
 	  case("moldyn_control")
-            call run_moldyn_control(my_configuration)	  
+            call run_moldyn_control(common_configuration)	  
 
 	end select
 	
@@ -67,9 +65,9 @@ contains
     if (in_constraints) then
       select case(name)
         case("fnc_constraint")
-          !perhaps call get_value(attributes, ....)
-          !and something like my_fnc_constraint = make_fnc_constraint(....)
-          call add_constraint(my_configuration, my_fnc_constraint)
+          call get_value(attributes,"filename",filename,status)
+          call make_fnc_constraint(filename)
+          call add_constraint(common_configuration, my_fnc_constraint)
       end select
     end if
 
