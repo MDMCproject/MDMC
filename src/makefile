@@ -16,7 +16,7 @@ MOD_SEARCH=-I$(FLIB_ROOT)/modules/
  
 OBJS= structure.o fnc_constraint.o configuration.o  \
       common_block.o structure_reader.o fnc_constraint_reader.o \
-      moldyn_control.o handler.o mdmc.o 
+      md_control.o handler.o mdmc.o 
 
 TARGET=mdmc
 
