@@ -1,7 +1,7 @@
 module handler_class
 use flib_sax
 use common_block_class 
-use moldyn_control_class
+use md_control_class
 use structure_reader_class
 
   implicit none
