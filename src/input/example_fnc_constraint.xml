@@ -1,0 +1,27 @@
+<fnc-constraint>
+
+  <constraint-type id="1">
+    <between atomtype1="cl" atomtype2="c" /> 
+    <limits rmin="1.69" rmax="2.19" />    
+  </constraint-type>
+
+  <constraint-type id="2">
+    <between atomtype1="cl" atomtype2="cl" /> 
+    <limits rmin="2.7" rmax="3.5" />    
+  </constraint-type>
+  
+  
+  <summary-information>
+  </summary-information>
+  
+  
+  <fnc-group>
+    <atomindex number="1" />
+    <neighbours>
+      <atomindex number="2049" type-id="1" />
+      <atomindex number="4097" type-id="1" />
+      <atomindex number="6145" type-id="1" />
+      <atomindex number="8193" type-id="1" />            
+    </neighbours>
+  </fnc-group>
+</fnc-constraint>

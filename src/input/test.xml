@@ -1,0 +1,24 @@
+<job>
+
+  <structure filename="../data/CCl4/CCl4.xml"> </structure>
+
+  <constraints>
+    <fnc-constraint filename="fnc.xml"></fnc-constraint>
+    <cutoff-constraint />
+    <coordination-constraint />
+    <soft-cutoff-constraint /> 
+  </constraints>
+  
+  
+  <data>
+    <neutron filename="../data/CCl4/CCl4_data.xml">
+      <range low-value="0" high-value="100" />
+      <constant-to-subtract value="0" />
+      <standard-deviation value="0.001" />
+      <partials> 0.0218 0.2520 0.7262 (find better way of rep. these)</partials>
+    </neutron>
+  </data>
+  
+  <control-object name="moldyn_control" />
+
+</job>
