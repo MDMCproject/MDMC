@@ -1,4 +1,4 @@
-program moldynmoncar
+program mdmc
 
   use flib_sax
   use handler_class
@@ -17,6 +17,6 @@ program moldynmoncar
                  start_document=start_document, &
                  end_document=end_document)
 
-end program moldynmoncar
+end program mdmc
 
 
