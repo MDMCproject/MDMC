@@ -4,6 +4,7 @@ use fnc_constraint_class
 
   implicit none
 
+  private ::  add_fnc_constraint
 
   ! Holds pointers to all possible constraint types
 
