@@ -1,0 +1,223 @@
+\documentclass[10pt,a4paper,twoside,notitlepage]{report}
+
+\usepackage{graphics} % For the pictures
+\usepackage{anysize}  % Try to circumvent Latex default margins
+\usepackage{fancyhdr}
+\usepackage[dvipdfm,bookmarks=true,backref,bookmarksnumbered=true,bookmarkstype=toc]{hyperref}
+\newcommand{\var}[1]{\textbf{\textsf{#1}}} % highlight variables in text
+\newcommand{\code}[1]{\textbf{\textsf{#1}}} % highlight code in text
+\newcommand{\param}[1]{\textbf{\textsf{#1}}} % ... parameters ...
+\newcommand{\mod}[1]{\textbf{\textsf{#1}}} % ... module names ...
+\newcommand{\mb}  [1] {\mathbf{#1}}
+
+
+\begin{document}
+
+%\marginsize{1.5cm}{1.5cm}{1.5cm}{1.5cm} % Needs anysize
+%\pagestyle{headings}            % These are ugly - fix them somehow?
+
+\pagestyle{fancy}
+\renewcommand{\chaptermark}[1]{
+      \markboth{\chaptername
+      \ \thechapter.\ #1} {} }
+
+\renewcommand{\sectionmark}[1]{
+      \markright {   
+      \ \thesection.\ #1} {} }
+
+\fancyhead[LE,RO]{\rightmark}
+\fancyhead[LO,RE]{\leftmark}
+\fancyfoot[C]{\today}
+\fancyfoot[LE,RO]{\thepage}
+\fancyfoot[LO,RE]{J. P. Wright}
+\renewcommand{\footrulewidth}{0.4pt}
+
+\pagenumbering{arabic}          % Page numbers
+
+%@}
+
+\chapter{Maximum likelihood}
+
+\section{Introduction}
+Following a highly productive visit from Anders Markvardsen to the ESRF,
+we can now attempt to add some maximum likelihood methods to the 
+package. 
+The essential idea, in oversimplified form, is to allow the model to 
+be wrong, or at least, not quite right.
+In normal least squares, we minimise the goodness of fit, assuming the 
+model is actually going to describe the data properly once the 
+parameters have been adjusted. 
+The goodness of fit indicator only takes into account the differences
+between the model and data with the error bars on the data being taken
+into account.
+In real life, especially with complex problems, it is unreasonable to 
+expect the first model you invent to be a perfect solution to the problem
+and to fully explain your data. 
+The aim of the maximum likelihood approach is therefore to try to improve
+the model as much as possible, taking into account that the model might not
+be entirely correct.
+In order to do that, we will have to make some model not only for the data, but
+also for the uncertainties on the model itself. 
+
+
+\section{Mathematics (as expressed in the Gaussian app of the
+  integral)}
+
+For now we will limit the problem to crystallography with overlapped peaks, 
+discussed extensively elsewhere in the this document, we can describe
+a goodness of fit to the data via a correlated $\chi^2$ statistic:
+
+\[ \chi^2 = \sum_{ij} (I_{obs,i}-I_{calc,i})W_{ij}(I_{obs,j}-I_{calc,j}) \]
+
+This is a quadratic depending only on the computed model and the observed 
+data and weights. If the weights were computed correctly, then it will
+not make a difference how the $I_{obs}$ are chosen, so long as they
+are consistent with the data. Later we will change ``obs'' to ``d''.
+
+The probability associated with this statistic is then given by something
+not unlike:
+
+\[ P(I) = K \exp(-\chi^2) \]
+
+Where the $K$ is chosen such that the distribution is normalised. This
+is only possible if there are no exact peak overlaps, or if you insist
+that all peaks are positive. Interpretation of a probability is left to the
+individual, but you might like to think about the Gaussian probability 
+distribution which goes with your error bar.
+
+Adding on an error bar for the model is simple enough in principle. We can
+define and model goodness of fit for a particular set of intensities in 
+an analogous way:
+
+\[ \chi^2 = \sum_{ij} (I_{test,i}-I_{model,i})W^{model}_{ij}(I_{test,j}-I_{model,j}) \]
+
+where the $I_{test}$ are some intensities that we are comparing to the model and 
+the weights are derived in some way depending on how well we think a particular
+intensity is computed by the model.
+
+The likelihood is then the convolution of these two probability distributions. That
+means to say that you take all possible values of the intensities themselves 
+and ask how well they fit both the model and the data.
+In the normal least squares approach we only took the one set of intensities which
+were computed from the model. 
+Considering some other sets of intensities, which might fit the data better, but fit
+the model worse is the whole idea.
+
+So, this likelihood is the product of two probability distributions (one for model
+and one for data), integrated over all values of intensity (should really only be 
+the positive ones, but that is a bit hard to do).
+
+\[ L = \int P^{data}(I) P^{model}(I) dI \]
+
+Both of these are $\exp(-$quadratic$)$, so we can sum up the two quadratics to 
+get a single Gaussian probability distribution. That Gaussian is going 
+to be described by:
+
+\[ f(\mb{I}) = (\mb{I^d} - \alpha \mb{I})^T \mb{W^d} (\mb{I^d} - \alpha \mb{I})   + 
+               (\mb{\tilde{I}^m} -        \mb{I})^T \mb{\tilde{W}^m} 
+               (\mb{\tilde{I}^m} -        \mb{I})  \]
+
+where:
+\begin{itemize}
+\item $\mb{I^d}$ are the ``observed'' intensities from the data
+\item $\alpha$ is a scale factor
+\item $\mb{I}$ are to be integrated out, eventually
+\item $\mb{W^d}$ weights from the data (transforming the error bars on the observed data)
+\item $\mb{\tilde{I}^m}$ intensities computed from a model.
+\item $\mb{\tilde{W}^m}$ weights computed from the model. 
+\end{itemize}
+This looks pretty symmetric in terms of model and data, as it should.
+
+We would like to transform this to give a single quadratic, as that might be easier
+to get an integral of, and also to normalise.
+At a maximum $df/dI = 0$, so we can differentiate and set equal to zero to find
+the top of our combined distribution...
+
+\[ \frac{df}{d\mb{I}} = \mb{0} = 2 \alpha \mb{W^d}(\mb{I^d}-\alpha\mb{I}) + 
+                       2        \mb{\tilde{W}^m}(\mb{\tilde{I}^m}-      \mb{I}) \]
+So that:
+\[  \alpha \mb{W^d} \mb{I^d} + \mb{\tilde{W}^m}\mb{\tilde{I}^m} =   
+    \alpha^2 \mb{W^d} \mb{I} +  \mb{\tilde{W}^m}  \mb{I} \]
+\[  \alpha \mb{W^d} \mb{I^d} + \mb{\tilde{W}^m}\mb{\tilde{I}^m} =
+    \mb{B} =  \left( \alpha^2 \mb{W^d} +  \mb{\tilde{W}^m} \right)  \mb{I} \]
+Denote the solution to this equation as $\mb{I}^s$ and we have:
+\[ \mb{S I^s}=\mb{B} \]
+where
+\[ \mb{S} = \alpha^2\mb{W^d} + \mb{\tilde{W}^m} \]
+\[ \mb{B} =  \alpha \mb{W^d} \mb{I^d} + \mb{\tilde{W}^m}\mb{\tilde{I}^m} \]
+If the scale factor, $\alpha$ is known, then both $\mb{S}$ and $\mb{B}$ are also known
+and we can in principle solve for $\mb{I^s}$. Why S? (there is no
+particular good reason why the notation S is used here - hence another
+letter may be used?)
+
+Given this set of $\mb{I^s}$ we can write:
+\[ f(\mb{I}) = f(\mb{I^s}) + (\mb{I} - \mb{I^s})^T \mb{S} (\mb{I} - \mb{I^s}) \]
+
+The likelihood integral expressed in terms of $f$ reads
+\[ L \propto (2\pi )^{-N/2}\sqrt{\det (\mb{\tilde{W}^m})}\int \exp (-f(\mb{I})/2) d\mb{I} \]
+Notice that the normalisation constant from the data is not included
+since (i) for the case where $\mb{W^d}$ is singular it is not defined; (ii)
+regardless it can be ignored since it stays constant. $N$ is the
+dimension of vector $\mb{I}$. The likelihood integral can be
+evaluated analytically and   
+\[ L \propto \frac{\sqrt{\det(\mb{\tilde{W}^m})} \exp (-f(\mb{I^s})/2)}{
+  \sqrt{\det (\mb{S}) }} \]
+We may define the following ML figure-of-merit
+\[ \chi^2_{ml}=-2\log(L)=f(\mb{I^s})+\ln(\det [\mb{(\tilde{W}^m})^{-1}\mb{S}])
+\]
+Notice it might be useful to calculate $\det
+[\mb{(\tilde{W}^m})^{-1}\mb{S}]$ as $\det [\mb{\alpha^2 (\tilde{W}^m})^{-1}
+  \mb{W^d}+\mb{II}]$, where $\mb{II}$ here stands for the identity
+matrix!! (not a brilliant notation). Also, it may be computationally
+advantageous to use that $f(\mb{I^s})$ can be written as
+\[ f(\mb{I^s}) = (\mb{I^d})^T \mb{W^d} \mb{I^d} + (\mb{\tilde{I}^m})^T 
+\mb{\tilde{W}^m} \mb{\tilde{I}^m} -(\mb{I^s})^T \mb{S} \mb{I^s} \]
+who know!?
+
+
+\section{Finding a set of compromise intensities, $\mb{I^s}$}
+
+Having gotten the maths in the previous section, we now need to concentrate
+on making some actual computations. 
+We will assume that we have a model available and that the model has only
+diagonal weights.
+This should reduce to conventional least squares in the case that the model
+weights tend to infinity...
+
+The equations to solve are:
+\[ \mb{S I^s}=\mb{B} \]
+where
+\[ \mb{S} = \alpha^2\mb{W^d} + \mb{\tilde{W}^m} \]
+\[ \mb{B} =  \alpha \mb{W^d} \mb{I^d} +
+\mb{\tilde{W}^m}\mb{\tilde{I}^m} \]
+
+The weights on the data and $ \mb{I^d}$ values will come from a correlated 
+integrated intensity object.
+The model weights and model computed values will come from a likelihood
+model object (see below).
+
+The scale factor, $\alpha$ needs to be estimated, such that it minimises the
+maximum likelihood figure of merit. For now we take it as known. 
+An object to do the maximum likelihood figures of merit ought to include
+the following things:
+
+\begin{itemize}
+\item \emph{Data} Weight matrix from the data
+\item \emph{Data} Observed values of intensities
+\item \emph{Data} Weights from the model
+\item \emph{Data} Computed model values
+\item \emph{Data} A scale factor $\alpha$
+\item \emph{Method/Data} Generate matrix $\mb{S}$ and vector $\mb{B}$
+\item \emph{Method} Generate the $\mb{I^s}$ values
+\item \emph{Method} Optimise the $\alpha$ value
+\item \emph{Method} Compute the figures of merit for model, data and combined maximum likelihood.
+\item ?
+\end{itemize}
+
+A python object therefore needs to hold internally a ``normal'' correlated integrated
+intensity object, also a model, and a scale factor. For now the scale factor is 
+just a constant.
+
+
+
+\end{document}
