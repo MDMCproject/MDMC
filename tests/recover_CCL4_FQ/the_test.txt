@@ -1,0 +1,4 @@
+The test here is to recover CCL4_FQ.xy
+from CCL4_rmc++.xml, which contain a 
+configuration from the RMC++ software
+that I assumes fit CCL4_FQ.xy very well!?
