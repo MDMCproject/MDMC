@@ -6,13 +6,17 @@
 LIB_STD=$(FLIB_ROOT)/lib/
 MOD_STD=$(FLIB_ROOT)/modules/
 INC_STD=$(FLIB_ROOT)/include/
-BIN_STD=$(FLIB_ROOT)/bin/
+#BIN_STD=$(FLIB_ROOT)/bin
 #
 FC=ifort
-CFLAGS= -static
-FFLAGS= -g    $(CFLAGS)
-FFLAGS_DEBUG= -g  
-FFLAGS_CHECK= -g 
+# For some reason you have to swich off all optimisation to get ifort
+# to link properly using Fedora Core 4!!!!
+# I copied and pasted to below flags from a suggestion by a bloke 
+# called Andrew from some Intel mailing list
+CFLAGS= -pthread -pad -Vaxlib -mp -save -O0 -w95 -extend_source
+FFLAGS=     $(CFLAGS)
+#FFLAGS_DEBUG= -g  
+#FFLAGS_CHECK= -g 
 LDFLAGS=      $(CFLAGS)
 #
 INC_PREFIX=-I
@@ -28,32 +32,32 @@ MOD_SEARCH= $(MOD_SEARCH_STD) $(MOD_SEARCH_OTHER)
 AR=ar
 RANLIB=echo
 #
-CPP=/bin/cpp -P
-COCO=$(BIN_STD)coco -I $(INC_STD)
-DEFS=
+#CPP=/bin/cpp -P
+#COCO=$(BIN_STD)coco -I $(INC_STD)
+#DEFS=
 #
 # Experimental : the following deactivates an implicit rule
 # which breaks havoc with the operation of this makefile
 # It works at least with GNU make
 %.o : %.mod
 #
-.F.o:
-	$(FC) -c $(MOD_SEARCH) $(INC_SEARCH) $(FFLAGS)  $(DEFS) $<
+#.F.o:
+#	$(FC) -c $(MOD_SEARCH) $(INC_SEARCH) $(FFLAGS)  $(DEFS) $<
 .f.o:
 	$(FC) -c $(MOD_SEARCH) $(INC_SEARCH) $(FFLAGS)   $<
-.F90.o:
-	$(FC) -c $(MOD_SEARCH) $(INC_SEARCH) $(FFLAGS) $(DEFS) $<
+#.F90.o:
+#	$(FC) -c $(MOD_SEARCH) $(INC_SEARCH) $(FFLAGS) $(DEFS) $<
 .f90.o:
 	$(FC) -c $(MOD_SEARCH) $(INC_SEARCH) $(FFLAGS)   $<
 .F95.o:
-	$(FC) -c $(MOD_SEARCH) $(INC_SEARCH) $(FFLAGS) $(DEFS) $<
-.f95.o:
-	cp $< $*.f90
-	$(FC) -c $(MOD_SEARCH) $(INC_SEARCH) $(FFLAGS)   $*.f90
-	rm -f $*.f90
+	$(FC) -c $(MOD_SEARCH) $(INC_SEARCH) $(FFLAGS)   $<
+#.f95.o:
+#	cp $< $*.f90
+#	$(FC) -c $(MOD_SEARCH) $(INC_SEARCH) $(FFLAGS)   $*.f90
+#	rm -f $*.f90
 #
-.fpp.f90:
-	$(COCO) $*
+#.fpp.f90:
+#	$(COCO) $*
 #
 
 

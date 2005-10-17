@@ -2,6 +2,14 @@
 
   <structure filename="../tests/recover_CCL4_FQ/CCl4_rmc++.xml"> </structure>
 
+  <structure>
+    <title>Liquid Ag</title>
+    <density units="g/mole">0.92</density>
+    <ag number="2048">
+      <mass units="amu">39.95</mass>
+    </ag>
+  </structure>
+  
   <constraints>
     <fnc-constraint filename="fnc.xml"></fnc-constraint>
     <cutoff-constraint />
@@ -10,15 +18,29 @@
   </constraints>
   
   
-  <data>
-    <neutron filename="../data/CCl4/CCl4_data.xml">
-      <range low-value="0" high-value="100" />
-      <constant-to-subtract value="0" />
-      <standard-deviation value="0.001" />
-      <partials> 0.0218 0.2520 0.7262 (find better way of rep. these)</partials>
-    </neutron>
-  </data>
+  <fom>
+    <pdf-fom filename="somefile" />
+    <sf-fom filename="somefile" />
+    <average-coor-fom />
+    <coordination-fom />
+  </fom>
   
-  <control-object name="moldyn_control" />
+  <gpe>
+    <lj-potential>
+      <sigma units="AA">3.4</sigma>
+      <epsilon units="J/mole">120*8.132</epsilon>
+    </lj-potential>
+    <average-coor-fom />
+  </gpe>
+  
+  <control-object name="moldyn_control">
+    <step-average number="200" />
+    <step-equilibrium number="2000" />
+    <step-limit number="20000" />
+    <delta-t units="10^-15">1.0</delta-t>
+    <mass units="amu" />
+    <length units="AA" />
+    <temperature units="kelvin">120</temperature>
+  </control-object>
 
 </job>

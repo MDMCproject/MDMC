@@ -3,7 +3,7 @@
 #
 include $(FLIB_ROOT)/fortran.mk
 #
-LIBRARY=libflib.a
+LIBRARY=libxmlf90_sax.a
 #
 CP=cp
 install: $(OBJFILES)

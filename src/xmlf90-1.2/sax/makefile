@@ -27,5 +27,7 @@ m_xml_parser.o: m_buffer.o m_elstack.o m_reader.o m_fsm.o m_dictionary.o \
 flib_sax.o: m_dictionary.o m_xml_parser.o m_converters.o m_xml_error.o
 #
 clean:
-	rm -f *.o  *.$(MOD_EXT)
+	rm -f *.o  
+	rm -f $(MOD_STD)*.$(MOD_EXT)
+	rm -f $(LIB_STD)$(LIBRARY)
 
