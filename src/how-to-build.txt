@@ -1,0 +1,10 @@
+Using ordinary Makefiles: 
+1) make sure xmlf90_sax library is compiled first by going to 
+trunk/src/xmlf90_sax/sax and using linux type 'make' and under windows type 
+'nmake -f windows-makefile'.
+2) go to the trunk/src directory. Type 'make' under linux and
+'nmake -f windows-makefile' under windows.
+
+Using SCONS makefiles:
+1) go to the trunk/src directory and type 'scons'. You may have to edit the 
+SConstruct file first so that only the library is build to start with.
