@@ -1,0 +1,17 @@
+#
+# Macro file to compile and install modules
+
+!include $(FLIB_ROOT)\windows-compile-option-makefile
+
+install: $(OBJFILES)
+#	@echo "  ==> Updating $(LIBRARY) with $(OBJFILES)"
+	$(AR) /nologo /OUT:$(LIB_STD)\$(LIBRARY) $(OBJFILES)  
+  move *.mod $(INC_STD)
+
+
+
+
+
+
+
+

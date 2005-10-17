@@ -1,0 +1,34 @@
+# There seem to be a general problem with the way scons handle
+# .mod files in the way that the construction variables FORTRANMODDIR
+# do not work as I would expect. 
+#
+# As a consequence of this, this file is a SConscript file rather than a
+# SConstruct file
+
+Import('env_lib')
+
+# Instead of the code below I would have liked to set -module directory 
+# using the scons FORTRANMODDIR construction variable but it doesn't
+# seem to work
+
+if env_lib['PLATFORM'] == 'win32':
+  env_lib.Append(FORTRANFLAGS = ' /nologo /module:xmlf90-1.2\macros\modules')
+else:
+  env_lib.Append(FORTRANFLAGS = ' -module xmlf90-1.2/macros/modules')
+  
+list = Split("""m_buffer.f90
+ m_charset.f90
+ m_converters.f90
+ m_debug.f90
+ m_dictionary.f90
+ m_elstack.f90
+ m_entities.f90
+ m_fsm.f90
+ m_io.f90
+ m_reader.f90
+ m_xml_error.f90
+ m_xml_parser.f90
+ flib_sax.f90""")
+
+library = env_lib.StaticLibrary('../macros/lib/xmlf90_sax', list)
+

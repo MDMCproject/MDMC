@@ -1,0 +1,42 @@
+#
+# Fortran macros for Intel Fortran compiler
+#
+.SUFFIXES: .SUFFIXES .f .f90 .f95 .F .F90 .F95 .fpp
+
+# where to put the library files
+LIB_STD=$(FLIB_ROOT)\lib
+
+# This macro points to the module directory. It has no effect when building
+# a static library but is required when linking. In windows-lib-makefile all
+# the .mod files are moved to this directory!
+INC_STD=$(FLIB_ROOT)\modules
+
+# compiler
+FC=ifort
+
+# ifort compiler flags. E.g. for debugging perhaps just use /Zi (-g)
+FFLAGS= /nologo
+
+# specify module file suffix in case this migth be useful
+MOD_EXT=mod
+
+INC_SEARCH=/include:$(INC_STD)
+
+AR=lib
+
+.f.obj:
+	$(FC) /c $(INC_SEARCH) $(FFLAGS)   $<
+.f90.obj:
+	$(FC) /c $(INC_SEARCH) $(FFLAGS)   $<
+.F95.obj:
+	$(FC) /c $(INC_SEARCH) $(FFLAGS)   $<
+
+
+
+
+
+
+
+
+
+

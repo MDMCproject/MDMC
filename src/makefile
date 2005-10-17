@@ -10,7 +10,7 @@ FOPT=
 #### link to Fortran XML library (xmlf90) ####
 
 FLIB_ROOT=$(HOME)/xmlf90-1.2/macros
-LIBS=-L$(FLIB_ROOT)/lib/ -lflib
+LIBS=-L$(FLIB_ROOT)/lib/ -lxmlf90_sax
 MOD_SEARCH=-I$(FLIB_ROOT)/modules/
 
  

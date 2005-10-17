@@ -1,0 +1,42 @@
+#
+# Makefile for example of XML processing with all kinds of handlers
+# and features.
+#
+
+LOCAL_TARGET=mdme.exe
+default: $(LOCAL_TARGET)
+
+MK=$(FLIB_ROOT)\windows-compile-option-makefile
+!include $(MK)
+
+LIBS=/LIBPATH:$(LIB_STD) xml90_sax.lib
+
+LOCAL_OBJS = structure.obj fnc_constraint.obj configuration.obj  \
+      common_block.obj structure_reader.obj fnc_constraint_reader.obj \
+      md_control.obj handler.obj mdmc.obj 
+           
+$(LOCAL_TARGET):  $(LOCAL_OBJS)
+  $(FC) $(FFLAGS) $(LOCAL_OBJS) /link /OUT:$(LOCAL_TARGET) $(LIBS)
+  
+  
+# Alternative you can use the Linker directly as shown below.
+# I am not sure if the $(FFLAGS) makes any difference above since by the 
+# point ifort is called above we just have object files hence I assume 
+# compiler optimization flags makes no difference!?
+
+#  link /NOLOGO /OUT:$(LOCAL_TARGET) $(LIBS) $(LOCAL_OBJS)
+
+
+clean: 
+	del  *.obj $(LOCAL_TARGET) *.$(MOD_EXT)
+
+
+
+
+
+
+
+
+
+
+

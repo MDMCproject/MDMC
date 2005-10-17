@@ -1,0 +1,29 @@
+#
+OBJFILES= m_debug.obj m_buffer.obj m_elstack.obj m_dictionary.obj m_io.obj \
+          m_reader.obj m_converters.obj m_charset.obj  m_entities.obj \
+          m_xml_error.obj  m_fsm.obj  m_xml_parser.obj flib_sax.obj
+
+LIBRARY=xml90_sax.lib
+
+# replace the .obj suffics with nothing
+MODFILES=$(OBJFILES:.obj=)
+
+MK=$(FLIB_ROOT)\windows-lib-makefile
+!include $(MK)
+
+m_reader.obj: m_io.obj m_debug.obj
+m_elstack.obj: m_buffer.obj
+m_dictionary.obj: m_buffer.obj
+m_entities.obj: m_buffer.obj
+m_converters.obj: m_debug.obj
+m_fsm.obj: m_buffer.obj m_dictionary.obj m_charset.obj m_entities.obj m_elstack.obj
+m_xml_error.obj: m_elstack.obj
+m_xml_parser.obj: m_buffer.obj m_elstack.obj m_reader.obj m_fsm.obj m_dictionary.obj m_debug.obj m_xml_error.obj m_entities.obj
+
+flib_sax.obj: m_dictionary.obj m_xml_parser.obj m_converters.obj m_xml_error.obj
+
+clean:
+	del  *.obj  $(INC_STD)\*.$(MOD_EXT) $(LIB_STD)\$(LIBRARY)
+
+test:
+  @echo "  ==> Updating $(LIBRARY) with $(MODFILES)"

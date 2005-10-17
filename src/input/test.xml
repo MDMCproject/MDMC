@@ -1,6 +1,6 @@
 <job>
 
-  <structure filename="../data/CCl4/CCl4.xml"> </structure>
+  <structure filename="../tests/recover_CCL4_FQ/CCl4_rmc++.xml"> </structure>
 
   <constraints>
     <fnc-constraint filename="fnc.xml"></fnc-constraint>

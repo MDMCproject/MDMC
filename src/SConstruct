@@ -1,0 +1,20 @@
+import os
+
+# specify common environment setup
+
+env = Environment(ENV = os.environ, FORTRAN = 'ifort')
+
+# building library.  NOTICE need to comment out SConscript below to avoid
+# SCONS to re-compiler part of the library all the time - the problem is 
+# caused by an issue with forcing scons to put .mod file in a certain 
+# directory......
+env_lib = env.Copy()
+#SConscript('xmlf90-1.2/sax/SConscript', exports='env_lib')
+
+# building executable
+env_exe = env.Copy()
+SConscript('SConscript', exports='env_exe')
+
+
+
+# In general I have had a lot of problems with getting scons to work properly!

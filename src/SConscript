@@ -1,0 +1,13 @@
+Import('env_exe')
+
+list = Split("""structure.f90 fnc_constraint.f90 configuration.f90
+      common_block.f90 structure_reader.f90 fnc_constraint_reader.f90
+      md_control.f90 handler.f90 mdmc.f90""")
+
+env_exe.Append(FORTRANPATH='xmlf90-1.2/macros/modules')
+
+if env_exe['PLATFORM'] == 'win32':
+  env_exe.Append(FORTRANFLAGS = ' /nologo')
+
+mdmc = env_exe.Program('mdmc', list, LIBS='xmlf90_sax', LIBPATH='xmlf90-1.2/macros/lib')
+#env_local
