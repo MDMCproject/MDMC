@@ -14,7 +14,7 @@ use structure_reader_class
 
 contains
 
-  !START_DOCUMENT
+  ! START_DOCUMENT
   subroutine start_document()
   end subroutine start_document
 
