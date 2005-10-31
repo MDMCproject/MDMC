@@ -1,6 +1,7 @@
 module fnc_constraint_reader_class
 use flib_sax
 use common_block_class, only : common_configuration
+use various_constants_class
 
 
   implicit none
@@ -45,7 +46,7 @@ contains
     character(len=40) :: control_object_name, read_number_atoms, read_dp
     integer :: number_atoms(1);
     character(len=120) :: filename
-    double precision :: number_dp(1)
+    real(db) :: number_dp(1)
 
     select case(name)
       case("molecule")

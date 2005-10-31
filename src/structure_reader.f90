@@ -1,6 +1,7 @@
 module structure_reader_class
 use flib_sax
 use common_block_class, only : common_configuration
+use various_constants_class
 
 
   implicit none
@@ -31,6 +32,41 @@ contains
 
   end subroutine make_structure
 
+  
+  subroutine make_simple_cubic_structure(density, n_atoms)
+    real(db), intent(in) :: density
+    integer, dimension(3) :: n_atoms
+    
+    real(db), dimension(3) :: edges
+    real(db), dimension(3) :: gap, put_atom_at ! gap between atoms
+    
+    integer :: n = 1, nx, ny, nz, n_tot
+    
+    
+    ! calculate box edge and gap
+    edges = n_atoms / density**0.333333333333333
+    common_configuration%cf_structure%box_edges = edges
+    gap = edges / n_atoms
+    
+    allocate(common_configuration%cf_structure%atoms(product(n_atoms)))
+
+    
+    do nx = 1, n_atoms(1)
+      do ny = 1, n_atoms(2)
+        do nz = 1, n_atoms(3)
+          put_atom_at(1) = nx - 0.5
+          put_atom_at(2) = ny - 0.5
+          put_atom_at(3) = nz - 0.5
+          put_atom_at = put_atom_at * gap - edges / 2.0
+          common_configuration%cf_structure%atoms%r(n) = put_atom_at
+          n = n + 1
+        end do
+      end do
+    end do
+    
+  end subroutine make_simple_cubic_structure
+  
+  
   !START_DOCUMENT
   subroutine start_document()
   end subroutine start_document
@@ -42,10 +78,11 @@ contains
     type(dictionary_t), intent(in) :: attributes
     
     integer :: status, ndata=0
-    character(len=40) :: control_object_name, read_number_atoms, read_dp
+    real(db) :: number_db(1)
+    character(len=40) :: read_db
+    character(len=40) :: control_object_name, read_number_atoms
     integer :: number_atoms(1);
     character(len=120) :: filename
-    double precision :: number_dp(1)
 
     select case(name)
       case("molecule")
@@ -56,22 +93,25 @@ contains
         count_number_atoms = 1
 
       case("atom")
-        call get_value(attributes,"x3", read_dp,status)
+        call get_value(attributes,"x3", read_db,status)
         ndata = 0
-        call build_data_array(read_dp, number_dp, ndata)
-        common_configuration%cf_structure%atoms(count_number_atoms)%position(1) = number_dp(1)
-        call get_value(attributes,"y3", read_dp,status)
+        call build_data_array(read_db, number_db, ndata)
+        common_configuration%cf_structure%atoms(count_number_atoms)%r(1) = number_db(1)
+
+        call get_value(attributes,"y3", read_db,status)
         ndata = 0
-        call build_data_array(read_dp, number_dp, ndata)
-        common_configuration%cf_structure%atoms(count_number_atoms)%position(2) = number_dp(1)
-        call get_value(attributes,"z3", read_dp,status)
+        call build_data_array(read_db, number_db, ndata)
+        common_configuration%cf_structure%atoms(count_number_atoms)%r(2) = number_db(1)
+
+        call get_value(attributes,"z3", read_db,status)
         ndata = 0
-        call build_data_array(read_dp, number_dp, ndata)
-        common_configuration%cf_structure%atoms(count_number_atoms)%position(3) = number_dp(1)
+        call build_data_array(read_db, number_db, ndata)
+        common_configuration%cf_structure%atoms(count_number_atoms)%r(3) = number_db(1)
+
         write (*,*) count_number_atoms, &
-          common_configuration%cf_structure%atoms(count_number_atoms)%position(1), &
-          common_configuration%cf_structure%atoms(count_number_atoms)%position(2), &
-          common_configuration%cf_structure%atoms(count_number_atoms)%position(3)
+          common_configuration%cf_structure%atoms(count_number_atoms)%r(1), &
+          common_configuration%cf_structure%atoms(count_number_atoms)%r(2), &
+          common_configuration%cf_structure%atoms(count_number_atoms)%r(3)
         count_number_atoms = count_number_atoms + 1        
 
 	

@@ -12,8 +12,8 @@ implicit none
 
   type fnc_constraint
     type (fnc_group), dimension(:), pointer :: fnc_groups
-    double precision, dimension(:), pointer :: rmin
-    double precision, dimension(:), pointer :: rmax
+    real(db), dimension(:), pointer :: rmin
+    real(db), dimension(:), pointer :: rmax
   end type fnc_constraint
 
 contains

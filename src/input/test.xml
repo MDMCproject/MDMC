@@ -1,13 +1,11 @@
 <job>
-
+<!--
   <structure filename="../tests/recover_CCL4_FQ/CCl4_rmc++.xml"> </structure>
-
+-->
   <structure>
-    <title>Liquid Ag</title>
-    <density units="g/mole">0.92</density>
-    <ag number="2048">
-      <mass units="amu">39.95</mass>
-    </ag>
+    <title>Liquid Ar</title>
+    <density units="atom/AA3" value="1" />
+    <ar nx="2" ny ="2" nz="2" /> 
   </structure>
   
   <constraints>

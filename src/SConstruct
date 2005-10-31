@@ -15,7 +15,7 @@ if env['PLATFORM'] == 'posix':
 # caused by an issue with forcing scons to put .mod file in a certain 
 # directory......
 env_lib = env.Copy()
-SConscript('xmlf90-1.2/sax/SConscript', exports='env_lib')
+#SConscript('xmlf90-1.2/sax/SConscript', exports='env_lib')
 
 # building executable
 env_exe = env.Copy()

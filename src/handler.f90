@@ -10,7 +10,11 @@ use structure_reader_class
   public :: start_document, end_document
   
 
-  logical, private  :: in_constraints
+  logical, private  :: in_constraints = .false., in_structure = .false.
+  
+  real(db), private :: density   
+  integer, dimension(3), private :: n_atoms  ! both to be passed to 
+                                             ! make_simple_cubic_structure
 
 contains
 
@@ -24,27 +28,33 @@ contains
     character(len=*), intent(in)   :: name
     type(dictionary_t), intent(in) :: attributes
     
-    integer :: status
-    character(len=40) :: control_object_name
+    integer :: status, ndata=0
+    real(db) :: number_db(1)
+    integer :: number_int(1)
+    character(len=40) :: read_db, read_int
+    character(len=40) :: control_object_name, units
     character(len=120) :: filename
 
     select case(name)
       case("structure")
         call get_value(attributes,"filename",filename,status)
-        call make_structure(filename)
-
+        if (status == 0) then
+          call make_structure(filename)
+        else
+          in_structure = .true.
+        end if
 
       case("constraints")
         in_constraints = .true.
 
       case("control-object")
-	call get_value(attributes,"name",control_object_name,status)
+	      call get_value(attributes,"name",control_object_name,status)
 	
-	select case(control_object_name)
-	  case("moldyn_control")
+        select case(control_object_name)
+          case("moldyn_control")
             call run_md_control(common_configuration)	  
 
-	end select
+        end select
 	
     end select
 
@@ -60,6 +70,46 @@ contains
       end select
     end if
 
+    
+    ! if in structure
+    
+    if (in_structure) then
+      select case(name)
+        case("density")          
+          ! read density value into read_dp(1)
+          call get_value(attributes,"value",read_db,status)
+          ndata = 0
+          call build_data_array(read_db, number_db, ndata)
+          
+          ! read units
+          call get_value(attributes,"units",units,status)
+          
+          if (units == "atom/AA3") then
+            density = number_db(1)
+          else
+            ! convert other units to atom/AA3 somehow
+          end if
+          
+        case("ar")
+          ! read number of atoms into read_int(1)
+          call get_value(attributes,"nx",read_int,status)
+          ndata = 0
+          call build_data_array(read_int, number_int, ndata)          
+          n_atoms(1) = number_int(1)
+
+          call get_value(attributes,"ny",read_int,status)
+          ndata = 0
+          call build_data_array(read_int, number_int, ndata)          
+          n_atoms(2) = number_int(1)
+          
+          call get_value(attributes,"nz",read_int,status)
+          ndata = 0
+          call build_data_array(read_int, number_int, ndata)          
+          n_atoms(3) = number_int(1)
+          
+      end select
+    end if
+    
   end subroutine begin_element
 
 
@@ -77,6 +127,11 @@ contains
     select case(name)
       case("constraints")
         in_constraints = .false.
+        
+      case("structure")
+        if (in_structure == .true.) then
+          call make_simple_cubic_structure(density, n_atoms)
+        end if
 
     end select
 
