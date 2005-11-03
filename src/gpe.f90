@@ -15,13 +15,55 @@ implicit none
 
 contains
 
-  function gpe_val(str) result (val)
+  function gpe_val(str, vars) result (val)
     type (structure), intent(in) :: str
+		type (variable), dimension(:), intent(in) :: vars
     real (db) :: val
     
-    integer :: i
+    integer :: i1, i2, n_tot, i
+    real (db) :: r_cut, rr_cut 
+    real (db) :: sigma, epsilon, epsilon_times4
+    real (db) :: rr, rri, rri3
+		real (db), dimension(3) :: diff_vec
     
     
+		sigma = vars(1)%val
+		epsilon = vars(2)%val
+    epsilon_times4 = 4*epsilon
+    
+    r_cut = 2**0.166666666666667 * sigma
+    rr_cut = r_cut * r_cut
+    
+		n_tot = size(str%atoms)
+		
+		write (*,*) sigma, epsilon, n_tot
+		
+    
+    val = 0.0
+    
+		do i1 = 1, n_tot
+		  do i2 = i1+1, n_tot
+        diff_vec = str%atoms(i1)%r - str%atoms(i2)%r
+        
+        do i = 1, 3
+          if (diff_vec(i) >= 0.5 * str%box_edges(i)) then
+            diff_vec(i) = diff_vec(i) - str%box_edges(i)
+          end if
+          if (diff_vec(i) < -0.5 * str%box_edges(i)) then
+            diff_vec(i) = diff_vec(i) + str%box_edges(i)
+          end if       
+        end do
+        
+        rr = sum(diff_vec*diff_vec)
+        
+        if (rr < rr_cut) then
+          rri = 1 / rr
+          rri3 = rri * rri * rri
+          val = val + epsilon_times4 * rri * (rri3 - 1.0) + 1.0   
+        end if
+			
+			end do
+		end do
     
     
   end function gpe_val
