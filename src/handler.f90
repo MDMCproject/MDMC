@@ -150,6 +150,8 @@ contains
         
       case("structure")
         if (in_structure == .true.) then
+          write (*,*) density
+          write (*,*) n_atoms
           call make_simple_cubic_structure(density, n_atoms)
         end if
 
