@@ -3,6 +3,7 @@ use flib_sax
 use common_block_class 
 use md_control_class
 use structure_reader_class
+use gpe_class
 
   implicit none
   
@@ -10,7 +11,8 @@ use structure_reader_class
   public :: start_document, end_document
   
 
-  logical, private  :: in_constraints = .false., in_structure = .false.
+  logical, private  :: in_constraints = .false., in_structure = .false. 
+	logical, private  :: in_gpe = .false.
   
   real(db), private :: density   
   integer, dimension(3), private :: n_atoms  ! both to be passed to 
@@ -46,6 +48,9 @@ contains
 
       case("constraints")
         in_constraints = .true.
+				
+		  case("gpe")
+			  in_gpe = .true.
 
       case("control-object")
 	      call get_value(attributes,"name",control_object_name,status)
@@ -58,7 +63,22 @@ contains
 	
     end select
 
+		
+    ! if in gpe
 
+    if (in_constraints) then
+      select case(name)
+        case("lj-potential")
+          call get_value(attributes,"num_variable",read_int,status)
+					ndata = 0
+          call build_data_array(read_int, number_int, ndata)
+					!common_pe_list(1)%name = "lj-potential"
+					!allocate(common_pe_list(1)%vars(number_int(1)))
+					write (*,*) number_int(1)
+      end select
+    end if
+		
+		
     ! if in constraints
 
     if (in_constraints) then

@@ -24,11 +24,11 @@
   </fom>
   
   <gpe>
-    <lj-potential>
+    <lj-potential num-variable = "2">
       <sigma units="AA">3.4</sigma>
-      <epsilon units="J/mole">120*8.132</epsilon>
+      <epsilon units="KJ/mole">0.998</epsilon>
     </lj-potential>
-    <average-coor-fom />
+    <!-- <lookup-data-potential /> -->
   </gpe>
   
   <control-object name="moldyn_control">
