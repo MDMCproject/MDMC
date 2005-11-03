@@ -48,9 +48,8 @@ contains
     common_configuration%cf_structure%box_edges = edges
     gap = edges / n_atoms
     
-    n_tot = product(n_atoms)+10
+    n_tot = product(n_atoms)
     allocate(common_configuration%cf_structure%atoms(n_tot))
-
     
     do nx = 1, n_atoms(1)
       do ny = 1, n_atoms(2)
@@ -59,9 +58,7 @@ contains
           put_atom_at(2) = ny - 0.5
           put_atom_at(3) = nz - 0.5
           put_atom_at = put_atom_at * gap - edges / 2.0
-          write(*,*) n
-          write(*,*) put_atom_at
-          common_configuration%cf_structure%atoms%r(n) = put_atom_at
+          common_configuration%cf_structure%atoms(n)%r = put_atom_at
           n = n + 1
         end do
       end do

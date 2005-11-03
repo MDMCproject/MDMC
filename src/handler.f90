@@ -37,6 +37,7 @@ contains
     character(len=40) :: control_object_name, units
     character(len=120) :: filename
 
+    !write(*,*) name
     select case(name)
       case("structure")
         call get_value(attributes,"filename",filename,status)
@@ -66,15 +67,33 @@ contains
 		
     ! if in gpe
 
-    if (in_constraints) then
+    if (in_gpe) then
       select case(name)
         case("lj-potential")
-          call get_value(attributes,"num_variable",read_int,status)
+          write(*,*) "in lj-potential"        
+          call get_value(attributes,"num-variable",read_int,status)
 					ndata = 0
           call build_data_array(read_int, number_int, ndata)
-					!common_pe_list(1)%name = "lj-potential"
-					!allocate(common_pe_list(1)%vars(number_int(1)))
-					write (*,*) number_int(1)
+					common_pe_list(1)%name = "lj-potential"
+					allocate(common_pe_list(1)%vars(number_int(1)))
+					write (*,*) "number_int ", size(common_pe_list(1)%vars)
+          
+        case("sigma")
+          call get_value(attributes,"val",read_db,status)
+					ndata = 0
+          call build_data_array(read_db, number_db, ndata)
+          common_pe_list(1)%vars(1)%name = "sigma"
+          common_pe_list(1)%vars(1)%val = number_db(1)
+          write(*,*) common_pe_list(1)%vars(1)%name, common_pe_list(1)%vars(1)%val
+
+        case("epsilon")
+          call get_value(attributes,"val",read_db,status)
+					ndata = 0
+          call build_data_array(read_db, number_db, ndata)
+          common_pe_list(1)%vars(2)%name = "epsilon"
+          common_pe_list(1)%vars(2)%val = number_db(1)
+          write(*,*) common_pe_list(1)%vars(2)%name, common_pe_list(1)%vars(2)%val
+          
       end select
     end if
 		
@@ -148,12 +167,12 @@ contains
       case("constraints")
         in_constraints = .false.
         
+      case("gpe")
+        in_gpe = .false.        
+        
       case("structure")
-        if (in_structure == .true.) then
-          write (*,*) density
-          write (*,*) n_atoms
-          call make_simple_cubic_structure(density, n_atoms)
-        end if
+        call make_simple_cubic_structure(density, n_atoms)
+        in_structure = .false.
 
     end select
 

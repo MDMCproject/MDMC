@@ -6,7 +6,7 @@ implicit none
   ! originally I imagined calling this type parameter rather then variable
   ! but I think parameter might be a reserved keyword in fortran
   type variable
-    character(len=99)  :: name
+    character(len=99) :: name
     real(db) :: val  
     real(db) :: limit_min
     real(db) :: limit_max

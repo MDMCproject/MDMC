@@ -24,9 +24,9 @@
   </fom>
   
   <gpe>
-    <lj-potential num-variable = "2">
-      <sigma units="AA">3.4</sigma>
-      <epsilon units="KJ/mole">0.998</epsilon>
+    <lj-potential num-variable="2">
+      <sigma units="AA" val="3.4" />
+      <epsilon units="KJ/mole" val="0.998" />
     </lj-potential>
     <!-- <lookup-data-potential /> -->
   </gpe>
