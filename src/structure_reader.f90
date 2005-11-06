@@ -1,6 +1,6 @@
 module structure_reader_class
 use flib_sax
-use common_block_class, only : common_configuration
+use common_block_class, only : common_config
 use various_constants_class
 
 
@@ -45,11 +45,11 @@ contains
     
     ! calculate box edge and gap
     edges = n_atoms / density**0.333333333333333
-    common_configuration%cf_structure%box_edges = edges
+    common_config%str%box_edges = edges
     gap = edges / n_atoms
     
     n_tot = product(n_atoms)
-    allocate(common_configuration%cf_structure%atoms(n_tot))
+    allocate(common_config%str%atoms(n_tot))
     
     do nx = 1, n_atoms(1)
       do ny = 1, n_atoms(2)
@@ -58,7 +58,7 @@ contains
           put_atom_at(2) = ny - 0.5
           put_atom_at(3) = nz - 0.5
           put_atom_at = put_atom_at * gap - edges / 2.0
-          common_configuration%cf_structure%atoms(n)%r = put_atom_at
+          common_config%str%atoms(n)%r = put_atom_at
           n = n + 1
         end do
       end do
@@ -89,29 +89,29 @@ contains
         call get_value(attributes,"number", read_number_atoms,status)
         call build_data_array(read_number_atoms, number_atoms, ndata)
         write(*,*) number_atoms
-        allocate(common_configuration%cf_structure%atoms(number_atoms(1)))
+        allocate(common_config%str%atoms(number_atoms(1)))
         count_number_atoms = 1
 
       case("atom")
         call get_value(attributes,"x3", read_db,status)
         ndata = 0
         call build_data_array(read_db, number_db, ndata)
-        common_configuration%cf_structure%atoms(count_number_atoms)%r(1) = number_db(1)
+        common_config%str%atoms(count_number_atoms)%r(1) = number_db(1)
 
         call get_value(attributes,"y3", read_db,status)
         ndata = 0
         call build_data_array(read_db, number_db, ndata)
-        common_configuration%cf_structure%atoms(count_number_atoms)%r(2) = number_db(1)
+        common_config%str%atoms(count_number_atoms)%r(2) = number_db(1)
 
         call get_value(attributes,"z3", read_db,status)
         ndata = 0
         call build_data_array(read_db, number_db, ndata)
-        common_configuration%cf_structure%atoms(count_number_atoms)%r(3) = number_db(1)
+        common_config%str%atoms(count_number_atoms)%r(3) = number_db(1)
 
         write (*,*) count_number_atoms, &
-          common_configuration%cf_structure%atoms(count_number_atoms)%r(1), &
-          common_configuration%cf_structure%atoms(count_number_atoms)%r(2), &
-          common_configuration%cf_structure%atoms(count_number_atoms)%r(3)
+          common_config%str%atoms(count_number_atoms)%r(1), &
+          common_config%str%atoms(count_number_atoms)%r(2), &
+          common_config%str%atoms(count_number_atoms)%r(3)
         count_number_atoms = count_number_atoms + 1        
 
 	

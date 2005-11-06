@@ -58,7 +58,7 @@ contains
 	
         select case(control_object_name)
           case("moldyn_control")
-            call run_md_control(common_configuration)	  
+            call run_md_control(common_config)	  
 
         end select
 	
@@ -69,14 +69,12 @@ contains
 
     if (in_gpe) then
       select case(name)
-        case("lj-potential")
-          write(*,*) "in lj-potential"        
+        case("lj-potential")       
           call get_value(attributes,"num-variable",read_int,status)
 					ndata = 0
           call build_data_array(read_int, number_int, ndata)
 					common_pe_list(1)%name = "lj-potential"
 					allocate(common_pe_list(1)%vars(number_int(1)))
-					write (*,*) "number_int ", size(common_pe_list(1)%vars)
           
         case("sigma")
           call get_value(attributes,"val",read_db,status)
@@ -84,7 +82,6 @@ contains
           call build_data_array(read_db, number_db, ndata)
           common_pe_list(1)%vars(1)%name = "sigma"
           common_pe_list(1)%vars(1)%val = number_db(1)
-          write(*,*) common_pe_list(1)%vars(1)%name, common_pe_list(1)%vars(1)%val
 
         case("epsilon")
           call get_value(attributes,"val",read_db,status)
@@ -92,7 +89,6 @@ contains
           call build_data_array(read_db, number_db, ndata)
           common_pe_list(1)%vars(2)%name = "epsilon"
           common_pe_list(1)%vars(2)%val = number_db(1)
-          write(*,*) common_pe_list(1)%vars(2)%name, common_pe_list(1)%vars(2)%val
           
       end select
     end if
@@ -105,7 +101,7 @@ contains
         case("fnc_constraint")
           call get_value(attributes,"filename",filename,status)
           call make_fnc_constraint(filename)
-          call add_constraint(common_configuration, my_fnc_constraint)
+          call add_constraint(common_config, my_fnc_constraint)
       end select
     end if
 

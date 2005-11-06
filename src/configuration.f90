@@ -21,8 +21,8 @@ use fnc_constraint_class
   ! it does satisfy them  
 
   type configuration
-    type (structure) :: cf_structure
-    type (constraints) :: cf_constraints
+    type (structure) :: str
+    type (constraints) :: constr_list
   end type configuration
 
 
@@ -39,7 +39,7 @@ contains
     type (configuration), intent(inout) :: a_config
     type (fnc_constraint), target, intent(in) :: fnc_target
     
-    a_config%cf_constraints%pt_fnc_constraint => fnc_target
+    a_config%constr_list%pt_fnc_constraint => fnc_target
 
   end subroutine add_fnc_constraint
 
@@ -48,8 +48,8 @@ contains
     type (configuration), intent(in) :: a_config
     logical :: flag
 
-    if ( associated (a_config%cf_constraints%pt_fnc_constraint) ) then
-      flag = validate_fnc_constraint (a_config%cf_structure)
+    if ( associated (a_config%constr_list%pt_fnc_constraint) ) then
+      flag = validate_fnc_constraint (a_config%str)
     !  if (.not. flag) exit this functions
     !else if
     !  etc....

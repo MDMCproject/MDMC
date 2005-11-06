@@ -35,9 +35,6 @@ contains
     rr_cut = r_cut * r_cut
     
 		n_tot = size(str%atoms)
-		
-		write (*,*) sigma, epsilon, n_tot
-		
     
     val = 0.0
     
@@ -57,14 +54,13 @@ contains
         rr = sum(diff_vec*diff_vec)
         
         if (rr < rr_cut) then
-          rri = 1 / rr
+          rri = sigma*sigma / rr
           rri3 = rri * rri * rri
-          val = val + epsilon_times4 * rri * (rri3 - 1.0) + 1.0   
+          val = val + epsilon_times4 * rri3 * (rri3 - 1.0) + 1.0   
         end if
 			
 			end do
 		end do
-    
     
   end function gpe_val
   

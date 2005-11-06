@@ -4,8 +4,8 @@
 -->
   <structure>
     <title>Liquid Ar</title>
-    <density units="atom/AA3" value="1" />
-    <ar nx="2" ny ="2" nz="2" /> 
+    <density units="atom/AA3" value="0.8" />
+    <ar nx="5" ny ="5" nz="5" /> 
   </structure>
   
   <constraints>
@@ -25,8 +25,8 @@
   
   <gpe>
     <lj-potential num-variable="2">
-      <sigma units="AA" val="3.4" />
-      <epsilon units="KJ/mole" val="0.998" />
+      <sigma units="AA" val="1.0" />
+      <epsilon units="KJ/mole" val="1.0" />
     </lj-potential>
     <!-- <lookup-data-potential /> -->
   </gpe>

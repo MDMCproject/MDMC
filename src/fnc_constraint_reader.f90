@@ -1,6 +1,6 @@
 module fnc_constraint_reader_class
 use flib_sax
-use common_block_class, only : common_configuration
+use common_block_class, only : common_config
 use various_constants_class
 
 
@@ -53,7 +53,7 @@ contains
         !call get_value(attributes,"number", read_number_atoms,status)
         !call build_data_array(read_number_atoms, number_atoms, ndata)
         !write(*,*) number_atoms
-        !allocate(common_configuration%cf_structure%atoms(number_atoms(1)))
+        !allocate(common_config%str%atoms(number_atoms(1)))
         count_number_atoms = 1    
 
 	
