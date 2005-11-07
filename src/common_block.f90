@@ -9,6 +9,6 @@ use configuration_class
   ! constraint pointer in common_config rather than using
   ! target, but not convinced that this would work so for
   ! now do it using targets (I would be easy to change later)
-  type (fnc_constraint), target :: my_fnc_constraint
+  type (fnc_constraint), target :: target_fnc_constr
 
 end module common_block_class

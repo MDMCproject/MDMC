@@ -24,7 +24,7 @@ contains
     real (db) :: r_cut, rr_cut 
     real (db) :: sigma, epsilon, epsilon_times4
     real (db) :: rr, rri, rri3
-		real (db), dimension(3) :: diff_vec
+		real (db), dimension(ndim) :: diff_vec
     
     
 		sigma = vars(1)%val
@@ -42,7 +42,7 @@ contains
 		  do i2 = i1+1, n_tot
         diff_vec = str%atoms(i1)%r - str%atoms(i2)%r
         
-        do i = 1, 3
+        do i = 1, ndim
           if (diff_vec(i) >= 0.5 * str%box_edges(i)) then
             diff_vec(i) = diff_vec(i) - str%box_edges(i)
           end if

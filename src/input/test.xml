@@ -5,7 +5,7 @@
   <structure>
     <title>Liquid Ar</title>
     <density units="atom/AA3" value="0.8" />
-    <ar nx="5" ny ="5" nz="5" /> 
+    <ar nx="8" ny ="8" nz="8" /> 
   </structure>
   
   <constraints>
@@ -31,13 +31,13 @@
     <!-- <lookup-data-potential /> -->
   </gpe>
   
-  <control-object name="moldyn_control">
+  <control-object name="md_control">
+    <r-cut units="AA" val="1.12246204831" />
+    <delta-r units="AA" val="0.4" />
     <step-average number="200" />
     <step-equilibrium number="2000" />
     <step-limit number="20000" />
     <delta-t units="10^-15">1.0</delta-t>
-    <mass units="amu" />
-    <length units="AA" />
     <temperature units="kelvin">120</temperature>
   </control-object>
 

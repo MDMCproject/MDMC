@@ -12,11 +12,19 @@ use gpe_class
   
 
   logical, private  :: in_constraints = .false., in_structure = .false. 
-	logical, private  :: in_gpe = .false.
+	logical, private  :: in_gpe = .false., in_md_control = .false.
   
   real(db), private :: density   
-  integer, dimension(3), private :: n_atoms  ! both to be passed to 
+  integer, dimension(ndim), private :: n_atoms  ! both to be passed to 
                                              ! make_simple_cubic_structure
+                                             
+  type md_control_params
+    private
+    real (db) :: r_cut
+    real (db) :: delta_r
+  end type md_control_params
+  
+  type (md_control_params), private :: setup_md_control_params
 
 contains
 
@@ -57,13 +65,31 @@ contains
 	      call get_value(attributes,"name",control_object_name,status)
 	
         select case(control_object_name)
-          case("moldyn_control")
-            call run_md_control(common_config)	  
+          case("md_control")
+            in_md_control = .true.
 
         end select
 	
     end select
 
+    
+    ! if in md_control
+    if (in_md_control) then
+      select case(name)
+        case("delta-r")       
+          call get_value(attributes,"val",read_db,status)
+					ndata = 0
+          call build_data_array(read_db, number_db, ndata)
+          setup_md_control_params%delta_r = number_db(1)
+          
+        case("r-cut")       
+          call get_value(attributes,"val",read_db,status)
+					ndata = 0
+          call build_data_array(read_db, number_db, ndata)
+          setup_md_control_params%r_cut = number_db(1)
+      end select
+    end if
+    
 		
     ! if in gpe
 
@@ -101,7 +127,7 @@ contains
         case("fnc_constraint")
           call get_value(attributes,"filename",filename,status)
           call make_fnc_constraint(filename)
-          call add_constraint(common_config, my_fnc_constraint)
+          call add_constraint(common_config, target_fnc_constr)
       end select
     end if
 
@@ -126,21 +152,33 @@ contains
           end if
           
         case("ar")
+          ! check that dimensions of input file matches that of ndim
+          number_int(1) = number_of_entries(attributes)
+          if (number_int(1) /= ndim) then
+            write(*,'(a,i2)') "ndim ", ndim
+            write(*,'(a,i2)') "number of ar attributes ", number_int(1)
+            write(*,*) "ERROR, ndim not equal number of ar attr"
+            stop
+          end if
+          
           ! read number of atoms into read_int(1)
           call get_value(attributes,"nx",read_int,status)
           ndata = 0
           call build_data_array(read_int, number_int, ndata)          
           n_atoms(1) = number_int(1)
-
-          call get_value(attributes,"ny",read_int,status)
-          ndata = 0
-          call build_data_array(read_int, number_int, ndata)          
-          n_atoms(2) = number_int(1)
+          if (ndim > 1) then
+            call get_value(attributes,"ny",read_int,status)
+            ndata = 0
+            call build_data_array(read_int, number_int, ndata)          
+            n_atoms(2) = number_int(1)
+          end if
           
-          call get_value(attributes,"nz",read_int,status)
-          ndata = 0
-          call build_data_array(read_int, number_int, ndata)          
-          n_atoms(3) = number_int(1)
+          if (ndim > 2) then
+            call get_value(attributes,"nz",read_int,status)
+            ndata = 0
+            call build_data_array(read_int, number_int, ndata)          
+            n_atoms(3) = number_int(1)
+          end if
           
       end select
     end if
@@ -165,6 +203,13 @@ contains
         
       case("gpe")
         in_gpe = .false.        
+        
+      case("control-object")
+        if (in_md_control == .true.) then
+          call run_md_control(common_config, &
+               setup_md_control_params%r_cut, setup_md_control_params%delta_r)
+        end if
+        
         
       case("structure")
         call make_simple_cubic_structure(density, n_atoms)

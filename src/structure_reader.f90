@@ -35,10 +35,10 @@ contains
   
   subroutine make_simple_cubic_structure(density, n_atoms)
     real(db), intent(in) :: density
-    integer, dimension(3) :: n_atoms
+    integer, dimension(ndim) :: n_atoms
     
-    real(db), dimension(3) :: edges
-    real(db), dimension(3) :: gap, put_atom_at ! gap between atoms
+    real(db), dimension(ndim) :: edges
+    real(db), dimension(ndim) :: gap, put_atom_at ! gap between atoms
     
     integer :: n = 1, nx, ny, nz, n_tot
     
@@ -51,9 +51,9 @@ contains
     n_tot = product(n_atoms)
     allocate(common_config%str%atoms(n_tot))
     
-    do nx = 1, n_atoms(1)
+    do nz = 1, n_atoms(3)
       do ny = 1, n_atoms(2)
-        do nz = 1, n_atoms(3)
+        do nx = 1, n_atoms(1)
           put_atom_at(1) = nx - 0.5
           put_atom_at(2) = ny - 0.5
           put_atom_at(3) = nz - 0.5

@@ -6,7 +6,7 @@ implicit none
 
   type atom
     character(len=2)  :: element_type
-    real(db), dimension(3) :: r   ! cartesian coor in units AA
+    real(db), dimension(ndim) :: r   ! cartesian coor in units AA
     real(db) :: mass=39.95        ! in units of amu
     real(db) :: inv_mass=0.025    ! to save comp time
   end type atom
@@ -18,7 +18,7 @@ implicit none
     ! defined in box_edges and with the box centered around the origin. That 
     ! means e.g. along the x-direction the atoms are placed
     ! within -box_edge(1)/2 and box_edge(1)/2
-    real(db), dimension(3) :: box_edges  
+    real(db), dimension(ndim) :: box_edges  
                            
     real(db) :: density    ! in units of atom/AA3
     character(len=120) :: title
