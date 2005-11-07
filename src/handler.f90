@@ -1,9 +1,9 @@
 module handler_class
 use flib_sax
-use common_block_class 
+use common_block_class
+use common_potential_block_class
 use md_control_class
 use structure_reader_class
-use gpe_class
 
   implicit none
   
@@ -99,22 +99,26 @@ contains
           call get_value(attributes,"num-variable",read_int,status)
 					ndata = 0
           call build_data_array(read_int, number_int, ndata)
-					common_pe_list(1)%name = "lj-potential"
-					allocate(common_pe_list(1)%vars(number_int(1)))
+          
+          call add_potential(common_gpe, target_lj_pe)
+          
+          allocate(target_lj_pe%vars(number_int(1)))
           
         case("sigma")
           call get_value(attributes,"val",read_db,status)
 					ndata = 0
           call build_data_array(read_db, number_db, ndata)
-          common_pe_list(1)%vars(1)%name = "sigma"
-          common_pe_list(1)%vars(1)%val = number_db(1)
-
+          
+          target_lj_pe%vars(1)%name = "sigma"
+          target_lj_pe%vars(1)%val = number_db(1)
+          
         case("epsilon")
           call get_value(attributes,"val",read_db,status)
 					ndata = 0
           call build_data_array(read_db, number_db, ndata)
-          common_pe_list(1)%vars(2)%name = "epsilon"
-          common_pe_list(1)%vars(2)%val = number_db(1)
+          
+          target_lj_pe%vars(2)%name = "epsilon"
+          target_lj_pe%vars(2)%val = number_db(1)
           
       end select
     end if

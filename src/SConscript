@@ -2,7 +2,8 @@ Import('env_exe')
 
 list = Split("""various_constants.f90 variable.f90 structure.f90 
       near_neighb.f90 phasespace.f90 fnc_constraint.f90 
-      configuration.f90 common_block.f90 structure_reader.f90 gpe.f90
+      configuration.f90 common_block.f90 structure_reader.f90 
+      lennard_jones.f90 gpe.f90 common_potential_block.f90
       fnc_constraint_reader.f90 md_control.f90 handler.f90 mdmc.f90""")
 
 

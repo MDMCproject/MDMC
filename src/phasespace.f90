@@ -1,6 +1,7 @@
 module phasespace_class
 use structure_class
 use near_neighb_class
+use common_potential_block_class
 
   implicit none
 
@@ -14,13 +15,26 @@ use near_neighb_class
   ! is e.g. definitely good enough for calculating a histogram, pdf etc from
 
   type phasespace
-
+    type (structure) :: str
+  
     type (near_neighb_list) :: neighb_list
   end type phasespace
 
 
 contains
 
+  subroutine trajectory_in_phasespace(ps, n_md, delta_t)
+    type (phasespace), intent(inout) :: ps
+    integer, intent(in) :: n_md
+    real(db), intent(in) :: delta_t   
+    
+    real(db) :: pot_energy
+    
+    pot_energy = gpe_val(ps%str, common_gpe)
+                         
+    write (*, '(a,f10.3)') "Epot = ", pot_energy
+  
+  end subroutine trajectory_in_phasespace
 
   function make_phasespace(str, r_cut, delta_r) result (ps)
     type (structure), intent(in) :: str
@@ -32,6 +46,8 @@ contains
     n_tot = size(str%atoms)
     
     ps%neighb_list = make_near_neighb_list(str, r_cut, delta_r)
+    
+    ps%str = copy_structure(str)
     
   end function make_phasespace
 
