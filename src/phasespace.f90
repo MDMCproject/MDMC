@@ -21,6 +21,9 @@ use common_potential_block_class
   
     ! the position coordinates are here stored in the same format as p and
     ! deriv for coding convenience and probably a slight speed gain
+    ! NOTICE I SHOULD PROBABLY CHANGE THE STRUCTURE TYPE TO STORE THE ATOMIC
+    ! COORS IN THIS FORMAT! (as a consequence of storing the coordinate I
+    ! also have to copy forward in trajectory_in_phasespace()
     real(db), dimension(:,:), allocatable :: r  ! atom positions
     
     ! this one is again added for speed gain and convenience
@@ -42,7 +45,9 @@ contains
     real(db), intent(in) :: delta_t   
     
     real(db) :: pot_energy, delta_t_half
-    integer :: i
+    integer :: i, j, n_tot
+    
+    n_tot = size(ps%str%atoms)
     
     delta_t_half = delta_t / 2.0
     
@@ -60,6 +65,10 @@ contains
       ps%r = ps%r + delta_t * ps%p_div_mass
       
       ! calculate derivatives for time t=t+h
+      do j = 1, n_tot
+        ps%str%atoms(i)%r = ps%r(i,:)
+      end do
+      call gpe_deriv(ps%str, ps%deriv, common_gpe)
       
       ! now get momenta in sync with positions and ready for the next loop
       ps%p = ps%p - delta_t_half * ps%deriv      
@@ -72,20 +81,33 @@ contains
     ps%p_div_mass = ps%p * ps%inv_mass
     ps%r = ps%r + delta_t * ps%p_div_mass    
     
+    ! this time cal derivative with extra stuff
+    do j = 1, n_tot
+      ps%str%atoms(i)%r = ps%r(i,:)
+    end do
+    call gpe_deriv(ps%str, ps%deriv, common_gpe)    
+    
     ps%p = ps%p - delta_t_half * ps%deriv
     
     pot_energy = gpe_val(ps%str, common_gpe)
                          
     write (*, '(a,f10.3)') "Epot = ", pot_energy
   
+    do j = 1, n_tot
+      write(*,*) j
+      write(*,'(3f10.3)') ps%r(j,:)
+      write(*,'(3f10.3)') ps%p(j,:)
+      write(*,'(3f10.3)') ps%deriv(j,:)
+    end do
+    
   end subroutine trajectory_in_phasespace
 
-  function make_phasespace(str, r_cut, delta_r) result (ps)
+  function make_phasespace(str, r_cut, delta_r, temperature) result (ps)
     type (structure), intent(in) :: str
-    real (db), intent(in) :: r_cut, delta_r
+    real (db), intent(in) :: r_cut, delta_r, temperature
     type (phasespace) :: ps
 
-    integer :: n_tot
+    integer :: n_tot, i
     
     n_tot = size(str%atoms)
     
@@ -99,7 +121,19 @@ contains
     allocate(ps%inv_mass(n_tot,3))
     allocate(ps%p_div_mass(n_tot,3))
     
-    ! add coordinates to 
+    ! copy coordinates to r - notice should probably change type of structure
+    do i = 1, n_tot
+      ps%r(i,:) = str%atoms(i)%r
+      ps%inv_mass(i,:) = str%atoms(i)%inv_mass
+    end do
+    
+    ! initial derivatives set to zero. According to Rapaport this is good
+    ! enough, although perhaps I simply calculate the true derivatives here!?
+    ps%deriv = 0.0
+    
+    ! determine initial momenta
+    
+    ps%p = 1.0
     
   end function make_phasespace
 

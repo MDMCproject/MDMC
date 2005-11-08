@@ -38,12 +38,13 @@ contains
   end function gpe_val  
   
   
-  subroutine gpe_deriv(str,deriv)
+  subroutine gpe_deriv(str, deriv, list)
     type (structure), intent(in) :: str
     real(db), dimension(:,:), intent(out) :: deriv
-    
-    integer :: i
-    
+    type (pe_list), intent(in) :: list
+
+    call lj_deriv(str, deriv, list%pt_lj_pe)
+
 
   end subroutine gpe_deriv
     
