@@ -47,6 +47,13 @@ contains
     real(db) :: pot_energy, delta_t_half
     integer :: i, j, n_tot
     
+    ! for testing stuff
+    real(db) :: sum_r_start, sum_r_end
+    real(db) :: sum_v_start, sum_v_intermediate, sum_v_end
+    real(db) :: sum_a_start, sum_a_end
+
+    
+    
     n_tot = size(ps%str%atoms)
     
     delta_t_half = delta_t / 2.0
@@ -77,9 +84,20 @@ contains
     ! do exactly the same as in the loop above but this time calculate
     ! the derivatives + core-loop-md-extra
     
-    ps%p = ps%p - delta_t_half * ps%deriv    
+    write(*,'(a,3f12.6)') "first atom ", ps%r(1,:)
+    write(*,'(a,f12.6)') "sum_r_start = ", sum(ps%r*ps%r)
+    write(*,'(a,f12.6)') "sum_v_start = ", sum(ps%p*ps%p)
+    write(*,'(a,f12.6)') "sum_a_start = ", sum(ps%deriv*ps%deriv)
+    
+    ps%p = ps%p - delta_t_half * ps%deriv
+    
+    write(*,'(a,f12.6)') "sum_v_intermediate = ", sum(ps%p*ps%p)
+    
     ps%p_div_mass = ps%p * ps%inv_mass
     ps%r = ps%r + delta_t * ps%p_div_mass    
+    
+    write(*,'(a,3f12.6)') "first atom after move ", ps%r(1,:)
+    write(*,'(a,f12.6)') "sum_r_end = ", sum(ps%r*ps%r)
     
     ! this time cal derivative with extra stuff
     do j = 1, n_tot
@@ -89,19 +107,19 @@ contains
     
     ps%p = ps%p - delta_t_half * ps%deriv
     
-    pot_energy = gpe_val(ps%str, common_gpe)
-                         
-    write (*, '(a,f10.3)') "Epot = ", pot_energy
-  
-    do j = 1, n_tot
-      write(*,*) j
-      write(*,'(3f10.3)') ps%r(j,:)
-      write(*,'(3f10.3)') ps%p(j,:)
-      write(*,'(3f10.3)') ps%deriv(j,:)
-    end do
+    write(*,'(a,f12.6)') "sum_v_end = ", sum(ps%p*ps%p)
     
+    write(*,'(a,f12.6)') "sum_a_end = ", sum(ps%deriv*ps%deriv)
+    
+    pot_energy = gpe_val(ps%str, common_gpe)                      
+    write (*, '(a,f12.6)') "Epot = ", pot_energy
+    
+    !build_near_neighb_with_cell(ps%cells, ps%str, ps%nn_list, r_cut_neighbour)
+    pot_energy = gpe_val_nn(ps%str, common_gpe, ps%neighb_list)                      
+    write (*, '(a,f12.6)') "Epot = ", pot_energy
   end subroutine trajectory_in_phasespace
 
+  
   function make_phasespace(str, r_cut, delta_r, temperature) result (ps)
     type (structure), intent(in) :: str
     real (db), intent(in) :: r_cut, delta_r, temperature

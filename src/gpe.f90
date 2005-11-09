@@ -35,7 +35,18 @@ contains
  
     val = lj_val(str, list%pt_lj_pe)
     
-  end function gpe_val  
+  end function gpe_val
+  
+  
+  function gpe_val_nn(str, list, nn_list) result (val)
+    type (structure), intent(in) :: str
+    type (pe_list), intent(in) :: list
+    type (near_neighb_list), intent(in) :: nn_list    
+    real (db) :: val
+ 
+    val = lj_val_nn(str, list%pt_lj_pe, nn_list)
+    
+  end function gpe_val_nn  
   
   
   subroutine gpe_deriv(str, deriv, list)

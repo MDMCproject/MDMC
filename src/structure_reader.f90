@@ -44,9 +44,12 @@ contains
     
     
     ! calculate box edge and gap
-    edges = n_atoms / density**0.333333333333333
+    !edges = n_atoms / density**0.333333333333333
+    edges = n_atoms / density**(1.0_db/3.0_db)
     common_config%str%box_edges = edges
     gap = edges / n_atoms
+    
+    write(*,'(a,3f12.6)') "gap = ", gap
     
     n_tot = product(n_atoms)
     allocate(common_config%str%atoms(n_tot))
@@ -54,10 +57,13 @@ contains
     do nz = 1, n_atoms(3)
       do ny = 1, n_atoms(2)
         do nx = 1, n_atoms(1)
-          put_atom_at(1) = nx - 0.5
-          put_atom_at(2) = ny - 0.5
-          put_atom_at(3) = nz - 0.5
-          put_atom_at = put_atom_at * gap - edges / 2.0
+          put_atom_at(1) = nx - 0.5_db
+          put_atom_at(2) = ny - 0.5_db
+          put_atom_at(3) = nz - 0.5_db
+          put_atom_at = put_atom_at * gap - 0.5_db * edges
+          !write(*,'(a,3f12.6)') "first atom = ", put_atom_at
+          !write(*,'(a,3f12.6)') "edges = ", edges
+          !stop
           common_config%str%atoms(n)%r = put_atom_at
           n = n + 1
         end do

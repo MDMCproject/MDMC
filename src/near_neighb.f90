@@ -33,6 +33,7 @@ use structure_class
     ! the list - for now just pairs of j1, j2
     integer, dimension(:), allocatable :: pairs
     integer :: pairs_allocated
+    integer :: n_pairs
   
     ! stuff decide if list needs updating and with rebuilding
     logical :: needs_updating = .true.
@@ -258,7 +259,6 @@ contains
     integer :: i
     integer :: ignore_cell_method = .false.  ! used for determining whether 
                                              ! to ignore cell method
-    integer :: num_near_neighbours
     integer :: n_tot
     
     n_tot = size(str%atoms)
@@ -290,24 +290,170 @@ contains
     
     
     ! the list        
-    num_near_neighbours = get_num_near_neighb(nn_list%cells, &
+    nn_list%n_pairs = get_num_near_neighb(nn_list%cells, &
                          str, r_cut+delta_r)
 
-    nn_list%pairs_allocated = num_near_neighbours+n_tot
-    allocate(nn_list%pairs( 2*(num_near_neighbours+n_tot) ))
-    allocate(nn_list%dists( num_near_neighbours+n_tot ))
+    nn_list%pairs_allocated = nn_list%n_pairs+n_tot
+    allocate(nn_list%pairs( 2*nn_list%pairs_allocated ))
+    allocate(nn_list%dists( nn_list%pairs_allocated ))
     
-    write(*,'(a,i7)') "num_near_neighbours ", num_near_neighbours
+    write(*,'(a,i7)') "num_near_neighbours ", nn_list%n_pairs
     
 
   end function make_near_neighb_list
   
   
-  subroutine build_near_neighb(str, neighb_list)
-    type (structure), intent(in) :: str
-    type (near_neighb_list), intent(out) :: neighb_list
+   subroutine build_near_neighb_with_cell(cells, str, nn_list, r_cut_neighbour)
+     type (cell_list), intent(inout) :: cells
+     type (structure), intent(in) :: str
+     type (near_neighb_list), intent(out) :: nn_list
+     real(db), intent(in) :: r_cut_neighbour
+    
 
-  end subroutine build_near_neighb
+    integer :: num  ! number of nearest neighbour pairs
+      
+    real(db) :: rr_cut_neighbour
+    real(db), dimension(ndim) :: inverse_cell_width, dummy
+    real(db), dimension(ndim) :: shift  ! atom shift caused by cell method
+    real(db), dimension(ndim) :: diff_vec  ! vector between two atoms
+    integer, dimension(ndim) :: cp_3d, cp1_3d, cp2_3d  ! 3D cell positions
+    integer :: cp_1d, cp1_1d, cp2_1d  ! 1D cell positions
+    integer :: n_tot, i, j, cp1x, cp1y, cp1z, j1, j2
+    
+    integer, dimension(ndim,14) :: offset_vals
+  
+    offset_vals = reshape( (/0,0,0, 1,0,0, 1,1,0, 0,1,0, -1,1,0, 0,0,1, 1,0,1, 1,1,1, 0,1,1, -1,1,1, -1,0,1, -1,-1,1, 0,-1,1, 1,-1,1/), & 
+                  shape(offset_vals))
+    
+    
+    
+    n_tot = size(str%atoms)
+   
+    rr_cut_neighbour = r_cut_neighbour*r_cut_neighbour
+    
+    inverse_cell_width = cells%num_cells / str%box_edges
+    
+    write(*, '(a,3f10.3)') "inverse_cell_witdh ", inverse_cell_width
+    
+    do i = 1, product(cells%num_cells)
+      cells%list(n_tot+i) = -1
+    end do
+    
+    do i = 1, n_tot
+      dummy = str%atoms(i)%r + 0.5 * str%box_edges
+      
+      ! find 3D cell position
+      cp_3d = floor(dummy * inverse_cell_width)
+      
+      ! here assume that we are in 3D
+      ! locating the cell position of an atom in a 1D array by having the fastest
+      ! running dimension to be (1), second fastest (2) and slowest (3). 
+      ! that means (cp_3d(1),cp_3d(2), cp_3d(3)) has the following index in a 
+      ! 1D (which first entry is index=0):
+      !
+      ! index = cp_3d(3) * num_cells(1)*num_cells(2) 
+      !         + cp_3d(2) * num_cells(1)
+      !         + cp_3d(1)
+      ! which is what is calculated below
+      ! cp_1d stands for cell position 1D
+      cp_1d = (cp_3d(3) * cells%num_cells(2) + cp_3d(2)) * cells%num_cells(1) &
+              + cp_3d(1)
+      
+      ! in the speciel cells the 'first' element in each cell is stored in 
+      ! the last n_tot+1, n_tot+2, ... n_tot+product(num_cells) elements
+      cp_1d = cp_1d + n_tot + 1
+      
+      ! put the previous atom listed in cell-list cells%list(cp_1d) into
+      ! cells%list(i) (which was also the 1st atom listed in that list)
+      cells%list(i) = cells%list(cp_1d)
+      
+      ! now let this cell-list point to the current atom number (here i). This 
+      ! then takes on the significance of the first atom in this cell-list; 
+      ! the content of that element then points to the next atom and so on 
+      ! until -1 is encountered
+      cells%list(cp_1d) = i
+      
+      !write(*, '(a,i10)') "i = ", i
+      !write(*, '(a,3f10.3)') "dummy ", dummy
+      !write(*, '(a,3i10)') "cp_3d ", cp_3d
+      !write(*, '(a,i10)') "cp_1d ",cp_1d
+
+    end do
+    
+    !do i = 1, n_tot+product(cells%num_cells)
+    !  write(*,'(i10, i10)') i, cells%list(i)
+    !end do
+    
+  
+    num = 0
+    do cp1z = 0, cells%num_cells(3)-1
+      do cp1y = 0, cells%num_cells(2)-1
+        do cp1x = 0, cells%num_cells(1)-1
+          cp1_3d(1)=cp1x; cp1_3d(2)=cp1y; cp1_3d(3)=cp1z
+    !      
+          cp1_1d = (cp1_3d(3) * cells%num_cells(2) + cp1_3d(2)) * & 
+                   cells%num_cells(1) + cp1_3d(1) + n_tot + 1
+          
+          do i = 1, n_offset
+            cp2_3d = cp1_3d + offset_vals(:,i)
+            shift = 0.0
+            
+            ! wrap around
+            do j = 1, ndim
+              if (cp2_3d(j) >= cells%num_cells(j)) then
+                cp2_3d(j) = 0
+                shift(j) = str%box_edges(j)
+              else if (cp2_3d(j) < 0) then
+                cp2_3d(j) = cells%num_cells(j) - 1
+                shift(j) = - str%box_edges(j)
+              end if
+            end do
+            
+            cp2_1d = (cp2_3d(3) * cells%num_cells(2) + cp2_3d(2)) * & 
+                     cells%num_cells(1) + cp2_3d(1) + n_tot + 1
+            
+            j1 = cells%list(cp1_1d)
+            
+          
+            do while (j1 >= 0)
+              j2 = cells%list(cp2_1d)
+              do while (j2 >= 0)
+              
+                ! remember to not counting twice distances within same cell
+                ! i.e. when cp1_1d==cp2_1d
+                if (cp1_1d /= cp2_1d .or. j2 < j1) then
+                  diff_vec = str%atoms(j1)%r - str%atoms(j2)%r
+                  diff_vec = diff_vec - shift
+                  
+                  if (sum(diff_vec*diff_vec) < rr_cut_neighbour) then
+                    
+                    ! this number must never be bigger than
+                    ! nn_list%pairs_allocated
+                    num = num + 1
+                    
+                    if (num > nn_list%pairs_allocated) then
+                      write (*, '(a)') "ERROR in build_near_neighb_with_cell"
+                      stop
+                    end if
+                    
+                    nn_list%pairs(2*num-1) = j1
+                    nn_list%pairs(2*num) = j2
+                  
+                  end if
+                end if
+              
+                j2 = cells%list(j2)
+              end do
+              j1 = cells%list(j1)
+            end do
+          
+            
+          end do
+        end do
+      end do
+    end do
+    
+ end subroutine build_near_neighb_with_cell
 
 
 end module near_neighb_class
