@@ -6,8 +6,8 @@ env = Environment(ENV = os.environ, FORTRAN = 'ifort')
 
 # need the below to get ifort to work with fc4
 if env['PLATFORM'] == 'posix':
-  env.Append(FORTRANFLAGS = ' -pthread -pad -Vaxlib -mp -save -O0 -w95 -extend_source')
-  env.Append(LINKFLAGS = ' -pthread -pad -Vaxlib -mp -save -O0 -w95 -extend_source')
+  env.Append(FORTRANFLAGS = ' -g -pthread -pad -Vaxlib -mp -save -O0 -w95 -extend_source')
+  env.Append(LINKFLAGS = ' -g -pthread -pad -Vaxlib -mp -save -O0 -w95 -extend_source')
 
 
 # building library.  NOTICE need to comment out SConscript below to avoid
