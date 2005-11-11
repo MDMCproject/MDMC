@@ -107,7 +107,10 @@ contains
     do j = 1, n_tot
       ps%str%atoms(j)%r = ps%r(j,:)
     end do
-    call gpe_deriv(ps%str, ps%deriv, common_gpe)    
+    
+    call build_near_neighb_with_cell(ps%str, ps%neighb_list)
+    call gpe_deriv_nn(ps%str, ps%deriv, common_gpe, ps%neighb_list)  
+    !call gpe_deriv(ps%str, ps%deriv, common_gpe)  
     
     ps%p = ps%p - delta_t_half * ps%deriv
     

@@ -6,6 +6,11 @@ use lennard_jones_class
 
 implicit none
 
+  public :: gpe_val, gpe_val_nn
+  public :: gpe_deriv, gpe_deriv_nn
+
+
+
   private ::  add_lj_pe_container
 
   type pe_list
@@ -58,6 +63,18 @@ contains
 
 
   end subroutine gpe_deriv
+
+
+  subroutine gpe_deriv_nn(str, deriv, list, nn_list)
+    type (structure), intent(in) :: str
+    real(db), dimension(:,:), intent(out) :: deriv
+    type (pe_list), intent(in) :: list
+    type (near_neighb_list), intent(in) :: nn_list
+    
+    call lj_deriv_nn(str, deriv, list%pt_lj_pe, nn_list)
+
+
+  end subroutine gpe_deriv_nn   
     
     
 end module gpe_class
