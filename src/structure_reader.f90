@@ -65,6 +65,7 @@ contains
           !write(*,'(a,3f12.6)') "edges = ", edges
           !stop
           common_config%str%atoms(n)%r = put_atom_at
+        !  write (*,'(3f12.6)') common_config%str%atoms(n)%r
           n = n + 1
         end do
       end do

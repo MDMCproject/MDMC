@@ -5,6 +5,10 @@ use common_potential_block_class
 
   implicit none
 
+  public :: trajectory_in_phasespace
+  public :: make_phasespace
+  
+  
 
   ! This type is only include to speed up the calculation. Most importantly by
   ! replacing the double summation over atoms by a sum over nearest neighboors
@@ -101,22 +105,28 @@ contains
     
     ! this time cal derivative with extra stuff
     do j = 1, n_tot
-      ps%str%atoms(i)%r = ps%r(i,:)
+      ps%str%atoms(j)%r = ps%r(j,:)
     end do
     call gpe_deriv(ps%str, ps%deriv, common_gpe)    
     
     ps%p = ps%p - delta_t_half * ps%deriv
     
     write(*,'(a,f12.6)') "sum_v_end = ", sum(ps%p*ps%p)
-    
     write(*,'(a,f12.6)') "sum_a_end = ", sum(ps%deriv*ps%deriv)
     
-    pot_energy = gpe_val(ps%str, common_gpe)                      
-    write (*, '(a,f12.6)') "Epot = ", pot_energy
     
-    !build_near_neighb_with_cell(ps%cells, ps%str, ps%nn_list, r_cut_neighbour)
+    ! just some checking
+    pot_energy = gpe_val(ps%str, common_gpe)                      
+    write (*, '(a,f12.6)') "Epot1 = ", pot_energy
+    
+    call build_near_neighb_with_cell(ps%str, ps%neighb_list)
     pot_energy = gpe_val_nn(ps%str, common_gpe, ps%neighb_list)                      
-    write (*, '(a,f12.6)') "Epot = ", pot_energy
+    write (*, '(a,f12.6)') "Epot2 = ", pot_energy
+    
+    call build_near_neighb_without_cell(ps%str, ps%neighb_list)
+    pot_energy = gpe_val_nn(ps%str, common_gpe, ps%neighb_list)                      
+    write (*, '(a,f12.6)') "Epot3 = ", pot_energy
+        
   end subroutine trajectory_in_phasespace
 
   
@@ -126,12 +136,16 @@ contains
     type (phasespace) :: ps
 
     integer :: n_tot, i
+    real(db), dimension(ndim) :: momentum_sum  ! mainly for debugging
     
     n_tot = size(str%atoms)
     
     ps%neighb_list = make_near_neighb_list(str, r_cut, delta_r)
     
     ps%str = copy_structure(str)
+    
+    !ps%delta_r = delta_r
+    !ps%r_cut = r_cut
     
     allocate(ps%p(n_tot,3))
     allocate(ps%deriv(n_tot,3))
@@ -151,7 +165,25 @@ contains
     
     ! determine initial momenta
     
-    ps%p = 1.0
+    if (modulo(n_tot,2) == 1) then
+     ps%p(n_tot,:) = 0.0
+    end if
+       
+    do i = 1, floor(n_tot / 2.0)
+      ps%p(2*i-1,:) = 1.0
+      ps%p(2*i,:) = -1.0
+    end do 
+    
+    ! what is the total momentum
+
+    momentum_sum = 0.0
+    do i = 1, n_tot
+      momentum_sum = momentum_sum + ps%p(i, :)
+    end do
+    
+    write(*,'(a,3f12.6)') "total momentum in make_phasespace ", momentum_sum
+    
+    !ps%p = 1.0
     
   end function make_phasespace
 
