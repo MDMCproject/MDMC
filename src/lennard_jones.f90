@@ -24,44 +24,42 @@ contains
     type (near_neighb_list), intent(in) :: nn_list
     real (db) :: val
   
-    integer :: i1, i2, n_tot, j, i
+    integer :: i1, i2, n_tot, j
     real (db) :: r_cut, rr_cut 
     real (db) :: sigma, epsilon, epsilon_times4
     real (db) :: rr, rri, rri3
-  	real (db), dimension(ndim) :: diff_vec
     
     
   	sigma = container%vars(1)%val
   	epsilon = container%vars(2)%val
     epsilon_times4 = 4*epsilon
     
+    
+    ! this potential here is assumed to have a 'natural' cut-off value
+    ! this is because it is in fact a kind off soft-sphere LJ potential
+    ! Because this potential has it own cut-off value then this value
+    ! may be favoured to the nn_list%r_cut value as dictated by the code
+    ! below
+    
+    ! this potential 'natural' cut-off
     r_cut = 2.0_db**(1.0_db / 6.0_db) * sigma
+    
+    if (nn_list%r_cut < r_cut) then
+      r_cut = nn_list%r_cut
+    end if
+    
     rr_cut = r_cut * r_cut
     
   	n_tot = size(str%atoms)
     
     val = 0.0
     
-    
     do j = 1, nn_list%n_pairs
-    
 
-    
   	  i1 = nn_list%pairs(2*j-1)
   	  i2 = nn_list%pairs(2*j)
       
-      diff_vec = str%atoms(i1)%r - str%atoms(i2)%r
-        
-      do i = 1, ndim
-        if (diff_vec(i) >= 0.5_db * str%box_edges(i)) then
-          diff_vec(i) = diff_vec(i) - str%box_edges(i)
-        end if
-        if (diff_vec(i) < -0.5_db * str%box_edges(i)) then
-          diff_vec(i) = diff_vec(i) + str%box_edges(i)
-        end if       
-      end do
-        
-      rr = sum(diff_vec*diff_vec)
+      rr = nn_list%dists(j)
       
  !     write (*, '(2i6, f12.6)') i1, i2, rr
         
@@ -205,18 +203,32 @@ contains
   	epsilon = container%vars(2)%val
     epsilon_times4 = 4*epsilon
     
+    ! this potential here is assumed to have a 'natural' cut-off value
+    ! this is because it is in fact a kind off soft-sphere LJ potential
+    ! Because this potential has it own cut-off value then this value
+    ! may be favoured to the nn_list%r_cut value as dictated by the code
+    ! below
+    
+    ! this potential 'natural' cut-off
     r_cut = 2.0_db**(1.0_db / 6.0_db) * sigma
+    
+    if (nn_list%r_cut < r_cut) then
+      r_cut = nn_list%r_cut
+    end if
+    
     rr_cut = r_cut * r_cut
     
   	n_tot = size(str%atoms)
     
-    
     do j = 1, nn_list%n_pairs
-    
 
-    
   	  i1 = nn_list%pairs(2*j-1)
   	  i2 = nn_list%pairs(2*j)
+      
+      
+      ! Notice I could speed up the calculation by moving the calculation of
+      ! diff_vec into type near_neighb_list with the penalty that this would
+      ! take up more memory = nn_list%n_pairs * 3 * 8 bytes
       
       diff_vec = str%atoms(i1)%r - str%atoms(i2)%r
         
@@ -228,9 +240,9 @@ contains
           diff_vec(i) = diff_vec(i) + str%box_edges(i)
         end if       
       end do
-        
-      rr = sum(diff_vec*diff_vec)
       
+      
+      rr = nn_list%dists(j)
  !     write (*, '(2i6, f12.6)') i1, i2, rr
         
       if (rr < rr_cut) then

@@ -8,6 +8,7 @@ use structure_class
   public :: build_near_neighb_without_cell ! these two will become private methods
   public :: build_near_neighb
   public :: update_nn_list_flags
+  public :: update_stored_nn_values
 
 
   ! used for the cell method (use rapaport's notation)
@@ -32,11 +33,10 @@ use structure_class
 
   ! This type is only include to speed up the calculation. Most importantly by
   ! replacing the double summation over atoms by a sum over nearest neighboors
-  ! and secondly by storing distances that may be used at a later stage.
-  ! Notice that this distances are here stored as REAL rather then REAL (DB)
-  ! to save memory, since this type will be the single most memory hungry 
-  ! component of this code and knowing these distances to 6 digits accuracy
-  ! is e.g. definitely good enough for calculating a histogram, pdf etc from
+  ! and secondly by storing distances that are used as input to values to the
+  ! various potential and fom functions. Therefore make sure that this stored
+  ! values are always up-to-date; this is the case after a near-neighb list
+  ! has just been build and after update_stored_nn_values has been called
 
   type near_neighb_list
     ! the list - for now just pairs of j1, j2
@@ -47,7 +47,7 @@ use structure_class
     ! stuff decide if list needs updating and with rebuilding
     logical :: needs_updating = .true.
     real(db) :: delta_r, r_cut
-    real(db) :: max_an_atom_has_moved
+    real(db) :: max_an_atom_has_moved = 0.0_db
   
     ! for the case where it is either decide
     ! that this list is no-point or requires more
@@ -56,7 +56,7 @@ use structure_class
   
     ! storage of numbers for potential later use
     character(len=2) :: what_is_stored
-    real, dimension(:), allocatable :: dists ! stored as reals!!
+    real(db), dimension(:), allocatable :: dists !
     
     type (cell_list) :: cells
   end type near_neighb_list
@@ -65,9 +65,39 @@ use structure_class
 
 contains
 
+  subroutine update_stored_nn_values(str, nn_list)
+    type (structure), intent(in) :: str
+    type (near_neighb_list), intent(inout) :: nn_list
+    
+    integer :: i1, i2, j, i
+    real(db), dimension(3) :: diff_vec
+    
+    do j = 1, nn_list%n_pairs
+  	  i1 = nn_list%pairs(2*j-1)
+  	  i2 = nn_list%pairs(2*j)
+      
+      diff_vec = str%atoms(i1)%r - str%atoms(i2)%r
+        
+      do i = 1, ndim
+        if (diff_vec(i) >= 0.5_db * str%box_edges(i)) then
+          diff_vec(i) = diff_vec(i) - str%box_edges(i)
+        end if
+        if (diff_vec(i) < -0.5_db * str%box_edges(i)) then
+          diff_vec(i) = diff_vec(i) + str%box_edges(i)
+        end if       
+      end do
+        
+      nn_list%dists(j) = sum(diff_vec*diff_vec)
+    end do
+    
+      nn_list%what_is_stored = "r2"
+      
+  end subroutine update_stored_nn_values
+
+  
   subroutine update_nn_list_flags(max_an_atom_has_moved, nn_list)
     real(db), intent(in) :: max_an_atom_has_moved
-    type (near_neighb_list) :: nn_list
+    type (near_neighb_list), intent(inout) :: nn_list
     
     nn_list%max_an_atom_has_moved = nn_list%max_an_atom_has_moved &
                              + max_an_atom_has_moved  
@@ -154,6 +184,7 @@ contains
     
   end subroutine build_near_neighb
 
+  
   subroutine build_near_neighb_without_cell(str, nn_list)
     type (structure), intent(in) :: str
     type (near_neighb_list), intent(inout) :: nn_list
@@ -163,6 +194,7 @@ contains
     real(db), dimension(ndim) :: diff_vec  ! vector between two atoms    
     integer :: i, i1, i2, n_tot
     real(db) :: r_cut_neighbour, rr_cut_neighbour    
+    real(db) :: rr  ! used when storing |r|^2    
     
     n_tot = size(str%atoms)
    
@@ -180,10 +212,11 @@ contains
           end if
           if (diff_vec(i) < -0.5 * str%box_edges(i)) then
           diff_vec(i) = diff_vec(i) + str%box_edges(i)
-          end if       
+          end if
       end do
       
-      if (sum(diff_vec*diff_vec) < rr_cut_neighbour) then
+      rr = sum(diff_vec*diff_vec)
+      if (rr < rr_cut_neighbour) then
           num = num + 1
           
           if (num > nn_list%pairs_allocated) then
@@ -193,7 +226,7 @@ contains
                     
           nn_list%pairs(2*num-1) = i1
           nn_list%pairs(2*num) = i2          
-          
+          nn_list%dists(num) = rr
       end if
   		
 		  end do
@@ -217,6 +250,7 @@ contains
     integer, dimension(ndim) :: cp_3d, cp1_3d, cp2_3d  ! 3D cell positions
     integer :: cp_1d, cp1_1d, cp2_1d  ! 1D cell positions
     integer :: n_tot, i, j, cp1x, cp1y, cp1z, j1, j2
+    real(db) :: rr  ! used when storing |r|^2     
     
     integer, dimension(ndim,14) :: offset_vals
   
@@ -326,7 +360,8 @@ contains
                   !write(*,'(3f12.6)') str%atoms(j2)%r
                   !write(*,'(3f12.6)') diff_vec
                   !write(*,'(3f12.6)') shift
-                  if (sum(diff_vec*diff_vec) < rr_cut_neighbour) then
+                  rr = sum(diff_vec*diff_vec)
+                  if (rr < rr_cut_neighbour) then
                     
                     ! this number must never be bigger than
                     ! nn_list%pairs_allocated
@@ -339,6 +374,7 @@ contains
                     
                     nn_list%pairs(2*num-1) = j1
                     nn_list%pairs(2*num) = j2
+                    nn_list%dists(num) = rr
                     !write(*,'(a,i6,a,i6,a,i6)') "j1=", j1-1, " j2=", j2-1, " num=", num
                     !stop
                   end if

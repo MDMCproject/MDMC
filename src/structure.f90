@@ -3,6 +3,9 @@ use various_constants_class
 
 implicit none
 
+  public :: apply_boundary_condition
+  public :: copy_structure
+  public :: swap_atoms
 
   type atom
     character(len=2)  :: element_type
@@ -26,6 +29,29 @@ implicit none
 
 contains
 
+  ! apply periodic boundary conditions, however assume here that atoms have
+  ! not moved out more that box_edge length away from the region
+  ! -box_edge/2 : box_edge/2
+  subroutine apply_boundary_condition(str)
+    type (structure), intent(inout) :: str
+    
+    integer :: i_a, i
+    
+    do i_a = 1, size(str%atoms)
+      
+      do i = 1, ndim
+        if (str%atoms(i_a)%r(i) >= 0.5 * str%box_edges(i)) then
+        str%atoms(i_a)%r(i) = str%atoms(i_a)%r(i) - str%box_edges(i)
+        end if
+        if (str%atoms(i_a)%r(i) < -0.5 * str%box_edges(i)) then
+        str%atoms(i_a)%r(i) = str%atoms(i_a)%r(i) + str%box_edges(i)
+        end if       
+      end do
+
+    end do
+  end subroutine apply_boundary_condition
+  
+  
   function copy_structure(str_in) result(str_out)
     type (structure), intent(in) :: str_in
     type (structure) :: str_out

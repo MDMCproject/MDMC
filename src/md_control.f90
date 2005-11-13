@@ -14,20 +14,40 @@ contains
     real (db), intent(in) :: r_cut, delta_r
 
 		real (db) :: pot_energy, delta_t, temperature
-    integer :: n_md
-    type (phasespace) :: phasespace_backup, ps_temp
+    real (db) :: time_now = 0.0
+    integer :: n_md = 10
+    integer :: i
+    integer :: steps_to_equilibrium = 0
+    integer :: adjust_temp_after_this_many_steps = 100
+    integer :: average_over_this_many_steps = 2000
+    
+    type (phasespace) :: my_ps
 		
     write(*,*) "In run_md_control"
 
-    n_md = 1
     delta_t = 0.005
     temperature = 1.0
     
-    phasespace_backup = make_phasespace(a_config%str, r_cut, delta_r, &
+    my_ps = make_phasespace(a_config%str, r_cut, delta_r, &
                         temperature)
     
-    call trajectory_in_phasespace(phasespace_backup, n_md, delta_t)
+    do i = 1, n_md
+      time_now = delta_t * i
+      
+      call trajectory_in_phasespace(my_ps, 1, delta_t)
 
+      ! calculate e_kin, e_tot, pressure
+      
+      !if (i < steps_to_equilibrium) then
+        
+      !else
+        ! accum properties
+      !  if (mod(i,average_over_this_many_steps) == 0) then
+          ! print mean s.d. and reset properties
+      !  end if
+      !end if
+      
+    end do
     ! md_cal_properties(phasespace..., props)
     ! md_print_properties(props)
     
