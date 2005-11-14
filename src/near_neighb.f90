@@ -120,6 +120,15 @@ contains
                                              ! to ignore cell method
     integer :: n_tot
     
+    ! first of all determine whether or not to completely ignore the 
+    ! using the nearest neighbour method. Perhaps the only reason 
+    ! why you want to do this if the memory storage required out-weights
+    ! the other benifits - for now simply just assume that everything
+    ! is fine
+    
+    nn_list%ignore_list = .false.
+ 
+    
     n_tot = size(str%atoms)
     
     ! stuff to do with when to update neighbor list
@@ -171,6 +180,12 @@ contains
       write(*,'(a)') "ERROR in build_near_neighb"
       write(*,'(a)') "Not allowed to rebuild nn_list when"
       write(*,'(a)') "needs_updating == .false."
+      stop
+    end if
+    if (nn_list%ignore_list == .true.) then
+      write(*,'(a)') "ERROR in build_near_neighb"
+      write(*,'(a)') "Not allowed to rebuild nn_list when"
+      write(*,'(a)') "ignore_list == .true."
       stop
     end if
     

@@ -49,7 +49,7 @@ contains
     common_config%str%box_edges = edges
     gap = edges / n_atoms
     
-    write(*,'(a,3f12.6)') "gap = ", gap
+    !write(*,'(a,3f12.6)') "gap = ", gap
     
     n_tot = product(n_atoms)
     allocate(common_config%str%atoms(n_tot))
@@ -61,11 +61,8 @@ contains
           put_atom_at(2) = ny - 0.5_db
           put_atom_at(3) = nz - 0.5_db
           put_atom_at = put_atom_at * gap - 0.5_db * edges
-          !write(*,'(a,3f12.6)') "first atom = ", put_atom_at
-          !write(*,'(a,3f12.6)') "edges = ", edges
-          !stop
+
           common_config%str%atoms(n)%r = put_atom_at
-        !  write (*,'(3f12.6)') common_config%str%atoms(n)%r
           n = n + 1
         end do
       end do

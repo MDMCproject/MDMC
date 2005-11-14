@@ -24,9 +24,9 @@ use common_potential_block_class
     ! this one is again added for speed gain and convenience
     real(db), dimension(:,:), allocatable :: inv_mass
     
-    ! this one to e.g. later speed up the calculation of the kinetic energy
-    ! p_div_mass stands for momentum divided by mass
-    real(db), dimension(:,:), allocatable :: p_div_mass
+    ! this one is at present only used to speedup the calculation of ps%v2 in
+    ! this module once
+     real(db), dimension(:,:), allocatable :: p_div_mass
     
     ! to calculate max velocity and kinetic energy
     real(db), dimension(:), allocatable :: v2
@@ -56,7 +56,7 @@ contains
 
     write(*,'(a,3f12.6)') "first atom ", ps%r(1,:)
     write(*,'(a,f12.6)') "sum_r_start = ", sum(ps%r*ps%r)
-    write(*,'(a,f12.6)') "sum_v_start = ", sum(ps%p*ps%p)
+    write(*,'(a,f12.6)') "0.5*sum_p2_start_per_atom = ", 0.5*sum(ps%p*ps%p) / n_tot
     write(*,'(a,f12.6)') "sum_a_start = ", sum(ps%deriv*ps%deriv)    
     
     !dummy = sum(ps%r,2)
@@ -74,12 +74,13 @@ contains
       ! for time t=t
       ps%p = ps%p - delta_t_half * ps%deriv
       
-      write(*,'(a,f12.6)') "sum_v_intermediate = ", sum(ps%p*ps%p)
+      write(*,'(a,f12.6)') "0.5*sum_v_intermediate_per_atom = ", 0.5*sum(ps%p*ps%p) / n_tot
     
-      ! update positions to time t=t+h and store p_div_mass which can be used 
-      ! for e.g. calculating the kinetic energy a bit faster!
+      ! update positions to time t=t+h. And store p_div_mass array here. Note it 
+      ! correspond to time t=t+h/2 and is at present only used to calculate ps%v2 below 
       ps%p_div_mass = ps%p * ps%inv_mass
-      ps%r = ps%r + delta_t * ps%p_div_mass
+      
+      ps%r = ps%r + delta_t * ps%p * ps%inv_mass
       
       write(*,'(a,3f12.6)') "first atom after move ", ps%r(1,:)
       write(*,'(a,f12.6)') "sum_r_end = ", sum(ps%r*ps%r)
@@ -95,12 +96,16 @@ contains
         ! stored the velocities at times t=t+h/2. Strictly speaking
         ! these should not be used for calculating the total energy at 
         ! t=t+h but could but reused for an adjusting-temperature-function
-        ps%v2 = sum(ps%r,2)
+
+        ps%v2 = sum(ps%p_div_mass*ps%p_div_mass,2)
+
+        
         
         ! update nearest neighbour list flags
         call update_nn_list_flags(sqrt(maxval(ps%v2))*delta_t, ps%neighb_list)
         
         if (ps%neighb_list%needs_updating == .true.) then
+          write (*,*) "need_updating == .true."
           call build_near_neighb(ps%str, ps%neighb_list)
         else
           call update_stored_nn_values(ps%str, ps%neighb_list)
@@ -113,14 +118,14 @@ contains
       ! now get momenta in sync with positions and ready for the next loop
       ps%p = ps%p - delta_t_half * ps%deriv     
       
-      write(*,'(a,f12.6)') "sum_v_end = ", sum(ps%p*ps%p)
+      write(*,'(a,f12.6)') "0.5*sum_v_end_per_atom = ", 0.5*sum(ps%p*ps%p) / n_tot
       write(*,'(a,f12.6)') "sum_a_end = ", sum(ps%deriv*ps%deriv)
     end do
 
     
     ! just some checking
-    !pot_energy = gpe_val(ps%str, common_gpe)                      
-    !write (*, '(a,f12.6)') "Epot1 = ", pot_energy
+    pot_energy = gpe_val(ps%str, common_gpe)                      
+    write (*, '(a,f12.6)') "Epot1_per_atom = ", pot_energy / n_tot
     
     !call build_near_neighb_with_cell(ps%str, ps%neighb_list)
     !pot_energy = gpe_val_nn(ps%str, common_gpe, ps%neighb_list)
@@ -140,7 +145,7 @@ contains
     type (phasespace) :: ps
 
     integer :: n_tot, i
-    real(db), dimension(ndim) :: momentum_sum  ! mainly for debugging
+    real(db), dimension(ndim) :: momentum_sum  ! mainly for debugging    
     
     n_tot = size(str%atoms)
     
@@ -148,8 +153,6 @@ contains
     
     ps%str = copy_structure(str)
     
-    !ps%delta_r = delta_r
-    !ps%r_cut = r_cut
     
     allocate(ps%p(n_tot,3))
     allocate(ps%deriv(n_tot,3))
