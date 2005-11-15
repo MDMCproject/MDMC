@@ -23,7 +23,7 @@ implicit none
     ! since in the code the below the properties are 
     ! all accumulated in one go I have moved it down for
     ! now
-    integer :: n_accum
+    integer :: n_accum = 0
   end type md_properties
 
 contains
