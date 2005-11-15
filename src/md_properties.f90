@@ -63,6 +63,8 @@ contains
     
     ! pressure is in units of 16387.72 atm
     
+    write(*,'(a,f12.6)') "virial_sum_component = ", -sum(ps%deriv*ps%r)
+    
     props%pressure%val = (sum_mass_v2-sum(ps%deriv*ps%r)) / &
        (product(ps%str%box_edges)*ndim)
 
