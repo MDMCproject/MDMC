@@ -8,7 +8,7 @@ implicit none
 
   public :: gpe_val, gpe_val_nn
   public :: gpe_deriv, gpe_deriv_nn
-
+  public :: gpe_md_extra, gpe_md_extra_nn
 
 
   private ::  add_lj_pe_container
@@ -29,7 +29,6 @@ contains
     type (lj_pe_container), target, intent(in) :: pe_target
     
     list%pt_lj_pe => pe_target
-
   end subroutine add_lj_pe_container
 
   
@@ -39,7 +38,6 @@ contains
     real (db) :: val
  
     val = lj_val(str, list%pt_lj_pe)
-    
   end function gpe_val
   
   
@@ -50,7 +48,6 @@ contains
     real (db) :: val
  
     val = lj_val_nn(str, list%pt_lj_pe, nn_list)
-    
   end function gpe_val_nn  
   
   
@@ -60,9 +57,17 @@ contains
     type (pe_list), intent(in) :: list
 
     call lj_deriv(str, deriv, list%pt_lj_pe)
-
-
   end subroutine gpe_deriv
+  
+  
+  subroutine gpe_md_extra(str, deriv, list, pressure_comp, pot_energy)
+    type (structure), intent(in) :: str
+    real(db), dimension(:,:), intent(out) :: deriv
+    type (pe_list), intent(in) :: list
+ 		real (db), intent(out) :: pressure_comp, pot_energy    
+
+    call lj_md_extra(str, deriv, list%pt_lj_pe, pressure_comp, pot_energy)
+  end subroutine gpe_md_extra  
 
 
   subroutine gpe_deriv_nn(str, deriv, list, nn_list)
@@ -72,9 +77,16 @@ contains
     type (near_neighb_list), intent(in) :: nn_list
     
     call lj_deriv_nn(str, deriv, list%pt_lj_pe, nn_list)
-
-
   end subroutine gpe_deriv_nn   
     
-    
+  subroutine gpe_md_extra_nn(str, deriv, list, nn_list, pressure_comp, pot_energy)
+    type (structure), intent(in) :: str
+    real(db), dimension(:,:), intent(out) :: deriv
+    type (pe_list), intent(in) :: list
+    type (near_neighb_list), intent(in) :: nn_list    
+ 		real (db), intent(out) :: pressure_comp, pot_energy    
+
+    call lj_md_extra_nn(str, deriv, list%pt_lj_pe, nn_list, pressure_comp, pot_energy)
+  end subroutine gpe_md_extra_nn  
+      
 end module gpe_class

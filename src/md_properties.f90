@@ -3,7 +3,7 @@ use phasespace_class
 
 implicit none
 
-  public :: md_cal_properties
+  public :: md_cal_properties, md_cal_properties_extra
   public :: md_accum_properties
   public :: md_reset_properties
   public :: md_print_properties
@@ -23,7 +23,7 @@ implicit none
     ! since in the code the below the properties are 
     ! all accumulated in one go I have moved it down for
     ! now
-    integer :: n_accum = 0
+    integer :: n_accum
   end type md_properties
 
 contains
@@ -62,17 +62,52 @@ contains
     
     
     ! pressure is in units of 16387.72 atm
-    
-    write(*,'(a,f12.6)') "virial_sum_component = ", -sum(ps%deriv*ps%r)
-    
-    props%pressure%val = (sum_mass_v2-sum(ps%deriv*ps%r)) / &
-       (product(ps%str%box_edges)*ndim)
+    ! the expression below is only valid when using non-periodic boundary conditions
+    !props%pressure%val = (sum_mass_v2-sum(ps%deriv*ps%r)) / &
+    !   (product(ps%str%box_edges)*ndim)
+    ! so if periodic boundary condition in use then put for now 
+    props%pressure%val = 0.0
 
   end subroutine md_cal_properties
   
+  subroutine md_cal_properties_extra(ps, props, list, pressure_comp, pot_energy)
+    type (phasespace), intent(in) :: ps
+    type (md_properties), intent(inout) :: props
+    type (pe_list), intent(in) :: list
+ 		real (db), intent(in) :: pressure_comp, pot_energy    
+    
+    real(db) :: sum_mass_v2
+    integer :: n_atoms
+    
+    n_atoms = size(ps%str%atoms)
+    
+    ! here assumes that ps%v2 is calculated at t=t+h/2
+    ! and therefore needs to be re-calculated so that
+    ! we calculate both the potential and kinetic energy
+    ! at t=t+h
+    
+    sum_mass_v2 = sum(ps%p * ps%p * ps%inv_mass)
+    
+    ! unit of kinetic energy below is KJ per mol per atom (assuming
+    ! mass_unit=amu=g/mol, t_unit=10^-13s, r_unit=AA), so do get the total
+    ! energy of the system in 'absolute' units you would multiply this
+    ! number by n_atoms and divide by Avogadro's number
+    
+    props%kin_energy%val = 0.5*sum_mass_v2 / n_atoms
+    
+    props%tot_energy%val = pot_energy / n_atoms + props%kin_energy%val
+    
+    
+    ! pressure is in units of 16387.72 atm
+    
+    props%pressure%val = (sum_mass_v2+pressure_comp) / &
+       (product(ps%str%box_edges)*ndim)
+
+  end subroutine md_cal_properties_extra
+
   
   subroutine md_accum_properties(props)
-    type (md_properties), intent(inout) :: props   
+    type (md_properties), intent(inout):: props    
 
     props%kin_energy%sum = props%kin_energy%sum + props%kin_energy%val
     props%tot_energy%sum = props%tot_energy%sum + props%tot_energy%val
@@ -91,7 +126,7 @@ contains
 
 
   subroutine md_reset_properties(props)
-    type (md_properties), intent(inout) :: props
+    type (md_properties), intent(out) :: props
     
     props%kin_energy%sum = 0.0
     props%tot_energy%sum = 0.0
@@ -125,7 +160,7 @@ contains
     write(*,'(a,2f12.6)') "Etot = ", props%tot_energy%ave, props%tot_energy%esd    
     write(*,'(a,2f12.6)') "Ekin = ", props%kin_energy%ave, props%kin_energy%esd
     write(*,'(a,2f12.6)') "P = ", props%pressure%ave, props%pressure%esd
-    write(*,'(a,2f12.6)') "Epot = ", props%tot_energy%ave - props%kin_energy%ave
+    !write(*,'(a,2f12.6)') "Epot = ", props%tot_energy%ave - props%kin_energy%ave
     
 
   end subroutine md_print_properties

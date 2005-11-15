@@ -5,7 +5,7 @@ use common_potential_block_class
 
   implicit none
 
-  public :: trajectory_in_phasespace
+  public :: trajectory_in_phasespace, trajectory_in_phasespace_extra
   public :: make_phasespace
   
 
@@ -124,8 +124,8 @@ contains
 
     
     ! just some checking
-    pot_energy = gpe_val(ps%str, common_gpe)                      
-    write (*, '(a,f12.6)') "Epot1_per_atom = ", pot_energy / n_tot
+    ! pot_energy = gpe_val(ps%str, common_gpe)                      
+    ! write (*, '(a,f12.6)') "Epot1_per_atom = ", pot_energy / n_tot
     
     !call build_near_neighb_with_cell(ps%str, ps%neighb_list)
     !pot_energy = gpe_val_nn(ps%str, common_gpe, ps%neighb_list)
@@ -138,7 +138,109 @@ contains
         
   end subroutine trajectory_in_phasespace
 
+
+  subroutine trajectory_in_phasespace_extra(ps, n_md, delta_t, pressure_comp, pot_energy)
+    type (phasespace), intent(inout) :: ps
+    integer, intent(in) :: n_md
+    real(db), intent(in) :: delta_t   
+ 		real (db), intent(out) :: pressure_comp, pot_energy 
+ 		    
+    real(db) :: pot_energy_not_pass, delta_t_half
+    integer :: i, j, n_tot
+    
+    ! for testing stuff
+    real(db) :: sum_r_start, sum_r_end
+    real(db) :: sum_v_start, sum_v_intermediate, sum_v_end
+    real(db) :: sum_a_start, sum_a_end
+    
+    ! for testing
+    !real(db), dimension(512) :: dummy
+
+    !write(*,'(a,3f12.6)') "first atom ", ps%r(1,:)
+    !write(*,'(a,f12.6)') "sum_r_start = ", sum(ps%r*ps%r)
+    !write(*,'(a,f12.6)') "0.5*sum_p2_start_per_atom = ", 0.5*sum(ps%p*ps%p) / n_tot
+    !write(*,'(a,f12.6)') "sum_a_start = ", sum(ps%deriv*ps%deriv)    
+    
+    !dummy = sum(ps%r,2)
+    !write(*,'(2f12.6)') dummy(1), sum(ps%r(1,:))
+    
+    n_tot = size(ps%str%atoms)
+    
+    delta_t_half = delta_t / 2.0
+    
+    ! leap-frog algorithm version used in Rapaport, where it is assumed
+    ! that the derivatives are up-to-date
+    
+    do i = 1, n_md
+      ! update momenta to time t=t+h/2 assuming we have up-to-date derivs 
+      ! for time t=t
+      ps%p = ps%p - delta_t_half * ps%deriv
+      
+      !write(*,'(a,f12.6)') "0.5*sum_v_intermediate_per_atom = ", 0.5*sum(ps%p*ps%p) / n_tot
+    
+      ! update positions to time t=t+h. And store p_div_mass array here. Note it 
+      ! correspond to time t=t+h/2 and is at present only used to calculate ps%v2 below 
+      ps%p_div_mass = ps%p * ps%inv_mass
+      
+      ps%r = ps%r + delta_t * ps%p * ps%inv_mass
+      
+      !write(*,'(a,3f12.6)') "first atom after move ", ps%r(1,:)
+      !write(*,'(a,f12.6)') "sum_r_end = ", sum(ps%r*ps%r)
+      
+      ! calculate derivatives for time t=t+h
+      do j = 1, n_tot
+        ps%str%atoms(j)%r = ps%r(j,:)
+      end do
+      
+      if (ps%neighb_list%ignore_list == .true.) then
+        call gpe_md_extra(ps%str, ps%deriv, common_gpe, pressure_comp, pot_energy)
+      else
+        ! stored the velocities at times t=t+h/2. Strictly speaking
+        ! these should not be used for calculating the total energy at 
+        ! t=t+h but could but reused for an adjusting-temperature-function
+
+        ps%v2 = sum(ps%p_div_mass*ps%p_div_mass,2)
+
+        
+        
+        ! update nearest neighbour list flags
+        call update_nn_list_flags(sqrt(maxval(ps%v2))*delta_t, ps%neighb_list)
+        
+        if (ps%neighb_list%needs_updating == .true.) then
+          write (*,*) "need_updating == .true."
+          call build_near_neighb(ps%str, ps%neighb_list)
+        else
+          call update_stored_nn_values(ps%str, ps%neighb_list)
+        end if
+        
+        call gpe_md_extra_nn(ps%str, ps%deriv, common_gpe, ps%neighb_list, pressure_comp, pot_energy)
+        
+      end if
+      
+      ! now get momenta in sync with positions and ready for the next loop
+      ps%p = ps%p - delta_t_half * ps%deriv     
+      
+      !write(*,'(a,f12.6)') "0.5*sum_v_end_per_atom = ", 0.5*sum(ps%p*ps%p) / n_tot
+      !write(*,'(a,f12.6)') "sum_a_end = ", sum(ps%deriv*ps%deriv)
+    end do
+
+    
+    ! just some checking
+    !pot_energy_not_pass = gpe_val(ps%str, common_gpe)                      
+    !write (*, '(a,f12.6)') "Epot1_per_atom = ", pot_energy_not_pass / n_tot
+    !write (*, '(a,f12.6)') "Epot2_per_atom = ", pot_energy / n_tot
+    !call build_near_neighb_with_cell(ps%str, ps%neighb_list)
+    !pot_energy = gpe_val_nn(ps%str, common_gpe, ps%neighb_list)
+    !write (*, '(a,f12.6)') "Epot2 = ", pot_energy
+    
+    !call build_near_neighb_without_cell(ps%str, ps%neighb_list)
+    !call update_stored_nn_values(ps%str, ps%neighb_list)
+    !pot_energy = gpe_val_nn(ps%str, common_gpe, ps%neighb_list)
+    !write (*, '(a,f12.6)') "Epot3 = ", pot_energy
+        
+  end subroutine trajectory_in_phasespace_extra
   
+    
   function make_phasespace(str, r_cut, delta_r, temperature) result (ps)
     type (structure), intent(in) :: str
     real (db), intent(in) :: r_cut, delta_r, temperature
@@ -146,6 +248,7 @@ contains
 
     integer :: n_tot, i
     real(db), dimension(ndim) :: momentum_sum  ! mainly for debugging    
+    real(db) :: momentum_scale
     
     n_tot = size(str%atoms)
     
@@ -174,15 +277,20 @@ contains
     ps%deriv = 0.0
     
     ! determine initial momenta
+    ! momentum_scale = temperature*ndim*(n_tot-1)/sum(ps%inv_mass(:,1))
+    momentum_scale = sqrt( temperature*ndim*(n_tot-1)/sum(ps%inv_mass(:,1)) ) / sqrt(3.0)
+    !write(*,'(a,f12.6)') "momentum_scale ", momentum_scale * sqrt(3.0)
     
     if (modulo(n_tot,2) == 1) then
      ps%p(n_tot,:) = 0.0
     end if
        
     do i = 1, floor(n_tot / 2.0)
-      ps%p(2*i-1,:) = 1.0
-      ps%p(2*i,:) = -1.0
+      ps%p(2*i-1,:) = momentum_scale
+      ps%p(2*i,:) = - momentum_scale
     end do 
+    
+    ! write(*,'(a,f12.6)') "a check ", sum(ps%p*ps%p) / ((n_tot-1)*3.0)
     
     ! what is the total momentum
 

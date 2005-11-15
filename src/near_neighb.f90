@@ -161,7 +161,7 @@ contains
     nn_list%n_pairs = get_num_near_neighb(nn_list%cells, &
                          str, r_cut+delta_r)
 
-    nn_list%pairs_allocated = nn_list%n_pairs+n_tot
+    nn_list%pairs_allocated = nn_list%n_pairs+10*n_tot
     allocate(nn_list%pairs( 2*nn_list%pairs_allocated ))
     allocate(nn_list%dists( nn_list%pairs_allocated ))
     
@@ -500,7 +500,7 @@ contains
     
     inverse_cell_width = cells%num_cells / str%box_edges
     
-    write(*, '(a,3f10.3)') "inverse_cell_witdh ", inverse_cell_width
+    !write(*, '(a,3f10.3)') "inverse_cell_witdh ", inverse_cell_width
     
     do i = 1, product(cells%num_cells)
       cells%list(n_tot+i) = -1

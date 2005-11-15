@@ -14,19 +14,24 @@ contains
     type (configuration), intent(inout) :: a_config
     real (db), intent(in) :: r_cut, delta_r
 
-		real (db) :: pot_energy, delta_t, temperature
+		real (db) :: delta_t, temperature
     real (db) :: time_now = 0.0
-    integer :: n_md = 1
+    integer :: n_md = 100
     integer :: i
     integer :: steps_to_equilibrium = 0
     integer :: adjust_temp_after_this_many_steps = 100
-    integer :: average_over_this_many_steps = 1
+    integer :: average_over_this_many_steps = 20
     
     type (phasespace) :: my_ps
     type (md_properties) :: my_props
+    
+    real(db) :: pressure_comp, pot_energy
+		
 		
     write(*,*) "In run_md_control"
 
+    call md_reset_properties(my_props)
+    
     delta_t = 0.005
     temperature = 1.0
     
@@ -36,10 +41,10 @@ contains
     do i = 1, n_md
       time_now = delta_t * i
       
-      call trajectory_in_phasespace(my_ps, 1, delta_t)
+      call trajectory_in_phasespace_extra(my_ps, 1, delta_t, pressure_comp, pot_energy)
 
       ! calculate e_kin, e_tot, pressure
-      call md_cal_properties(my_ps, my_props, common_gpe)
+      call md_cal_properties_extra(my_ps, my_props, common_gpe, pressure_comp, pot_energy)
       if (i < steps_to_equilibrium) then
         
       else
