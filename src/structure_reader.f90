@@ -49,7 +49,6 @@ contains
     common_config%str%box_edges = edges
     gap = edges / n_atoms
     
-    !write(*,'(a,3f12.6)') "gap = ", gap
     
     n_tot = product(n_atoms)
     allocate(common_config%str%atoms(n_tot))

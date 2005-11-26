@@ -5,27 +5,22 @@ use common_block_class, only : common_config
 use common_potential_block_class
 use phasespace_class
 use md_properties_class
+use control_containers_class
 
   implicit none
 
 contains
 
-  subroutine run_md_control(a_config, r_cut, delta_r)
+  subroutine run_md_control(a_config, c)
     type (configuration), intent(inout) :: a_config
-    real (db), intent(in) :: r_cut, delta_r
+    type (md_control_container) :: c
     
     real (db) :: time_now = 0.0    
     integer :: i
     
-    ! md control parameters 
-
-		real (db) :: delta_t = 0.005, temperature = 1.0
-    integer :: n_md = 100
-    integer :: steps_to_equilibrium = 0
-    integer :: adjust_temp_after_this_many_steps = 100
-    integer :: average_over_this_many_steps = 20
-
-    
+    real(db) :: sum_kin_energy = 0.0
+    real(db) :: temp_adjust_factor
+  
     ! md storage containers
 
     type (phasespace) :: my_ps
@@ -38,38 +33,56 @@ contains
 
     ! initiate phasespace
     
-    my_ps = make_phasespace(a_config%str, r_cut, delta_r, &
-                        temperature)
+    my_ps = make_phasespace(a_config%str, c%r_cut, c%delta_r, &
+                        c%temperature)
     
     
-    do i = 1, n_md
-      time_now = delta_t * i   ! perhaps print this one out 
+    do i = 1, c%step_limit
+      time_now = c%time_step * i   ! perhaps print this one out 
       
       ! do one trajectory of length = 1 where pressure_comp and pot_energy is also
       ! calculated
       
-      call trajectory_in_phasespace_extra(my_ps, 1, delta_t, pressure_comp, pot_energy)
+      call trajectory_in_phasespace_extra(my_ps, 1, c%time_step, pressure_comp, pot_energy)
 
 
       ! calculate properties at this time
+      !if (i == 808) then
+      !  write (*,*) i
+      !end if
+      
       
       call md_cal_properties_extra(my_ps, my_props, common_gpe, pressure_comp, pot_energy)
       
       
-      if (i < steps_to_equilibrium) then
-        ! perhaps some code is that adjust temperature
-      else
-        ! accumulate the calculated MD property values
+      ! case you want to adject the temperature in the initial stages of the MD simulation
         
-        call md_accum_properties(my_props)
-        
-        
-        ! print out stuff and interval = average_over_this_many_steps
-        
-        if (mod(i,average_over_this_many_steps) == 0) then
-          call md_print_properties(my_props)
-          call md_reset_properties(my_props)
+      if (c%perform_initial_temperature_calibration) then
+        if (i < c%total_step) then
+          sum_kin_energy = sum_kin_energy + my_props%kin_energy%val
+          if (mod(i,c%adjust_temp_at_interval) == 0) then
+            temp_adjust_factor = sqrt(c%adjust_temp_at_interval * 1.5 * c%temperature / &
+               sum_kin_energy * (size(my_ps%str%atoms)-1.0) / size(my_ps%str%atoms))
+            !write(*,*) sum_kin_energy / c%adjust_temp_at_interval   
+            my_ps%p = my_ps%p * temp_adjust_factor
+            !write(*,*) sum(my_ps%p * my_ps%p) * 0.5 / size(my_ps%str%atoms)
+            sum_kin_energy = 0.0
+          end if
         end if
+      end if      
+      
+
+      ! accumulate the calculated MD property values
+        
+      call md_accum_properties(my_props)
+        
+        
+      ! print out stuff and interval = average_over_this_many_steps
+        
+      if (mod(i,c%average_over_this_many_step) == 0) then
+        call md_print_properties(my_props)
+        write(*,'(a,3f12.6)') "total momentum ", sum(my_ps%p,1)
+        call md_reset_properties(my_props)
       end if
       
     end do

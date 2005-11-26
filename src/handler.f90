@@ -4,6 +4,7 @@ use common_block_class
 use common_potential_block_class
 use md_control_class
 use structure_reader_class
+use control_containers_class
 
   implicit none
   
@@ -18,13 +19,6 @@ use structure_reader_class
   integer, dimension(ndim), private :: n_atoms  ! both to be passed to 
                                              ! make_simple_cubic_structure
                                              
-  type md_control_params
-    private
-    real (db) :: r_cut
-    real (db) :: delta_r
-  end type md_control_params
-  
-  type (md_control_params), private :: setup_md_control_params
 
 contains
 
@@ -76,6 +70,10 @@ contains
     ! if in md_control
     if (in_md_control) then
       select case(name)
+      
+        !case("use-near-neighbour-method")
+        !  setup_md_control_params%use_near_neighbour_method = .true.
+      
         case("delta-r")       
           call get_value(attributes,"val",read_db,status)
 					ndata = 0
@@ -87,6 +85,46 @@ contains
 					ndata = 0
           call build_data_array(read_db, number_db, ndata)
           setup_md_control_params%r_cut = number_db(1)
+          
+        case("step-limit")       
+          call get_value(attributes,"number",read_int,status)
+					ndata = 0
+          call build_data_array(read_int, number_int, ndata)
+          setup_md_control_params%step_limit = number_int(1)
+          
+        case("average-over-this-many-step")       
+          call get_value(attributes,"number",read_int,status)
+					ndata = 0
+          call build_data_array(read_int, number_int, ndata)
+          setup_md_control_params%average_over_this_many_step = number_int(1)     
+          
+        case("perform-initial-temperature-calibration")
+          setup_md_control_params%perform_initial_temperature_calibration = .true.               
+          
+        case("total-step")       
+          call get_value(attributes,"number",read_int,status)
+					ndata = 0
+          call build_data_array(read_int, number_int, ndata)
+          setup_md_control_params%total_step = number_int(1)       
+          
+        case("adjust-temp-at-interval")       
+          call get_value(attributes,"number",read_int,status)
+					ndata = 0
+          call build_data_array(read_int, number_int, ndata)
+          setup_md_control_params%adjust_temp_at_interval = number_int(1)          
+            
+        case("temperature")       
+          call get_value(attributes,"val",read_db,status)
+					ndata = 0
+          call build_data_array(read_db, number_db, ndata)
+          setup_md_control_params%temperature = number_db(1)            
+            
+        case("time-step")       
+          call get_value(attributes,"val",read_db,status)
+					ndata = 0
+          call build_data_array(read_db, number_db, ndata)
+          setup_md_control_params%time_step = number_db(1) 
+                    
       end select
     end if
     
@@ -142,7 +180,7 @@ contains
       select case(name)
         case("density")          
           ! read density value into read_dp(1)
-          call get_value(attributes,"value",read_db,status)
+          call get_value(attributes,"val",read_db,status)
           ndata = 0
           call build_data_array(read_db, number_db, ndata)
           
@@ -210,8 +248,7 @@ contains
         
       case("control-object")
         if (in_md_control == .true.) then
-          call run_md_control(common_config, &
-               setup_md_control_params%r_cut, setup_md_control_params%delta_r)
+          call run_md_control(common_config, setup_md_control_params)
         end if
         
         

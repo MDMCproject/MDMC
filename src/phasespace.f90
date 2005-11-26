@@ -86,8 +86,17 @@ contains
       write(*,'(a,f12.6)') "sum_r_end = ", sum(ps%r*ps%r)
       
       ! calculate derivatives for time t=t+h
+      ! notice that I would needing any copying here if I put r in type structure 
       do j = 1, n_tot
         ps%str%atoms(j)%r = ps%r(j,:)
+      end do
+      
+      ! wrap around
+      
+      call apply_boundary_condition(ps%str)
+      
+      do j = 1, n_tot
+        ps%r(j,:) = ps%str%atoms(j)%r
       end do
       
       if (ps%neighb_list%ignore_list == .true.) then
@@ -188,9 +197,18 @@ contains
       !write(*,'(a,f12.6)') "sum_r_end = ", sum(ps%r*ps%r)
       
       ! calculate derivatives for time t=t+h
+      ! notice that I would needing any copying here if I put r in type structure 
       do j = 1, n_tot
         ps%str%atoms(j)%r = ps%r(j,:)
       end do
+      
+      ! wrap around
+      
+      call apply_boundary_condition(ps%str)
+      
+      do j = 1, n_tot
+        ps%r(j,:) = ps%str%atoms(j)%r
+      end do      
       
       if (ps%neighb_list%ignore_list == .true.) then
         call gpe_md_extra(ps%str, ps%deriv, common_gpe, pressure_comp, pot_energy)
@@ -207,7 +225,7 @@ contains
         call update_nn_list_flags(sqrt(maxval(ps%v2))*delta_t, ps%neighb_list)
         
         if (ps%neighb_list%needs_updating == .true.) then
-          write (*,*) "need_updating == .true."
+          !write (*,*) "need_updating == .true."
           call build_near_neighb(ps%str, ps%neighb_list)
         else
           call update_stored_nn_values(ps%str, ps%neighb_list)
@@ -247,7 +265,7 @@ contains
     type (phasespace) :: ps
 
     integer :: n_tot, i
-    real(db), dimension(ndim) :: momentum_sum  ! mainly for debugging    
+    !real(db), dimension(ndim) :: momentum_sum  ! mainly for debugging    
     real(db) :: momentum_scale
     
     n_tot = size(str%atoms)
@@ -294,13 +312,13 @@ contains
     
     ! what is the total momentum
 
-    momentum_sum = 0.0
-    do i = 1, n_tot
-      momentum_sum = momentum_sum + ps%p(i, :)
-    end do
+    !momentum_sum = 0.0
+    !do i = 1, n_tot
+    !  momentum_sum = momentum_sum + ps%p(i, :)
+    !end do
     
-    write(*,'(a,3f12.6)') "total momentum in make_phasespace ", momentum_sum
-    
+    !write(*,'(a,3f12.6)') "total momentum in make_phasespace ", momentum_sum
+    write(*,'(a,3f12.6)') "total momentum in make_phasespace ", sum(ps%p,1)
     !ps%p = 1.0
     
   end function make_phasespace

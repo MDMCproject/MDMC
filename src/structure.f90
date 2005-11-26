@@ -41,10 +41,30 @@ contains
       
       do i = 1, ndim
         if (str%atoms(i_a)%r(i) >= 0.5 * str%box_edges(i)) then
-        str%atoms(i_a)%r(i) = str%atoms(i_a)%r(i) - str%box_edges(i)
+          str%atoms(i_a)%r(i) = str%atoms(i_a)%r(i) - str%box_edges(i)
         end if
         if (str%atoms(i_a)%r(i) < -0.5 * str%box_edges(i)) then
-        str%atoms(i_a)%r(i) = str%atoms(i_a)%r(i) + str%box_edges(i)
+          str%atoms(i_a)%r(i) = str%atoms(i_a)%r(i) + str%box_edges(i)
+        end if       
+      end do
+      
+      
+      ! check that atoms have not moved further than one box length!!
+      ! This might be caused by 1) crap initial structure where two atoms starts
+      ! off being far too close to each other 2) when using the nearest neighbour
+      ! method be careful not to wait too long before updating which can cause
+      ! the effect described in 1)
+      
+      do i = 1, ndim
+        if (str%atoms(i_a)%r(i) >= 0.5 * str%box_edges(i)) then
+          write (*,*) "atoms move further than the length of the box within one step!!"
+          write (*,*) "ERROR written from apply_boundary_condition"
+          stop
+        end if
+        if (str%atoms(i_a)%r(i) < -0.5 * str%box_edges(i)) then
+          write (*,*) "atoms move further than the length of the box within one step!!"
+          write (*,*) "ERROR written from apply_boundary_condition"
+          stop
         end if       
       end do
 

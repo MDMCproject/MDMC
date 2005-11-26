@@ -102,7 +102,7 @@ contains
     nn_list%max_an_atom_has_moved = nn_list%max_an_atom_has_moved &
                              + max_an_atom_has_moved  
                              
-    if (nn_list%max_an_atom_has_moved > nn_list%delta_r) then
+    if (nn_list%max_an_atom_has_moved > 0.5 * nn_list%delta_r) then
       nn_list%needs_updating = .true.
       nn_list%max_an_atom_has_moved = 0.0
     end if 
@@ -125,9 +125,12 @@ contains
     ! why you want to do this if the memory storage required out-weights
     ! the other benifits - for now simply just assume that everything
     ! is fine
+    ! The alternative is to not specify an use-near-neighbour-method
+    ! element in the input file in which case this causes r_cut=0.0
     
-    nn_list%ignore_list = .false.
- 
+    if (r_cut /= 0.0) then
+      nn_list%ignore_list = .false.
+    end if
     
     n_tot = size(str%atoms)
     
@@ -303,6 +306,17 @@ contains
       ! cp_1d stands for cell position 1D
       cp_1d = (cp_3d(3) * nn_list%cells%num_cells(2) + cp_3d(2)) * & 
               nn_list%cells%num_cells(1) + cp_3d(1)
+      
+      
+      ! Here I could check whether I have remembered to do wrap around 
+      
+      !if (cp_1d < 0) then
+      !  write(*,*) "ERROR - serious error in simulation in build_near_neighb_with_cell"
+      !  write(*,*) "Likely causes are that you have forgot to do wrap around"
+      !  write(*,'(a,i6)') "Value of cp_1d = ", cp_1d
+      !  stop
+      !end if 
+      
       
       ! in the speciel cells the 'first' element in each cell is stored in 
       ! the last n_tot+1, n_tot+2, ... n_tot+product(num_cells) elements

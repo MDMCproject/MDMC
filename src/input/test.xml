@@ -4,7 +4,7 @@
 -->
   <structure>
     <title>Liquid Ar</title>
-    <density units="atom/AA3" value="0.8" />
+    <density units="atom/AA3" val="0.8" />
     <ar nx="8" ny ="8" nz="8" /> 
   </structure>
   
@@ -32,13 +32,23 @@
   </gpe>
   
   <control-object name="md_control">
-    <r-cut units="AA" val="1.12246204831" />
-    <delta-r units="AA" val="0.4" />
-    <step-average number="200" />
-    <step-equilibrium number="2000" />
-    <step-limit number="20000" />
-    <delta-t units="10^-15">1.0</delta-t>
-    <temperature units="kelvin">120</temperature>
+
+    <step-limit number="8000" />
+    <average-over-this-many-step number="2000" />
+    
+    <temperature units="Kelvin" val="1.0" />
+    <time-step units="10e-13s" val="0.005" />
+    
+    <use-near-neighbour-method>
+      <r-cut units="AA" val="1.12246204831" />
+      <delta-r units="AA" val="0.4" />      
+    </use-near-neighbour-method>
+    
+    <perform-initial-temperature-calibration>
+      <total-step number="4000" />
+      <adjust-temp-at-interval number="200" />
+    </perform-initial-temperature-calibration>
+
   </control-object>
 
 </job>

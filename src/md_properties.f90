@@ -161,7 +161,6 @@ contains
     write(*,'(a,2f12.6)') "Ekin = ", props%kin_energy%ave, props%kin_energy%esd
     write(*,'(a,2f12.6)') "P = ", props%pressure%ave, props%pressure%esd
     !write(*,'(a,2f12.6)') "Epot = ", props%tot_energy%ave - props%kin_energy%ave
-    
 
   end subroutine md_print_properties
   
