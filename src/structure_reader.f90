@@ -44,14 +44,15 @@ contains
     
     
     ! calculate box edge and gap
-    !edges = n_atoms / density**0.333333333333333
+
     edges = n_atoms / density**(1.0_db/3.0_db)
     common_config%str%box_edges = edges
     gap = edges / n_atoms
     
     
     n_tot = product(n_atoms)
-    allocate(common_config%str%atoms(n_tot))
+    allocate(common_config%str%atoms(n_tot))   ! allocate mass, name...
+    allocate(common_config%str%r(n_tot,ndim))  ! allocate coordinates
     
     do nz = 1, n_atoms(3)
       do ny = 1, n_atoms(2)
@@ -61,7 +62,7 @@ contains
           put_atom_at(3) = nz - 0.5_db
           put_atom_at = put_atom_at * gap - 0.5_db * edges
 
-          common_config%str%atoms(n)%r = put_atom_at
+          common_config%str%r(n,:) = put_atom_at
           n = n + 1
         end do
       end do
@@ -92,29 +93,30 @@ contains
         call get_value(attributes,"number", read_number_atoms,status)
         call build_data_array(read_number_atoms, number_atoms, ndata)
         write(*,*) number_atoms
-        allocate(common_config%str%atoms(number_atoms(1)))
+        allocate(common_config%str%atoms(number_atoms(1)))  ! allocate mass, name...
+        allocate(common_config%str%r(number_atoms(1), ndim))  ! allocate coordinates
         count_number_atoms = 1
 
       case("atom")
         call get_value(attributes,"x3", read_db,status)
         ndata = 0
         call build_data_array(read_db, number_db, ndata)
-        common_config%str%atoms(count_number_atoms)%r(1) = number_db(1)
+        common_config%str%r(count_number_atoms,1) = number_db(1)
 
         call get_value(attributes,"y3", read_db,status)
         ndata = 0
         call build_data_array(read_db, number_db, ndata)
-        common_config%str%atoms(count_number_atoms)%r(2) = number_db(1)
+        common_config%str%r(count_number_atoms,2) = number_db(1)
 
         call get_value(attributes,"z3", read_db,status)
         ndata = 0
         call build_data_array(read_db, number_db, ndata)
-        common_config%str%atoms(count_number_atoms)%r(3) = number_db(1)
+        common_config%str%r(count_number_atoms,3) = number_db(1)
 
         write (*,*) count_number_atoms, &
-          common_config%str%atoms(count_number_atoms)%r(1), &
-          common_config%str%atoms(count_number_atoms)%r(2), &
-          common_config%str%atoms(count_number_atoms)%r(3)
+          common_config%str%r(count_number_atoms,1), &
+          common_config%str%r(count_number_atoms,2), &
+          common_config%str%r(count_number_atoms,3)
         count_number_atoms = count_number_atoms + 1        
 
 	

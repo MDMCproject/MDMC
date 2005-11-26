@@ -102,7 +102,7 @@ contains
     
 		do i1 = 1, n_tot
 		  do i2 = i1+1, n_tot
-        diff_vec = str%atoms(i1)%r - str%atoms(i2)%r
+        diff_vec = str%r(i1,:) - str%r(i2,:)
         
         do i = 1, ndim
           if (diff_vec(i) >= 0.5_db * str%box_edges(i)) then
@@ -157,7 +157,7 @@ contains
     
 		do i1 = 1, n_tot
 		  do i2 = i1+1, n_tot
-        diff_vec = str%atoms(i1)%r - str%atoms(i2)%r
+        diff_vec = str%r(i1,:) - str%r(i2,:)
         
         do i = 1, ndim
           if (diff_vec(i) >= 0.5 * str%box_edges(i)) then
@@ -219,7 +219,7 @@ contains
     
 		do i1 = 1, n_tot
 		  do i2 = i1+1, n_tot
-        diff_vec = str%atoms(i1)%r - str%atoms(i2)%r
+        diff_vec = str%r(i1,:) - str%r(i2,:)
         
         do i = 1, ndim
           if (diff_vec(i) >= 0.5 * str%box_edges(i)) then
@@ -303,7 +303,7 @@ contains
       ! diff_vec into type near_neighb_list with the penalty that this would
       ! take up more memory = nn_list%n_pairs * 3 * 8 bytes
       
-      diff_vec = str%atoms(i1)%r - str%atoms(i2)%r
+      diff_vec = str%r(i1,:) - str%r(i2,:)
         
       do i = 1, ndim
         if (diff_vec(i) >= 0.5_db * str%box_edges(i)) then
@@ -386,7 +386,7 @@ contains
       ! diff_vec into type near_neighb_list with the penalty that this would
       ! take up more memory = nn_list%n_pairs * 3 * 8 bytes
       
-      diff_vec = str%atoms(i1)%r - str%atoms(i2)%r
+      diff_vec = str%r(i1,:) - str%r(i2,:)
         
       do i = 1, ndim
         if (diff_vec(i) >= 0.5_db * str%box_edges(i)) then

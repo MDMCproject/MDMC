@@ -33,8 +33,8 @@
   
   <control-object name="md_control">
 
-    <step-limit number="8000" />
-    <average-over-this-many-step number="2000" />
+    <step-limit number="1000" />
+    <average-over-this-many-step number="200" />
     
     <temperature units="Kelvin" val="1.0" />
     <time-step units="10e-13s" val="0.005" />
@@ -45,7 +45,7 @@
     </use-near-neighbour-method>
     
     <perform-initial-temperature-calibration>
-      <total-step number="4000" />
+      <total-step number="0" />
       <adjust-temp-at-interval number="200" />
     </perform-initial-temperature-calibration>
 

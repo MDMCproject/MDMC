@@ -76,7 +76,7 @@ contains
   	  i1 = nn_list%pairs(2*j-1)
   	  i2 = nn_list%pairs(2*j)
       
-      diff_vec = str%atoms(i1)%r - str%atoms(i2)%r
+      diff_vec = str%r(i1,:) - str%r(i2,:)
         
       do i = 1, ndim
         if (diff_vec(i) >= 0.5_db * str%box_edges(i)) then
@@ -222,7 +222,7 @@ contains
     num = 0
 	  do i1 = 1, n_tot
 		  do i2 = i1+1, n_tot
-      diff_vec = str%atoms(i1)%r - str%atoms(i2)%r
+      diff_vec = str%r(i1,:) - str%r(i2,:)
       
       do i = 1, ndim
           if (diff_vec(i) >= 0.5 * str%box_edges(i)) then
@@ -288,7 +288,7 @@ contains
     end do
     
     do i = 1, n_tot
-      dummy = str%atoms(i)%r + 0.5 * str%box_edges
+      dummy = str%r(i,:) + 0.5 * str%box_edges
       
       ! find 3D cell position
       cp_3d = floor(dummy * inverse_cell_width)
@@ -382,11 +382,11 @@ contains
                 ! remember to not counting twice distances within same cell
                 ! i.e. when cp1_1d==cp2_1d
                 if (cp1_1d /= cp2_1d .or. j2 < j1) then
-                  diff_vec = str%atoms(j1)%r - str%atoms(j2)%r
+                  diff_vec = str%r(j1,:) - str%r(j2,:)
                   diff_vec = diff_vec - shift
                   !write(*,'(a,i6,a,i6,a,i6)') "j1=", j1-1, " j2=", j2-1, " num=", num
-                  !write(*,'(3f12.6)') str%atoms(j1)%r
-                  !write(*,'(3f12.6)') str%atoms(j2)%r
+                  !write(*,'(3f12.6)') str%r(j1,:)
+                  !write(*,'(3f12.6)') str%r(j2,:)
                   !write(*,'(3f12.6)') diff_vec
                   !write(*,'(3f12.6)') shift
                   rr = sum(diff_vec*diff_vec)
@@ -464,7 +464,7 @@ contains
     num = 0
 	  do i1 = 1, n_tot
 		  do i2 = i1+1, n_tot
-      diff_vec = str%atoms(i1)%r - str%atoms(i2)%r
+      diff_vec = str%r(i1,:) - str%r(i2,:)
       
       do i = 1, ndim
           if (diff_vec(i) >= 0.5 * str%box_edges(i)) then
@@ -521,7 +521,7 @@ contains
     end do
     
     do i = 1, n_tot
-      dummy = str%atoms(i)%r + 0.5 * str%box_edges
+      dummy = str%r(i,:) + 0.5 * str%box_edges
       
       ! find 3D cell position
       cp_3d = floor(dummy * inverse_cell_width)
@@ -603,7 +603,7 @@ contains
                 ! remember to not counting twice distances within same cell
                 ! i.e. when cp1_1d==cp2_1d
                 if (cp1_1d /= cp2_1d .or. j2 < j1) then
-                  diff_vec = str%atoms(j1)%r - str%atoms(j2)%r
+                  diff_vec = str%r(j1,:) - str%r(j2,:)
                   diff_vec = diff_vec - shift
                   
                   if (sum(diff_vec*diff_vec) < rr_cut_neighbour) then

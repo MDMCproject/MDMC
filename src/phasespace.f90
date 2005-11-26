@@ -19,7 +19,7 @@ use common_potential_block_class
     ! NOTICE I SHOULD PROBABLY CHANGE THE STRUCTURE TYPE TO STORE THE ATOMIC
     ! COORS IN THIS FORMAT! (as a consequence of storing the coordinate I
     ! also have to copy forward in trajectory_in_phasespace()
-    real(db), dimension(:,:), allocatable :: r  ! atom positions
+    !real(db), dimension(:,:), allocatable :: r  ! atom positions
     
     ! this one is again added for speed gain and convenience
     real(db), dimension(:,:), allocatable :: inv_mass
@@ -54,8 +54,6 @@ contains
     ! for testing
     !real(db), dimension(512) :: dummy
 
-    write(*,'(a,3f12.6)') "first atom ", ps%r(1,:)
-    write(*,'(a,f12.6)') "sum_r_start = ", sum(ps%r*ps%r)
     write(*,'(a,f12.6)') "0.5*sum_p2_start_per_atom = ", 0.5*sum(ps%p*ps%p) / n_tot
     write(*,'(a,f12.6)') "sum_a_start = ", sum(ps%deriv*ps%deriv)    
     
@@ -80,24 +78,22 @@ contains
       ! correspond to time t=t+h/2 and is at present only used to calculate ps%v2 below 
       ps%p_div_mass = ps%p * ps%inv_mass
       
-      ps%r = ps%r + delta_t * ps%p * ps%inv_mass
+      ps%str%r = ps%str%r + delta_t * ps%p * ps%inv_mass
       
-      write(*,'(a,3f12.6)') "first atom after move ", ps%r(1,:)
-      write(*,'(a,f12.6)') "sum_r_end = ", sum(ps%r*ps%r)
       
       ! calculate derivatives for time t=t+h
       ! notice that I would needing any copying here if I put r in type structure 
-      do j = 1, n_tot
-        ps%str%atoms(j)%r = ps%r(j,:)
-      end do
+      !do j = 1, n_tot
+      !  ps%str%atoms(j)%r = ps%r(j,:)
+      !end do
       
       ! wrap around
       
       call apply_boundary_condition(ps%str)
       
-      do j = 1, n_tot
-        ps%r(j,:) = ps%str%atoms(j)%r
-      end do
+      !do j = 1, n_tot
+      !  ps%r(j,:) = ps%str%atoms(j)%r
+      !end do
       
       if (ps%neighb_list%ignore_list == .true.) then
         call gpe_deriv(ps%str, ps%deriv, common_gpe)
@@ -191,24 +187,13 @@ contains
       ! correspond to time t=t+h/2 and is at present only used to calculate ps%v2 below 
       ps%p_div_mass = ps%p * ps%inv_mass
       
-      ps%r = ps%r + delta_t * ps%p * ps%inv_mass
-      
-      !write(*,'(a,3f12.6)') "first atom after move ", ps%r(1,:)
-      !write(*,'(a,f12.6)') "sum_r_end = ", sum(ps%r*ps%r)
+      ps%str%r = ps%str%r + delta_t * ps%p * ps%inv_mass
+ 
       
       ! calculate derivatives for time t=t+h
-      ! notice that I would needing any copying here if I put r in type structure 
-      do j = 1, n_tot
-        ps%str%atoms(j)%r = ps%r(j,:)
-      end do
+      ! but wrap around first
       
-      ! wrap around
-      
-      call apply_boundary_condition(ps%str)
-      
-      do j = 1, n_tot
-        ps%r(j,:) = ps%str%atoms(j)%r
-      end do      
+      call apply_boundary_condition(ps%str)   
       
       if (ps%neighb_list%ignore_list == .true.) then
         call gpe_md_extra(ps%str, ps%deriv, common_gpe, pressure_comp, pot_energy)
@@ -277,7 +262,7 @@ contains
     
     allocate(ps%p(n_tot,3))
     allocate(ps%deriv(n_tot,3))
-    allocate(ps%r(n_tot,3))
+    !allocate(ps%r(n_tot,3))
     allocate(ps%inv_mass(n_tot,3))
     allocate(ps%p_div_mass(n_tot,3))
     allocate(ps%mass(n_tot))
@@ -285,7 +270,6 @@ contains
     
     ! copy coordinates to r - notice should probably change type of structure
     do i = 1, n_tot
-      ps%r(i,:) = str%atoms(i)%r
       ps%inv_mass(i,:) = str%atoms(i)%inv_mass
       ps%mass(i) = str%atoms(i)%mass
     end do

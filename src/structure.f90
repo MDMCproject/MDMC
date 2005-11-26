@@ -9,13 +9,21 @@ implicit none
 
   type atom
     character(len=2)  :: element_type
-    real(db), dimension(ndim) :: r   ! cartesian coor in units AA
     real(db) :: mass=1.0 !39.95        ! in units of amu
     real(db) :: inv_mass=1.0 !0.025    ! to save comp time
   end type atom
 
   type structure
     type (atom), dimension(:), allocatable :: atoms
+    
+    ! Fortran90 have many utilities for handling arrays hence
+    ! the atom coordinates are here stored in ONE array rather
+    ! than as atoms%r(1:ndim) for each atom as was originally done
+    !
+    ! Index 1 : atom number
+    ! Index 2 : atom coordinates
+    
+    real(db), dimension(:,:), allocatable :: r  ! cartesian coor in units AA
     
     ! box_edges in units of AA. Atoms are forces into a box with dimensions
     ! defined in box_edges and with the box centered around the origin. That 
@@ -40,11 +48,11 @@ contains
     do i_a = 1, size(str%atoms)
       
       do i = 1, ndim
-        if (str%atoms(i_a)%r(i) >= 0.5 * str%box_edges(i)) then
-          str%atoms(i_a)%r(i) = str%atoms(i_a)%r(i) - str%box_edges(i)
+        if (str%r(i_a,i) >= 0.5 * str%box_edges(i)) then
+          str%r(i_a,i) = str%r(i_a,i) - str%box_edges(i)
         end if
-        if (str%atoms(i_a)%r(i) < -0.5 * str%box_edges(i)) then
-          str%atoms(i_a)%r(i) = str%atoms(i_a)%r(i) + str%box_edges(i)
+        if (str%r(i_a,i) < -0.5 * str%box_edges(i)) then
+          str%r(i_a,i) = str%r(i_a,i) + str%box_edges(i)
         end if       
       end do
       
@@ -56,12 +64,12 @@ contains
       ! the effect described in 1)
       
       do i = 1, ndim
-        if (str%atoms(i_a)%r(i) >= 0.5 * str%box_edges(i)) then
+        if (str%r(i_a,i) >= 0.5 * str%box_edges(i)) then
           write (*,*) "atoms move further than the length of the box within one step!!"
           write (*,*) "ERROR written from apply_boundary_condition"
           stop
         end if
-        if (str%atoms(i_a)%r(i) < -0.5 * str%box_edges(i)) then
+        if (str%r(i_a,i) < -0.5 * str%box_edges(i)) then
           write (*,*) "atoms move further than the length of the box within one step!!"
           write (*,*) "ERROR written from apply_boundary_condition"
           stop
@@ -83,24 +91,16 @@ contains
     str_out%density = str_in%density
     str_out%title = str_in%title
     
-    allocate(str_out%atoms(size(str_in%atoms)))
-    
-    sum_out = 0.0
-    sum_in = 0.0
+    allocate(str_out%atoms(size(str_in%atoms)))  ! allocate mass, name...
+    allocate(str_out%r(size(str_in%atoms),ndim)) ! allocate coordinates
+
     do i = 1, size(str_in%atoms)
-      str_out%atoms(i)%r = str_in%atoms(i)%r
       str_out%atoms(i)%mass = str_in%atoms(i)%mass
       str_out%atoms(i)%inv_mass = str_in%atoms(i)%inv_mass
       str_out%atoms(i)%element_type = str_in%atoms(i)%element_type
-      
-      sum_out = sum_out + sum(str_out%atoms(i)%r)
-      sum_in = sum_in + sum(str_in%atoms(i)%r)
     end do
     
-    if (sum_out /= sum_in) then
-      write(*,*) "ERROR: problem with copying structure"
-      stop
-    end if
+    str_out%r = str_in%r
   
   end function copy_structure
 
