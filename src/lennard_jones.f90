@@ -1,7 +1,7 @@
 module lennard_jones_class
 use various_constants_class
 use structure_class
-use variable_class
+use func_param_class
 use near_neighb_class
 
 implicit none
@@ -11,7 +11,7 @@ implicit none
 
 
   type lj_pe_container
-    type (variable), dimension(:), allocatable :: vars
+    type (func_param), dimension(:), allocatable :: vars
   end type lj_pe_container
 
 

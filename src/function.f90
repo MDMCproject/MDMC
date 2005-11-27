@@ -1,13 +1,13 @@
-module gpe_class
+module function_class
 use various_constants_class
 use structure_class
-use variable_class
+use func_param_class
 use lennard_jones_class
 
 implicit none
 
-  public :: gpe_val, gpe_val_nn
-  public :: gpe_deriv, gpe_deriv_nn
+  public :: func_val, func_val_nn
+  public :: func_deriv, func_deriv_nn
 
 
   private ::  add_lj_pe_container
@@ -31,26 +31,26 @@ contains
   end subroutine add_lj_pe_container
 
   
-  function gpe_val(str, list) result (val)
+  function func_val(str, list) result (val)
     type (structure), intent(in) :: str
     type (func_list), intent(in) :: list
     real (db) :: val
  
     val = lj_val(str, list%pt_lj_pe)
-  end function gpe_val
+  end function func_val
   
   
-  function gpe_val_nn(str, list, nn_list) result (val)
+  function func_val_nn(str, list, nn_list) result (val)
     type (structure), intent(in) :: str
     type (func_list), intent(in) :: list
     type (near_neighb_list), intent(in) :: nn_list    
     real (db) :: val
  
     val = lj_val_nn(str, list%pt_lj_pe, nn_list)
-  end function gpe_val_nn  
+  end function func_val_nn  
   
   
-  subroutine gpe_deriv(str, deriv, list, pressure_comp, pot_energy)
+  subroutine func_deriv(str, deriv, list, pressure_comp, pot_energy)
     type (structure), intent(in) :: str
     real(db), dimension(:,:), intent(out) :: deriv
     type (func_list), intent(in) :: list
@@ -63,16 +63,16 @@ contains
     else if (present(pressure_comp)==.false. .and. present(pot_energy)==.false.) then
       call lj_deriv(str, deriv, list%pt_lj_pe)
     else
-      write(*,*) "ERROR in gpe_deriv"
+      write(*,*) "ERROR in func_deriv"
       write(*,*) "Either both pressure_comp and pot_energy must be present"
       write(*,*) "none of them."
       stop    
     end if 
  		
-  end subroutine gpe_deriv
+  end subroutine func_deriv
 
 
-  subroutine gpe_deriv_nn(str, deriv, list, nn_list, pressure_comp, pot_energy)
+  subroutine func_deriv_nn(str, deriv, list, nn_list, pressure_comp, pot_energy)
     type (structure), intent(in) :: str
     real(db), dimension(:,:), intent(out) :: deriv
     type (func_list), intent(in) :: list
@@ -86,12 +86,12 @@ contains
     else if (present(pressure_comp)==.false. .and. present(pot_energy)==.false.) then
       call lj_deriv_nn(str, deriv, list%pt_lj_pe, nn_list)
     else
-      write(*,*) "ERROR in gpe_deriv_nn"
+      write(*,*) "ERROR in func_deriv_nn"
       write(*,*) "Either both pressure_comp and pot_energy must be present"
       write(*,*) "none of them."
       stop    
     end if 		    
  		     
-  end subroutine gpe_deriv_nn   
+  end subroutine func_deriv_nn   
       
-end module gpe_class
+end module function_class

@@ -1,22 +1,22 @@
-module variable_class
+module func_param_class
 use various_constants_class
 
 implicit none
 
-  ! originally I imagined calling this type parameter rather then variable
-  ! but I think parameter might be a reserved keyword in fortran
-  type variable
+  public :: get_func_param_val, update_func_param
+
+  type func_param
     character(len=99) :: name
     real(db) :: val  
     real(db) :: limit_min
     real(db) :: limit_max
-  end type variable
+  end type func_param
 
 
 contains
 
-  function get_variable_val(vars, name) result (val)
-    type (variable), dimension(:), intent(in) :: vars
+  function get_func_param_val(vars, name) result (val)
+    type (func_param), dimension(:), intent(in) :: vars
     character(len=99), intent(in) :: name
     real (db) :: val
     
@@ -32,11 +32,11 @@ contains
     ! if hasn't returned by this stage then name was not found
     ! and a error should be thrown
     
-  end function get_variable_val
+  end function get_func_param_val
   
   
-  subroutine update_variable(vars, name, val)
-    type (variable), dimension(:), intent(inout) :: vars
+  subroutine update_func_param(vars, name, val)
+    type (func_param), dimension(:), intent(inout) :: vars
     character(len=99), intent(in) :: name
     real (db), intent(in) :: val
     
@@ -52,7 +52,7 @@ contains
     ! if hasn't returned by this stage then name was not found
     ! and a error should be thrown    
 
-  end subroutine update_variable
+  end subroutine update_func_param
     
     
-end module variable_class
+end module func_param_class

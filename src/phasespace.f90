@@ -1,7 +1,7 @@
 module phasespace_class
 use structure_class
 use near_neighb_class
-use gpe_class
+use function_class
 
   implicit none
 
@@ -93,9 +93,9 @@ contains
       
       if (ps%neighb_list%ignore_list == .true.) then
         if (extra_args) then
-          call gpe_deriv(ps%str, ps%deriv, pe_list, pressure_comp, pot_energy)
+          call func_deriv(ps%str, ps%deriv, pe_list, pressure_comp, pot_energy)
         else
-          call gpe_deriv(ps%str, ps%deriv, pe_list)
+          call func_deriv(ps%str, ps%deriv, pe_list)
         end if
       else
         ! stored the velocities at times t=t+h/2. Strictly speaking
@@ -116,9 +116,9 @@ contains
         end if
         
         if (extra_args) then
-          call gpe_deriv_nn(ps%str, ps%deriv, pe_list, ps%neighb_list, pressure_comp, pot_energy)
+          call func_deriv_nn(ps%str, ps%deriv, pe_list, ps%neighb_list, pressure_comp, pot_energy)
         else
-          call gpe_deriv_nn(ps%str, ps%deriv, pe_list, ps%neighb_list)
+          call func_deriv_nn(ps%str, ps%deriv, pe_list, ps%neighb_list)
         end if
       end if
       
