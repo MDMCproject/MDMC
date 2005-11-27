@@ -164,11 +164,38 @@ contains
     nn_list%n_pairs = get_num_near_neighb(nn_list%cells, &
                          str, r_cut+delta_r)
 
+    ! nn_list cannot possibly be bigger than N(N-1)/2 here
+    ! exception should be used below but for now simply use brute force
+    
+    if (nn_list%n_pairs > n_tot*(n_tot-1) / 2 ) then
+      write(*,*) " "
+      write(*,*) "ERROR in make_near_neighb_list"
+      write(*,'(a,i6)') "n_pairs = ", nn_list%n_pairs
+      write(*,'(a,i6)') "and number of possible pairs are ", n_tot*(n_tot-1) / 2
+      stop
+    end if
+    
+
     nn_list%pairs_allocated = nn_list%n_pairs+10*n_tot
+    
+    if (nn_list%pairs_allocated > n_tot*(n_tot-1) / 2 ) then
+      nn_list%pairs_allocated = n_tot*(n_tot-1) / 2
+    end if
+    
     allocate(nn_list%pairs( 2*nn_list%pairs_allocated ))
     allocate(nn_list%dists( nn_list%pairs_allocated ))
     
-    !write(*,'(a,i7)') "num_near_neighbours ", nn_list%n_pairs
+    ! general warning since no point in using nearest neighbour method
+    ! if nn_list close to max number of allowed and this is likely to 
+    ! be the case when
+    
+    if ( r_cut+delta_r > maxval(str%box_edges) ) then
+      write(*,*) " "
+      write(*,*) "WARNING: using nearest neighbour method may be inefficient"
+      write(*,'(a,i6)') "pairs allocated = ", nn_list%n_pairs
+      write(*,'(a,i6)') "and number of possible pairs are ", n_tot*(n_tot-1) / 2
+      write(*,*) " "
+    end if
     
 
   end function make_near_neighb_list

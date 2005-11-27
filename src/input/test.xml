@@ -39,16 +39,19 @@
     <temperature units="Kelvin" val="1.0" />
     <time-step units="10e-13s" val="0.005" />
     
+    <!-- To not use nearest neighbour method comment out the element below -->
     <use-near-neighbour-method>
       <r-cut units="AA" val="1.12246204831" />
       <delta-r units="AA" val="0.4" />      
-    </use-near-neighbour-method>
+    </use-near-neighbour-method> 
     
+    <!-- to not perform initial temperature calibration either comment
+         out the element below or set total-step to zero -->
     <perform-initial-temperature-calibration>
       <total-step number="0" />
       <adjust-temp-at-interval number="200" />
     </perform-initial-temperature-calibration>
-
+    
   </control-object>
 
 </job>

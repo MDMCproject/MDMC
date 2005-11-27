@@ -8,7 +8,6 @@ implicit none
 
   public :: gpe_val, gpe_val_nn
   public :: gpe_deriv, gpe_deriv_nn
-  public :: gpe_md_extra, gpe_md_extra_nn
 
 
   private ::  add_lj_pe_container
@@ -51,42 +50,48 @@ contains
   end function gpe_val_nn  
   
   
-  subroutine gpe_deriv(str, deriv, list)
+  subroutine gpe_deriv(str, deriv, list, pressure_comp, pot_energy)
     type (structure), intent(in) :: str
     real(db), dimension(:,:), intent(out) :: deriv
     type (pe_list), intent(in) :: list
-
-    call lj_deriv(str, deriv, list%pt_lj_pe)
+ 		real (db), optional, intent(out) :: pressure_comp, pot_energy
+ 		
+ 		! test for optional arguments
+    
+    if (present(pressure_comp) .and. present(pot_energy)) then
+      call lj_deriv(str, deriv, list%pt_lj_pe, pressure_comp, pot_energy)
+    else if (present(pressure_comp)==.false. .and. present(pot_energy)==.false.) then
+      call lj_deriv(str, deriv, list%pt_lj_pe)
+    else
+      write(*,*) "ERROR in gpe_deriv"
+      write(*,*) "Either both pressure_comp and pot_energy must be present"
+      write(*,*) "none of them."
+      stop    
+    end if 
+ 		
   end subroutine gpe_deriv
-  
-  
-  subroutine gpe_md_extra(str, deriv, list, pressure_comp, pot_energy)
-    type (structure), intent(in) :: str
-    real(db), dimension(:,:), intent(out) :: deriv
-    type (pe_list), intent(in) :: list
- 		real (db), intent(out) :: pressure_comp, pot_energy    
-
-    call lj_md_extra(str, deriv, list%pt_lj_pe, pressure_comp, pot_energy)
-  end subroutine gpe_md_extra  
 
 
-  subroutine gpe_deriv_nn(str, deriv, list, nn_list)
+  subroutine gpe_deriv_nn(str, deriv, list, nn_list, pressure_comp, pot_energy)
     type (structure), intent(in) :: str
     real(db), dimension(:,:), intent(out) :: deriv
     type (pe_list), intent(in) :: list
     type (near_neighb_list), intent(in) :: nn_list
+ 		real (db), optional, intent(out) :: pressure_comp, pot_energy
+ 		    
+ 		! test for optional arguments
     
-    call lj_deriv_nn(str, deriv, list%pt_lj_pe, nn_list)
+    if (present(pressure_comp) .and. present(pot_energy)) then
+      call lj_deriv_nn(str, deriv, list%pt_lj_pe, nn_list, pressure_comp, pot_energy)
+    else if (present(pressure_comp)==.false. .and. present(pot_energy)==.false.) then
+      call lj_deriv_nn(str, deriv, list%pt_lj_pe, nn_list)
+    else
+      write(*,*) "ERROR in gpe_deriv_nn"
+      write(*,*) "Either both pressure_comp and pot_energy must be present"
+      write(*,*) "none of them."
+      stop    
+    end if 		    
+ 		     
   end subroutine gpe_deriv_nn   
-    
-  subroutine gpe_md_extra_nn(str, deriv, list, nn_list, pressure_comp, pot_energy)
-    type (structure), intent(in) :: str
-    real(db), dimension(:,:), intent(out) :: deriv
-    type (pe_list), intent(in) :: list
-    type (near_neighb_list), intent(in) :: nn_list    
- 		real (db), intent(out) :: pressure_comp, pot_energy    
-
-    call lj_md_extra_nn(str, deriv, list%pt_lj_pe, nn_list, pressure_comp, pot_energy)
-  end subroutine gpe_md_extra_nn  
       
 end module gpe_class
