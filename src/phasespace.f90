@@ -1,7 +1,7 @@
 module phasespace_class
 use structure_class
 use near_neighb_class
-use common_potential_block_class
+use gpe_class
 
   implicit none
 
@@ -38,8 +38,9 @@ use common_potential_block_class
 
 contains
 
-  subroutine trajectory_in_phasespace(ps, n_md, delta_t, pressure_comp, pot_energy)
+  subroutine trajectory_in_phasespace(ps, pe_list, n_md, delta_t, pressure_comp, pot_energy)
     type (phasespace), intent(inout) :: ps
+    type (func_list), intent(in) :: pe_list
     integer, intent(in) :: n_md
     real(db), intent(in) :: delta_t   
  		real (db), optional, intent(out) :: pressure_comp, pot_energy 
@@ -92,9 +93,9 @@ contains
       
       if (ps%neighb_list%ignore_list == .true.) then
         if (extra_args) then
-          call gpe_deriv(ps%str, ps%deriv, common_gpe, pressure_comp, pot_energy)
+          call gpe_deriv(ps%str, ps%deriv, pe_list, pressure_comp, pot_energy)
         else
-          call gpe_deriv(ps%str, ps%deriv, common_gpe)
+          call gpe_deriv(ps%str, ps%deriv, pe_list)
         end if
       else
         ! stored the velocities at times t=t+h/2. Strictly speaking
@@ -115,9 +116,9 @@ contains
         end if
         
         if (extra_args) then
-          call gpe_deriv_nn(ps%str, ps%deriv, common_gpe, ps%neighb_list, pressure_comp, pot_energy)
+          call gpe_deriv_nn(ps%str, ps%deriv, pe_list, ps%neighb_list, pressure_comp, pot_energy)
         else
-          call gpe_deriv_nn(ps%str, ps%deriv, common_gpe, ps%neighb_list)
+          call gpe_deriv_nn(ps%str, ps%deriv, pe_list, ps%neighb_list)
         end if
       end if
       

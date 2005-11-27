@@ -33,7 +33,7 @@ contains
   subroutine md_cal_properties(ps, props, list, pressure_comp, pot_energy)
     type (phasespace), intent(in) :: ps
     type (md_properties), intent(inout) :: props
-    type (pe_list), intent(in) :: list
+    type (func_list), intent(in) :: list
  		real (db), optional, intent(in) :: pressure_comp, pot_energy    
    
   
@@ -117,7 +117,7 @@ contains
   subroutine md_cal_properties_not_extra(ps, props, list)
     type (phasespace), intent(in) :: ps
     type (md_properties), intent(inout) :: props
-    type (pe_list), intent(in) :: list
+    type (func_list), intent(in) :: list
     
     real(db) :: pot_energy, sum_mass_v2
     integer :: n_atoms
@@ -160,7 +160,7 @@ contains
   subroutine md_cal_properties_extra(ps, props, list, pressure_comp, pot_energy)
     type (phasespace), intent(in) :: ps
     type (md_properties), intent(inout) :: props
-    type (pe_list), intent(in) :: list
+    type (func_list), intent(in) :: list
  		real (db), intent(in) :: pressure_comp, pot_energy    
     
     real(db) :: sum_mass_v2

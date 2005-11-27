@@ -1,7 +1,7 @@
 module handler_class
 use flib_sax
 use common_block_class
-use common_potential_block_class
+!use common_potential_block_class
 use md_control_class
 use structure_reader_class
 use control_containers_class
@@ -138,7 +138,7 @@ contains
 					ndata = 0
           call build_data_array(read_int, number_int, ndata)
           
-          call add_potential(common_gpe, target_lj_pe)
+          call add_potential(common_pe_list, target_lj_pe)
           
           allocate(target_lj_pe%vars(number_int(1)))
           

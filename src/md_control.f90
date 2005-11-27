@@ -1,8 +1,8 @@
 module md_control_class
 use configuration_class
 use gpe_class
-use common_block_class, only : common_config
-use common_potential_block_class
+use common_block_class, only : common_config, common_pe_list
+!use common_potential_block_class
 use phasespace_class
 use md_properties_class
 use control_containers_class
@@ -45,11 +45,12 @@ contains
       ! do one trajectory of length = 1 where pressure_comp and pot_energy is also
       ! calculated
       
-      !call trajectory_in_phasespace(my_ps, 1, c%time_step)
-      call trajectory_in_phasespace(my_ps, 1, c%time_step, pressure_comp, pot_energy)
+      !call trajectory_in_phasespace(my_ps, common_pe_list, 1, c%time_step)
+      call trajectory_in_phasespace(my_ps, common_pe_list, 1, c%time_step, & 
+                                    pressure_comp, pot_energy)
       
-      !call md_cal_properties(my_ps, my_props, common_gpe)
-      call md_cal_properties(my_ps, my_props, common_gpe, pressure_comp, pot_energy)
+      !call md_cal_properties(my_ps, my_props, common_pe_list)
+      call md_cal_properties(my_ps, my_props, common_pe_list, pressure_comp, pot_energy)
       
       ! case you want to adject the temperature in the initial stages of the MD simulation
         
