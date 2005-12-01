@@ -11,7 +11,7 @@ implicit none
 
 
   type lj_pe_container
-    type (func_param), dimension(:), allocatable :: vars
+    type (func_params) :: params
   end type lj_pe_container
 
 
@@ -29,19 +29,21 @@ contains
     real (db) :: rr, rri, rri3
     
     
-  	sigma = container%vars(1)%val
-  	epsilon = container%vars(2)%val
+		sigma = get_func_param_val(container%params, "sigma")  !container%params%p(1)%val
+		epsilon = get_func_param_val(container%params, "epsilon") !container%params%p(2)%val
     epsilon_times4 = 4*epsilon
     
     
-    ! this potential here is assumed to have a 'natural' cut-off value
-    ! this is because it is in fact a kind off soft-sphere LJ potential
-    ! Because this potential has it own cut-off value then this value
-    ! may be favoured to the nn_list%r_cut value as dictated by the code
-    ! below
+
+    ! r_cut = 2.0_db**(1.0_db / 6.0_db) * sigma
     
-    ! this potential 'natural' cut-off
-    r_cut = 2.0_db**(1.0_db / 6.0_db) * sigma
+    if (does_func_param_exist(container%params, "r-cut")) then
+      r_cut = get_func_param_val(container%params, "r-cut")
+    else
+      ! otherwise put r_cut to a value higher than any possible distance
+      r_cut = sqrt(sum(str%box_edges*str%box_edges))
+    end if
+    
     
     if (nn_list%r_cut < r_cut) then
       r_cut = nn_list%r_cut
@@ -60,7 +62,6 @@ contains
       
       rr = nn_list%dists(j)
       
- !     write (*, '(2i6, f12.6)') i1, i2, rr
         
       if (rr < rr_cut) then
         rri = sigma*sigma / rr
@@ -86,11 +87,19 @@ contains
 		real (db), dimension(ndim) :: diff_vec
     
     
-		sigma = container%vars(1)%val
-		epsilon = container%vars(2)%val
+		sigma = get_func_param_val(container%params, "sigma")  !container%params%p(1)%val
+		epsilon = get_func_param_val(container%params, "epsilon") !container%params%p(2)%val
     epsilon_times4 = 4*epsilon
     
-    r_cut = 2.0_db**(1.0_db / 6.0_db) * sigma
+    ! r_cut = 2.0_db**(1.0_db / 6.0_db) * sigma
+    
+    if (does_func_param_exist(container%params, "r-cut")) then
+      r_cut = get_func_param_val(container%params, "r-cut")
+    else
+      ! otherwise put r_cut to a value higher than any possible distance
+      r_cut = sqrt(sum(str%box_edges*str%box_edges))
+    end if
+    
     rr_cut = r_cut * r_cut
     
 		n_tot = size(str%atoms)
@@ -156,11 +165,19 @@ contains
     end if    
     
     
-		sigma = container%vars(1)%val
-		epsilon = container%vars(2)%val
+		sigma = get_func_param_val(container%params, "sigma")  !container%params%p(1)%val
+		epsilon = get_func_param_val(container%params, "epsilon") !container%params%p(2)%val
     epsilon_times4 = 4*epsilon
     
-    r_cut = 2.0_db**(1.0_db / 6.0_db) * sigma
+    ! r_cut = 2.0_db**(1.0_db / 6.0_db) * sigma
+    
+    if (does_func_param_exist(container%params, "r-cut")) then
+      r_cut = get_func_param_val(container%params, "r-cut")
+    else
+      ! otherwise put r_cut to a value higher than any possible distance
+      r_cut = sqrt(sum(str%box_edges*str%box_edges))
+    end if
+    
     rr_cut = r_cut * r_cut
     
 		n_tot = size(str%atoms)
@@ -241,18 +258,19 @@ contains
     end if    
     
     
-  	sigma = container%vars(1)%val
-  	epsilon = container%vars(2)%val
+		sigma = get_func_param_val(container%params, "sigma")  !container%params%p(1)%val
+		epsilon = get_func_param_val(container%params, "epsilon") !container%params%p(2)%val
     epsilon_times4 = 4*epsilon
+  
     
-    ! this potential here is assumed to have a 'natural' cut-off value
-    ! this is because it is in fact a kind off soft-sphere LJ potential
-    ! Because this potential has it own cut-off value then this value
-    ! may be favoured to the nn_list%r_cut value as dictated by the code
-    ! below
+    ! r_cut = 2.0_db**(1.0_db / 6.0_db) * sigma
     
-    ! this potential 'natural' cut-off
-    r_cut = 2.0_db**(1.0_db / 6.0_db) * sigma
+    if (does_func_param_exist(container%params, "r-cut")) then
+      r_cut = get_func_param_val(container%params, "r-cut")
+    else
+      ! otherwise put r_cut to a value higher than any possible distance
+      r_cut = sqrt(sum(str%box_edges*str%box_edges))
+    end if
     
     if (nn_list%r_cut < r_cut) then
       r_cut = nn_list%r_cut

@@ -1,4 +1,4 @@
-function read_rdf(filename)
+function read_rdf(filename, format)
 
 s = xmlread(filename);
 
@@ -13,4 +13,4 @@ for i = 0 : mylist.getLength()-1
   g(i+1) = str2num(mylist.item(i).getAttribute('g'));
 end 
 
-plot(r,g)
+plot(r, g, format)

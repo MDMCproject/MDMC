@@ -19,7 +19,7 @@ use control_containers_class
   integer, dimension(ndim), private :: n_atoms  ! both to be passed to 
                                              ! make_simple_cubic_structure
                                              
-
+  integer, dimension(ndim), private :: n_param
 contains
 
   ! START_DOCUMENT
@@ -32,7 +32,7 @@ contains
     character(len=*), intent(in)   :: name
     type(dictionary_t), intent(in) :: attributes
     
-    integer :: status, ndata=0
+    integer :: status, ndata=0, n
     real(db) :: number_db(1)
     integer :: number_int(1)
     character(len=40) :: read_db, read_int
@@ -162,29 +162,28 @@ contains
     if (in_gpe) then
       select case(name)
         case("lj-potential")       
-          call get_value(attributes,"num-variable",read_int,status)
-					ndata = 0
-          call build_data_array(read_int, number_int, ndata)
-          
           call add_potential(common_pe_list, target_lj_pe)
-          
-          allocate(target_lj_pe%vars(number_int(1)))
           
         case("sigma")
           call get_value(attributes,"val",read_db,status)
 					ndata = 0
           call build_data_array(read_db, number_db, ndata)
           
-          target_lj_pe%vars(1)%name = "sigma"
-          target_lj_pe%vars(1)%val = number_db(1)
+          call add_func_param(target_lj_pe%params, "sigma", number_db(1))
           
         case("epsilon")
           call get_value(attributes,"val",read_db,status)
 					ndata = 0
           call build_data_array(read_db, number_db, ndata)
           
-          target_lj_pe%vars(2)%name = "epsilon"
-          target_lj_pe%vars(2)%val = number_db(1)
+          call add_func_param(target_lj_pe%params, "epsilon", number_db(1))
+          
+        case("r-cut")
+          call get_value(attributes,"val",read_db,status)
+					ndata = 0
+          call build_data_array(read_db, number_db, ndata)
+          
+          call add_func_param(target_lj_pe%params, "r-cut", number_db(1))      
           
       end select
     end if
