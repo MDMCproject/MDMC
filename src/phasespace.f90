@@ -187,7 +187,7 @@ contains
     !end do
     
     !write(*,'(a,3f12.6)') "total momentum in make_phasespace ", momentum_sum
-    write(*,'(a,3f12.6)') "total momentum in make_phasespace ", sum(ps%p,1)
+    !write(*,'(a,3f12.6)') "total momentum in make_phasespace ", sum(ps%p,1)
     !ps%p = 1.0
     
   end function make_phasespace

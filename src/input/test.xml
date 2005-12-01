@@ -4,7 +4,7 @@
 -->
   <structure>
     <title>Liquid Ar</title>
-    <density units="atom/AA3" val="0.8" />
+    <density units="atom/AA3" val="1.0" />
     <ar nx="8" ny ="8" nz="8" /> 
   </structure>
   
@@ -33,8 +33,8 @@
   
   <control-object name="md_control">
 
-    <step-limit number="1000" />
-    <average-over-this-many-step number="200" />
+    <step-limit number="17000" />
+    <average-over-this-many-step number="1000" />
     
     <temperature units="Kelvin" val="1.0" />
     <time-step units="10e-13s" val="0.005" />
@@ -48,10 +48,18 @@
     <!-- to not perform initial temperature calibration either comment
          out the element below or set total-step to zero -->
     <perform-initial-temperature-calibration>
-      <total-step number="0" />
+      <total-step-temp-cali number="2000" />
       <adjust-temp-at-interval number="200" />
     </perform-initial-temperature-calibration>
-    
+
+    <!-- To calculate radial dist-func comment out the element below -->
+    <calculate-rdf>
+      <r-max units="AA" val="4.0" />
+      <number-bins number="200" /> 
+      <cal-rdf-at-interval number="50" />
+      <average-over-this-many-rdf number="100" />  
+    </calculate-rdf> 
+        
   </control-object>
 
 </job>

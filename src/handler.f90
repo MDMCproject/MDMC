@@ -98,14 +98,14 @@ contains
           call build_data_array(read_int, number_int, ndata)
           setup_md_control_params%average_over_this_many_step = number_int(1)     
           
-        case("perform-initial-temperature-calibration")
-          setup_md_control_params%perform_initial_temperature_calibration = .true.               
+        !case("perform-initial-temperature-calibration")
+        !  setup_md_control_params%perform_initial_temperature_calibration = .true.               
           
-        case("total-step")       
+        case("total-step-temp-cali")       
           call get_value(attributes,"number",read_int,status)
 					ndata = 0
           call build_data_array(read_int, number_int, ndata)
-          setup_md_control_params%total_step = number_int(1)       
+          setup_md_control_params%total_step_temp_cali = number_int(1)       
           
         case("adjust-temp-at-interval")       
           call get_value(attributes,"number",read_int,status)
@@ -124,7 +124,35 @@ contains
 					ndata = 0
           call build_data_array(read_db, number_db, ndata)
           setup_md_control_params%time_step = number_db(1) 
-                    
+               
+        
+        case("calculate-rdf")
+          setup_md_control_params%calculate_rdf = .true.   
+          
+        case("r-max")       
+          call get_value(attributes,"val",read_db,status)
+					ndata = 0
+          call build_data_array(read_db, number_db, ndata)
+          setup_md_control_params%r_max = number_db(1)    
+          
+        case("number-bins")       
+          call get_value(attributes,"number",read_int,status)
+					ndata = 0
+          call build_data_array(read_int, number_int, ndata)
+          setup_md_control_params%number_bins = number_int(1)                 
+                          
+        case("cal-rdf-at-interval")       
+          call get_value(attributes,"number",read_int,status)
+					ndata = 0
+          call build_data_array(read_int, number_int, ndata)
+          setup_md_control_params%cal_rdf_at_interval = number_int(1)
+          
+        case("average-over-this-many-rdf")       
+          call get_value(attributes,"number",read_int,status)
+					ndata = 0
+          call build_data_array(read_int, number_int, ndata)
+          setup_md_control_params%average_over_this_many_rdf = number_int(1)
+                               
       end select
     end if
     

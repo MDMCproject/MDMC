@@ -17,11 +17,17 @@ implicit none
     real(db) :: delta_r       ! buffer region so that the near-neighbour pairs includes
                               ! all pairs with distances less than r_cut+delta_r
                               
-    logical :: perform_initial_temperature_calibration = .false.
-    integer :: total_step     ! the total number of MD steps where the temperature is adjusted
+    !logical :: perform_initial_temperature_calibration = .false.
+    integer :: total_step_temp_cali = 0    ! the total number of MD steps where the temperature is adjusted
     integer :: adjust_temp_at_interval ! at what intervals should the temperature be adjusted
                               ! in this initial calibration stage. Notice that adjust_temp_at_interval
-                              ! most be equal or smaller than total_step
+                              ! most be equal or smaller than total_step_temp_cali
+                              
+    logical :: calculate_rdf = .false.                          
+    real(db) :: r_max                  ! cal rdf for interval [0:r_max]
+    integer :: number_bins             ! over this many bins
+    integer :: cal_rdf_at_interval     ! at what intervals should rdf be calculated
+    integer :: average_over_this_many_rdf  ! how many rdf's do you want to average over
   end type md_control_container
 
 

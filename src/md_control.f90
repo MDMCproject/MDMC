@@ -7,6 +7,7 @@ use phasespace_class
 use md_properties_class
 use control_containers_class
 use tic_toc_class
+use rdf_class
 
   implicit none
 
@@ -27,6 +28,17 @@ contains
     type (phasespace) :: my_ps
     type (md_properties) :: my_props
     real(db) :: pressure_comp = 0.0, pot_energy = 0.0
+    type (rdf) :: my_rdf, my_rdf_sum
+		
+		!character(len=5) :: filename
+    
+    !i = 1
+    
+    
+    !write(filename, fmt='(i5)') i
+		
+		!write (*,*) trim(filename)
+		!stop
 		
 		
     write(*,*) "In run_md_control"
@@ -37,7 +49,16 @@ contains
     
     my_ps = make_phasespace(a_config%str, c%r_cut, c%delta_r, &
                         c%temperature)
+    my_rdf = make_rdf(product(my_ps%str%box_edges), size(my_ps%str%atoms), &
+                      c%r_max, c%number_bins)
     
+                      
+    ! this is a rdf container for accumulation rdf's
+    
+    my_rdf_sum = make_rdf(product(my_ps%str%box_edges), size(my_ps%str%atoms), &
+                      c%r_max, c%number_bins)
+    my_rdf_sum%g_of_r = 0.0
+                          
     
     do i = 1, c%step_limit
       time_now = c%time_step * i   ! perhaps print this one out 
@@ -53,20 +74,21 @@ contains
       call md_cal_properties(my_ps, my_props, common_pe_list, pressure_comp, pot_energy)
       
       ! case you want to adject the temperature in the initial stages of the MD simulation
-        
-      if (c%perform_initial_temperature_calibration) then
-        if (i < c%total_step) then
-          sum_kin_energy = sum_kin_energy + my_props%kin_energy%val
-          if (mod(i,c%adjust_temp_at_interval) == 0) then
-            temp_adjust_factor = sqrt(c%adjust_temp_at_interval * 1.5 * c%temperature / &
-               sum_kin_energy * (size(my_ps%str%atoms)-1.0) / size(my_ps%str%atoms))
-            !write(*,*) sum_kin_energy / c%adjust_temp_at_interval   
-            my_ps%p = my_ps%p * temp_adjust_factor
-            !write(*,*) sum(my_ps%p * my_ps%p) * 0.5 / size(my_ps%str%atoms)
-            sum_kin_energy = 0.0
-          end if
+      ! (notice c%total_step_temp_cali = 0 if <perform-initial-temperature-calibration> 
+      ! element not specified in input file)
+
+      if (i < c%total_step_temp_cali) then
+        sum_kin_energy = sum_kin_energy + my_props%kin_energy%val
+        if (mod(i,c%adjust_temp_at_interval) == 0) then
+          temp_adjust_factor = sqrt(c%adjust_temp_at_interval * 1.5 * c%temperature / &
+              sum_kin_energy * (size(my_ps%str%atoms)-1.0) / size(my_ps%str%atoms))
+          !write(*,*) sum_kin_energy / c%adjust_temp_at_interval   
+          my_ps%p = my_ps%p * temp_adjust_factor
+          !write(*,*) sum(my_ps%p * my_ps%p) * 0.5 / size(my_ps%str%atoms)
+          sum_kin_energy = 0.0
         end if
-      end if      
+      end if
+     
       
 
       ! accumulate the calculated MD property values
@@ -76,13 +98,43 @@ contains
         
       ! print out stuff and interval = average_over_this_many_steps
         
-      if (mod(i,c%average_over_this_many_step) == 0) then
+      if (mod(i,c%average_over_this_many_step) == 0) then 
         call md_print_properties(my_props)
         write(*,'(a,3f12.6)') "total momentum ", sum(my_ps%p,1)
         call md_reset_properties(my_props)
+        write(*, '(a,i8,a,f8.4,a)') "MD steps = ", i, " MD run-time = ", time_now, "10e-13"
+      end if
+      
+      
+      ! if rdf is set to be calculated
+      
+      if (c%calculate_rdf) then
+        if (i > c%total_step_temp_cali) then
+          if ( mod(i-c%total_step_temp_cali, c%cal_rdf_at_interval) == 0 ) then
+            call cal_rdf(my_rdf, my_ps%str)
+            
+            ! add to rdf sum container
+            
+            my_rdf_sum%g_of_r = my_rdf_sum%g_of_r + my_rdf%g_of_r
+          end if
+          
+          
+          ! when average_over_this_many_rdf rdf's have been calculated then print out the average
+          ! of these and reset rdf sum container
+          
+          if ( mod(i-c%total_step_temp_cali, c%cal_rdf_at_interval*c%average_over_this_many_rdf) == 0 ) then
+            my_rdf_sum%g_of_r = my_rdf_sum%g_of_r / c%average_over_this_many_rdf
+            call save_rdf(my_rdf_sum)
+            my_rdf_sum%g_of_r = 0.0
+          end if
+        
+        end if
+        
+        
       end if
       
     end do
+   
     
     print *, ' '
     print *, 'Job took ', toc(), ' seconds to execute.'
