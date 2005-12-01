@@ -19,7 +19,7 @@ implicit none
   end type rdf
   
   
-  character(len=3), parameter, private :: rdf_filename_prefix = "rdf"  
+  character(len=10), parameter, private :: rdf_filename_prefix = "output/rdf"  
   integer, private :: filname_number = 1  ! so first saved rdf file will be called rdf1.xml
 
 contains
