@@ -25,14 +25,16 @@ contains
   
     integer :: i1, i2, n_tot, j
     real (db) :: r_cut, rr_cut 
-    real (db) :: sigma, epsilon, epsilon_times4
+    real (db) :: sigma, epsilon 
+    real (db) :: epsilon_times4    ! 4 * epsilon
+    real (db) :: sigma2    ! = sigma*sigma
     real (db) :: rr, rri, rri3
     
     
 		sigma = get_func_param_val(container%params, "sigma")  !container%params%p(1)%val
 		epsilon = get_func_param_val(container%params, "epsilon") !container%params%p(2)%val
     epsilon_times4 = 4*epsilon
-    
+    sigma2 = sigma * sigma
     
 
     ! r_cut = 2.0_db**(1.0_db / 6.0_db) * sigma
@@ -64,9 +66,9 @@ contains
       
         
       if (rr < rr_cut) then
-        rri = sigma*sigma / rr
+        rri = sigma2 / rr
         rri3 = rri * rri * rri
-        val = val + epsilon_times4 * rri3 * (rri3 - 1.0_db) + 1.0_db
+        val = val + epsilon_times4 * rri3 * (rri3 - 1.0)
         
       end if
   
@@ -82,7 +84,9 @@ contains
   
     integer :: i1, i2, n_tot, i
     real (db) :: r_cut, rr_cut 
-    real (db) :: sigma, epsilon, epsilon_times4
+    real (db) :: sigma, epsilon 
+    real (db) :: epsilon_times4    ! 4 * epsilon
+    real (db) :: sigma2    ! = sigma*sigma
     real (db) :: rr, rri, rri3
 		real (db), dimension(ndim) :: diff_vec
     
@@ -90,6 +94,7 @@ contains
 		sigma = get_func_param_val(container%params, "sigma")  !container%params%p(1)%val
 		epsilon = get_func_param_val(container%params, "epsilon") !container%params%p(2)%val
     epsilon_times4 = 4*epsilon
+    sigma2 = sigma * sigma
     
     ! r_cut = 2.0_db**(1.0_db / 6.0_db) * sigma
     
@@ -122,9 +127,9 @@ contains
         rr = sum(diff_vec*diff_vec)
         
         if (rr < rr_cut) then
-          rri = sigma*sigma / rr
+          rri = sigma2 / rr
           rri3 = rri * rri * rri
-          val = val + epsilon_times4 * rri3 * (rri3 - 1.0_db) + 1.0_db
+          val = val + epsilon_times4 * rri3 * (rri3 - 1.0)
           
         end if
 			
@@ -142,7 +147,10 @@ contains
 		  
     integer :: i1, i2, n_tot, i
     real (db) :: r_cut, rr_cut 
-    real (db) :: sigma, epsilon, epsilon_times4
+    real (db) :: sigma, epsilon 
+    real (db) :: epsilon_times4    ! 4 * epsilon
+    real (db) :: sigma2    ! = sigma*sigma
+    real (db) :: epsi48sigma2   ! 48*epsilon/(sigma^2)
     real (db) :: rr, rri, rri3
 		real (db), dimension(ndim) :: diff_vec
     real (db) :: prefac  ! used for calculating derivatives
@@ -168,7 +176,9 @@ contains
 		sigma = get_func_param_val(container%params, "sigma")  !container%params%p(1)%val
 		epsilon = get_func_param_val(container%params, "epsilon") !container%params%p(2)%val
     epsilon_times4 = 4*epsilon
-    
+    sigma2 = sigma * sigma
+    epsi48sigma2 = 48.0 * epsilon / sigma2
+        
     ! r_cut = 2.0_db**(1.0_db / 6.0_db) * sigma
     
     if (does_func_param_exist(container%params, "r-cut")) then
@@ -201,9 +211,9 @@ contains
         rr = sum(diff_vec*diff_vec)
         
         if (rr < rr_cut) then
-          rri = sigma*sigma / rr
+          rri = sigma2 / rr
           rri3 = rri * rri * rri
-          prefac = 48.0 * rri3 * (rri3 - 0.5) * rri
+          prefac = epsi48sigma2 * rri3 * (rri3 - 0.5) * rri
           
           ! be aware that derivatives are calculated which are 
           ! equal to - force
@@ -212,7 +222,7 @@ contains
           
           if (extra_args) then
             ! calculate potential energy
-            pot_energy = pot_energy + 4.0 * rri3 * (rri3 - 1.0)
+            pot_energy = pot_energy + epsilon_times4 * rri3 * (rri3 - 1.0)
           
             ! calculate sum_i=1^n-1 sum_j>i f_ij |r_ij|^2
             pressure_comp = pressure_comp + prefac * rr     
@@ -235,7 +245,10 @@ contains
 		  
     integer :: i1, i2, n_tot, j, i
     real (db) :: r_cut, rr_cut 
-    real (db) :: sigma, epsilon, epsilon_times4
+    real (db) :: sigma, epsilon 
+    real (db) :: epsilon_times4    ! 4 * epsilon
+    real (db) :: sigma2    ! = sigma*sigma
+    real (db) :: epsi48sigma2   ! 48*epsilon/(sigma^2)   
     real (db) :: rr, rri, rri3
   	real (db), dimension(ndim) :: diff_vec
     real (db) :: prefac  ! used for calculating derivatives    
@@ -261,7 +274,8 @@ contains
 		sigma = get_func_param_val(container%params, "sigma")  !container%params%p(1)%val
 		epsilon = get_func_param_val(container%params, "epsilon") !container%params%p(2)%val
     epsilon_times4 = 4*epsilon
-  
+    sigma2 = sigma * sigma
+    epsi48sigma2 = 48.0 * epsilon / sigma2  
     
     ! r_cut = 2.0_db**(1.0_db / 6.0_db) * sigma
     
@@ -309,9 +323,9 @@ contains
  !     write (*, '(2i6, f12.6)') i1, i2, rr
         
       if (rr < rr_cut) then
-        rri = sigma*sigma / rr
+        rri = sigma2 / rr
         rri3 = rri * rri * rri
-        prefac = 48.0 * rri3 * (rri3 - 0.5) * rri        
+        prefac = epsi48sigma2 * rri3 * (rri3 - 0.5) * rri        
         
         ! be aware that derivatives are calculated which are 
         ! equal to - force
@@ -320,7 +334,7 @@ contains
       
         if (extra_args) then
           ! calculate potential energy
-          pot_energy = pot_energy + 4.0 * rri3 * (rri3 - 1.0)
+          pot_energy = pot_energy + epsilon_times4 * rri3 * (rri3 - 1.0)
         
           ! calculate sum_i=1^n-1 sum_j>i f_ij |r_ij|^2
           pressure_comp = pressure_comp + prefac * rr     

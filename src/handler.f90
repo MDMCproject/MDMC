@@ -131,7 +131,9 @@ contains
           call get_value(attributes,"val",read_db,status)
 					ndata = 0
           call build_data_array(read_db, number_db, ndata)
-          setup_md_control_params%temperature = number_db(1)            
+          
+          ! to convert to dimensionless units multiply by 8.314/1000 K^-1
+          setup_md_control_params%temperature = 0.008314 * number_db(1)            
             
         case("time-step")       
           call get_value(attributes,"val",read_db,status)

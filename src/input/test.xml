@@ -4,7 +4,7 @@
 -->
   <structure what-init-structure-to-build="fcc">
     <title>Liquid Ar</title>
-    <density units="atom/AA3" val="0.8" />
+    <density units="atom/AA3" val="0.020264628116" />
     <ar nx="6" ny ="6" nz="6" /> 
   </structure>
   
@@ -25,13 +25,13 @@
   
   <gpe>
     <lj-potential>
-      <sigma units="AA" val="1" />
-      <epsilon units="KJ/mole" val="1" />
+      <sigma units="AA" val="3.405" />
+      <epsilon units="KJ/mole" val="0.9960172" />
       
       <!-- you can argue whether r-cut here is a property of this potentially,
            but for now you can optionally specify an r-cut value here, which
            simply put the potential to zero for all r values higher than r-cut -->
-      <r-cut units="AA" val="2.2" />
+      <r-cut units="AA" val="7.491" />
     </lj-potential>
     <!-- <lookup-data-potential /> -->
   </gpe>
@@ -41,13 +41,13 @@
     <step-limit number="10000" />
     <average-over-this-many-step number="2000" />
     
-    <temperature units="Kelvin" val="1.0" />
-    <time-step units="10e-13s" val="0.005" />
+    <temperature units="Kelvin" val="119.8" />
+    <time-step units="10e-13s" val="0.1075" />
     
     <!-- To not use nearest neighbour method comment out the element below -->
     <use-near-neighbour-method>
-      <r-cut units="AA" val="2.2" />      <!--  1.12246204831" /> 2.2" />-->
-      <delta-r units="AA" val="0.4" />      
+      <r-cut units="AA" val="7.491" />      <!--  1.12246204831" /> 2.2" />-->
+      <delta-r units="AA" val="1.362" />      
     </use-near-neighbour-method> 
     
     <!-- to not perform initial temperature calibration either comment
@@ -59,7 +59,7 @@
 
     <!-- To calculate radial dist-func comment out the element below -->
     <calculate-rdf>
-      <r-max units="AA" val="4.0" />
+      <r-max units="AA" val="13.62" />
       <number-bins number="200" /> 
       <cal-rdf-at-interval number="50" />
       <average-over-this-many-rdf number="100" />  

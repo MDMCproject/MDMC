@@ -102,7 +102,7 @@ contains
         call md_print_properties(my_props)
         write(*,'(a,3f12.6)') "total momentum ", sum(my_ps%p,1)
         call md_reset_properties(my_props)
-        write(*, '(a,i8,a,f8.4,a)') "MD steps = ", i, " MD run-time = ", time_now, "10e-13"
+        write(*, '(a,i8,a,f12.4,a)') "MD steps = ", i, " MD run-time = ", time_now, "*10e-13"
       end if
       
       
