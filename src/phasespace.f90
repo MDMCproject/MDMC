@@ -135,9 +135,10 @@ contains
     real (db), intent(in) :: r_cut, delta_r, temperature
     type (phasespace) :: ps
 
-    integer :: n_tot, i
+    integer :: n_tot, i, n_seeds
     !real(db), dimension(ndim) :: momentum_sum  ! mainly for debugging    
     real(db) :: momentum_scale
+    real(db), dimension(ndim) :: dummy_vec
     
     n_tot = size(str%atoms)
     
@@ -178,17 +179,32 @@ contains
     end do 
     
     ! write(*,'(a,f12.6)') "a check ", sum(ps%p*ps%p) / ((n_tot-1)*3.0)
+  
+    call random_seed(size=n_seeds)
+    call random_seed(put=(/(i, i = 1, n_seeds)/))
+
+    !write(*,'(a,f)') "length to aim for = ", momentum_scale
+    !stop
+    do i = 1, n_tot
+      call random_number(ps%p(i,:))
+      !write(*,'(a,f)') "length before rescaling = ", sqrt(sum(ps%p(i,:)*ps%p(i,:)))
+      ps%p(i,:) = ps%p(i,:) * momentum_scale / sqrt(sum(ps%p(i,:)*ps%p(i,:)))
+      !write(*,'(a,f)') "length after rescaling = ", sqrt(sum(ps%p(i,:)*ps%p(i,:)))
+    end do 
+  
+    !stop
+    
+    dummy_vec = sum(ps%p,1) / n_tot
+    
+    do i = 1, n_tot
+      ps%p(i,:) = ps%p(i,:) - dummy_vec
+    end do
     
     ! what is the total momentum
 
-    !momentum_sum = 0.0
-    !do i = 1, n_tot
-    !  momentum_sum = momentum_sum + ps%p(i, :)
-    !end do
-    
-    !write(*,'(a,3f12.6)') "total momentum in make_phasespace ", momentum_sum
     !write(*,'(a,3f12.6)') "total momentum in make_phasespace ", sum(ps%p,1)
-    !ps%p = 1.0
+
+    !stop
     
   end function make_phasespace
 

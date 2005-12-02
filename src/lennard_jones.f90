@@ -212,7 +212,7 @@ contains
           
           if (extra_args) then
             ! calculate potential energy
-            pot_energy = pot_energy + 4.0 * rri3 * (rri3 - 1.0) + 1.0
+            pot_energy = pot_energy + 4.0 * rri3 * (rri3 - 1.0)
           
             ! calculate sum_i=1^n-1 sum_j>i f_ij |r_ij|^2
             pressure_comp = pressure_comp + prefac * rr     
@@ -320,7 +320,7 @@ contains
       
         if (extra_args) then
           ! calculate potential energy
-          pot_energy = pot_energy + 4.0 * rri3 * (rri3 - 1.0) + 1.0
+          pot_energy = pot_energy + 4.0 * rri3 * (rri3 - 1.0)
         
           ! calculate sum_i=1^n-1 sum_j>i f_ij |r_ij|^2
           pressure_comp = pressure_comp + prefac * rr     

@@ -20,6 +20,8 @@ use control_containers_class
                                              ! make_simple_cubic_structure
                                              
   integer, dimension(ndim), private :: n_param
+  
+  character(len=99), private :: what_init_structure_to_build
 contains
 
   ! START_DOCUMENT
@@ -47,7 +49,19 @@ contains
           call make_structure(filename)
         else
           in_structure = .true.
+          
+          
+          ! which initial structure to create
+          
+          call get_value(attributes,"what-init-structure-to-build", &
+                         what_init_structure_to_build, status)
+          if (status /= 0) then
+            write (*,*) "ERROR Initial structure type not specified in input file"
+            stop
+          end if
+            
         end if
+
 
       case("constraints")
         in_constraints = .true.
@@ -280,9 +294,20 @@ contains
         
         
       case("structure")
-        call make_simple_cubic_structure(density, n_atoms)
+        select case(what_init_structure_to_build)
+          case("simple-cubic")
+            call make_simple_cubic_structure(density, n_atoms)
+            
+          case("fcc")
+            call make_fcc_structure(density, n_atoms)
+            
+          case default
+            write (*,*) "ERROR initial what-init-structure-to-build attribute"
+            write (*,*) "in input file not recognized"
+            write (*,'(2a)') "what-init-structure-to-build = ", what_init_structure_to_build
+            stop         
+        end select
         in_structure = .false.
-
     end select
 
   end subroutine end_element

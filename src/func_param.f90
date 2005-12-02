@@ -6,6 +6,7 @@ implicit none
   public :: get_func_param_val, update_func_param
 
   type func_param
+    private
     character(len=99) :: name
     real(db) :: val  
     real(db) :: limit_min
