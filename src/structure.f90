@@ -8,7 +8,7 @@ implicit none
   public :: swap_atoms
 
   type atom
-    character(len=2)  :: element_type
+    character(len=2)  :: element_type = "Ar"
     real(db) :: mass=39.95        ! in units of amu
     real(db) :: inv_mass=0.025031289111  ! to save comp time
   end type atom
@@ -31,8 +31,8 @@ implicit none
     ! within -box_edge(1)/2 and box_edge(1)/2
     real(db), dimension(ndim) :: box_edges  
                            
-    real(db) :: density    ! in units of atom/AA3
-    character(len=120) :: title
+    !real(db) :: density    ! in units of atom/AA3
+    character(len=120) :: title = " "
   end type structure
 
 contains
@@ -88,7 +88,7 @@ contains
     real(db) :: sum_out, sum_in
     
     str_out%box_edges = str_in%box_edges
-    str_out%density = str_in%density
+!    str_out%density = str_in%density
     str_out%title = str_in%title
     
     allocate(str_out%atoms(size(str_in%atoms)))  ! allocate mass, name...
@@ -109,5 +109,55 @@ contains
     integer, intent(in) :: atom_number1, atom_number2
 
   end subroutine swap_atoms
+  
+  
+  subroutine save_structure(s, filename)
+    use flib_wxml
+    use tic_toc_class
+    type (structure), intent(in) :: s  
+    character(len=*), intent(in) :: filename
+  
+    type (xmlf_t) :: xf
+    
+    integer :: i
+  
+  
+    write(*,'(3a)') "Write ", trim(filename), " to disk"
+    
+    call xml_OpenFile(filename, xf, indent=.true.)
+    
+    call xml_AddXMLDeclaration(xf, "UTF-8")
+    call xml_NewElement(xf, "molecule")
+    call xml_AddAttribute(xf, "title", get_current_date_and_time())
+    
+    call xml_NewElement(xf, "box-edges")
+    call xml_AddAttribute(xf, "units", "AA")
+    call xml_AddAttribute(xf, "x", str(s%box_edges(1), format="(f12.5)"))  
+    call xml_AddAttribute(xf, "y", str(s%box_edges(2), format="(f12.5)"))
+    call xml_AddAttribute(xf, "z", str(s%box_edges(3), format="(f12.5)"))
+    call xml_EndElement(xf, "box-edges")
+    
+    call xml_NewElement(xf, "atomArray")
+    call xml_AddAttribute(xf, "number", str(size(s%atoms)))
+    call xml_AddAttribute(xf, "units", "AA")
+  
+    do i = 1, size(s%atoms)
+      call xml_NewElement(xf, "atom")
+      call xml_AddAttribute(xf, "id", str(i))
+      call xml_AddAttribute(xf, "elementType", s%atoms(i)%element_type)
+      call xml_AddAttribute(xf, "x3", str(s%r(i,1), format="(f12.6)"))
+      call xml_AddAttribute(xf, "y3", str(s%r(i,2), format="(f12.6)"))
+      call xml_AddAttribute(xf, "z3", str(s%r(i,3), format="(f12.6)"))
+      call xml_EndElement(xf, "atom")
+    end do   
+  
+    call xml_EndElement(xf, "atomArray")
+    call xml_EndElement(xf, "molecule")
+  
+    call xml_Close(xf)
+  
+  end subroutine save_structure
 
+    
+    
 end module structure_class

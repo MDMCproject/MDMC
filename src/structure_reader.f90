@@ -1,5 +1,4 @@
 module structure_reader_class
-use flib_sax
 use common_block_class, only : common_config
 use various_constants_class
 
@@ -9,11 +8,12 @@ use various_constants_class
   private :: begin_element, end_element, pcdata_chunk
   private :: start_document, end_document
   
-  integer, private :: count_number_atoms
+  integer, private :: count_number_atoms = 1
 
 contains
 
   subroutine make_structure(filename)
+    use flib_sax  
     character(len=*), intent(in) :: filename
 
     type(xml_t) :: fxml
@@ -29,6 +29,9 @@ contains
                  pcdata_chunk_handler=pcdata_chunk, &
                  start_document=start_document, &
                  end_document=end_document)
+
+    
+    call close_xmlfile(fxml)                             
 
   end subroutine make_structure
 
@@ -126,11 +129,13 @@ contains
   
   !START_DOCUMENT
   subroutine start_document()
+    use flib_sax
   end subroutine start_document
 
 
   ! BEGIN_ELEMENT
   subroutine begin_element(name,attributes)
+    use flib_sax  
     character(len=*), intent(in)   :: name
     type(dictionary_t), intent(in) :: attributes
     
@@ -138,14 +143,41 @@ contains
     real(db) :: number_db(1)
     character(len=40) :: read_db
     character(len=40) :: control_object_name, read_number_atoms
-    integer :: number_atoms(1);
+    integer :: number_atoms(1)
+    
     character(len=120) :: filename
 
     select case(name)
       case("molecule")
+        call get_value(attributes,"title", common_config%str%title, status)
+        
+      case("box-edges")
+        call get_value(attributes,"x", read_db,status)
+        ndata = 0
+        call build_data_array(read_db, number_db, ndata)
+        common_config%str%box_edges(1) = number_db(1)
+
+        call get_value(attributes,"y", read_db,status)
+        ndata = 0
+        call build_data_array(read_db, number_db, ndata)
+        common_config%str%box_edges(2) = number_db(1)
+
+        call get_value(attributes,"z", read_db,status)
+        ndata = 0
+        call build_data_array(read_db, number_db, ndata)
+        common_config%str%box_edges(3) = number_db(1)
+        
+    
+      case("atomArray")
         call get_value(attributes,"number", read_number_atoms,status)
+        
+        if (status /= 0) then
+          write (*,*) "ERROR: number attribute missing for atomArray element"
+          stop
+        end if       
+        
+        ndata = 0        
         call build_data_array(read_number_atoms, number_atoms, ndata)
-        write(*,*) number_atoms
         allocate(common_config%str%atoms(number_atoms(1)))  ! allocate mass, name...
         allocate(common_config%str%r(number_atoms(1), ndim))  ! allocate coordinates
         count_number_atoms = 1
@@ -166,10 +198,6 @@ contains
         call build_data_array(read_db, number_db, ndata)
         common_config%str%r(count_number_atoms,3) = number_db(1)
 
-        write (*,*) count_number_atoms, &
-          common_config%str%r(count_number_atoms,1), &
-          common_config%str%r(count_number_atoms,2), &
-          common_config%str%r(count_number_atoms,3)
         count_number_atoms = count_number_atoms + 1        
 
 	
@@ -181,6 +209,7 @@ contains
 
   ! PCDATA_CHUNK
   subroutine pcdata_chunk(chunk)
+    use flib_sax
     character(len=*), intent(in) :: chunk
 
   end subroutine pcdata_chunk
@@ -188,15 +217,26 @@ contains
 
   ! END_ELEMENT
   subroutine end_element(name)
+    use flib_sax  
     character(len=*), intent(in)   :: name
 
+    select case(name)
+      case("atomArray")
+        if (count_number_atoms /= size(common_config%str%atoms)+1) then
+          write (*,*) "ERROR: number of atoms read in not equal to element attribute"
+          write (*,*) count_number_atoms
+          write (*,*) size(common_config%str%atoms)+1
+          stop
+        end if
 
+    end select
 
   end subroutine end_element
 
 
   !END_DOCUMENT
   subroutine end_document()
+    use flib_sax  
   end subroutine end_document
 
 end module structure_reader_class

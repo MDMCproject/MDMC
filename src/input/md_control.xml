@@ -1,14 +1,12 @@
 <job>
-
-  
 <!--
+  <structure filename="../tests/recover_CCL4_FQ/CCl4_rmc++.xml"> </structure>
+-->
   <structure what-init-structure-to-build="simple-cubic">
     <title>Liquid Ar</title>
     <density units="atom/AA3" val="0.02125" />
     <ar nx="8" ny ="8" nz="8" /> 
-  </structure> -->
-  
-  <structure filename="output/argon_structure_old.xml" />
+  </structure>
   
   <constraints>
     <fnc-constraint filename="fnc.xml"></fnc-constraint>

@@ -1,15 +1,17 @@
 module handler_class
 use flib_sax
 use common_block_class
-!use common_potential_block_class
 use md_control_class
 use structure_reader_class
 use control_containers_class
 
   implicit none
   
-  public :: begin_element, end_element, pcdata_chunk
-  public :: start_document, end_document
+  
+  private :: begin_element, end_element, pcdata_chunk
+  private :: start_document, end_document
+  
+  public :: startup_handler
   
 
   logical, private  :: in_constraints = .false., in_structure = .false. 
@@ -23,6 +25,27 @@ use control_containers_class
   
   character(len=99), private :: what_init_structure_to_build
 contains
+  
+  subroutine startup_handler(filename)
+    character(len=*), intent(in) :: filename
+  
+    type(xml_t) :: fxml
+    integer     :: iostat
+  
+    call open_xmlfile(trim(filename),fxml,iostat)
+    if (iostat /= 0) stop "Cannot open file."
+
+    call xml_parse(fxml,           &
+                 begin_element_handler=begin_element, &
+                 end_element_handler=end_element,     &
+                 pcdata_chunk_handler=pcdata_chunk, &
+                 start_document=start_document, &
+                 end_document=end_document)
+  
+    call close_xmlfile(fxml)
+  
+  end subroutine startup_handler
+
 
   ! START_DOCUMENT
   subroutine start_document()
@@ -41,12 +64,12 @@ contains
     character(len=40) :: control_object_name, units
     character(len=120) :: filename
 
-    !write(*,*) name
-    select case(name)
+
+    select case(trim(name))
       case("structure")
         call get_value(attributes,"filename",filename,status)
         if (status == 0) then
-          call make_structure(filename)
+          ! do nothing since this structure has already been read in mdmc.f90
         else
           in_structure = .true.
           
@@ -68,9 +91,10 @@ contains
 				
 		  case("gpe")
 			  in_gpe = .true.
-
+        
       case("control-object")
 	      call get_value(attributes,"name",control_object_name,status)
+	
 	
         select case(control_object_name)
           case("md_control")
@@ -296,6 +320,7 @@ contains
         
         
       case("structure")
+        if (in_structure) then
         select case(what_init_structure_to_build)
           case("simple-cubic")
             call make_simple_cubic_structure(density, n_atoms)
@@ -310,6 +335,7 @@ contains
             stop         
         end select
         in_structure = .false.
+        end if
     end select
 
   end subroutine end_element

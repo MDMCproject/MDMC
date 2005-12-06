@@ -8,6 +8,7 @@ use md_properties_class
 use control_containers_class
 use tic_toc_class
 use rdf_class
+use structure_reader_class
 
   implicit none
 
@@ -29,17 +30,8 @@ contains
     type (md_properties) :: my_props
     real(db) :: pressure_comp = 0.0, pot_energy = 0.0
     type (rdf) :: my_rdf, my_rdf_sum
-		
-		!character(len=5) :: filename
-    
-    !i = 1
-    
-    
-    !write(filename, fmt='(i5)') i
-		
-		!write (*,*) trim(filename)
-		!stop
-		
+	
+		!call make_structure("input/test.xml")
 		
     write(*,*) "In run_md_control"
 
@@ -100,7 +92,14 @@ contains
         
       if (mod(i,c%average_over_this_many_step) == 0) then 
         call md_print_properties(my_props)
-        write(*,'(a,3f12.6)') "total momentum ", sum(my_ps%p,1)
+        
+        if (sum(sum(my_ps%p,1)) > 0.0001) then
+          write(*,*) "ERROR:"
+          write(*,'(a,3f12.6)') "total momentum ", sum(my_ps%p,1)
+          write(*,*) "Serious problem - total momentum different from zero"
+          stop
+        end if
+        
         call md_reset_properties(my_props)
         write(*, '(a,i8,a,f12.4,a)') "MD steps = ", i, " MD run-time = ", time_now, "*10e-13"
       end if
@@ -135,6 +134,7 @@ contains
       
     end do
    
+    call save_structure(my_ps%str, "output/argon_structure.xml")
     
     print *, ' '
     print *, 'Job took ', toc(), ' seconds to execute.'
