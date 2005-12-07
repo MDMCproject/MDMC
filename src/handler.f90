@@ -2,6 +2,7 @@ module handler_class
 use flib_sax
 use common_block_class
 use md_control_class
+use mdmc_control_class
 use structure_reader_class
 use control_containers_class
 
@@ -15,7 +16,8 @@ use control_containers_class
   
 
   logical, private  :: in_constraints = .false., in_structure = .false. 
-	logical, private  :: in_gpe = .false., in_md_control = .false.
+	logical, private  :: in_gpe = .false., in_fom = .false.
+	logical, private  :: in_md_control = .false., in_mdmc_control = .false.
   
   real(db), private :: density   
   integer, dimension(ndim), private :: n_atoms  ! both to be passed to 
@@ -91,6 +93,9 @@ contains
 				
 		  case("gpe")
 			  in_gpe = .true.
+			  
+		  case("fom")
+			  in_fom = .true.			  
         
       case("control-object")
 	      call get_value(attributes,"name",control_object_name,status)
@@ -99,7 +104,9 @@ contains
         select case(control_object_name)
           case("md_control")
             in_md_control = .true.
-
+            
+          case("mdmc_control")
+            in_mdmc_control = .true.
         end select
 	
     end select
@@ -195,7 +202,54 @@ contains
                                
       end select
     end if
+
+
+    ! if in mdmc_control
     
+    if (in_mdmc_control) then
+      select case(name)
+      
+        case("delta-r")       
+          call get_value(attributes,"val",read_db,status)
+					ndata = 0
+          call build_data_array(read_db, number_db, ndata)
+          setup_mdmc_control_params%delta_r = number_db(1)
+          
+        case("r-cut")       
+          call get_value(attributes,"val",read_db,status)
+					ndata = 0
+          call build_data_array(read_db, number_db, ndata)
+          setup_mdmc_control_params%r_cut = number_db(1)
+          
+        case("md-steps-per-trajectory")       
+          call get_value(attributes,"number",read_int,status)
+					ndata = 0
+          call build_data_array(read_int, number_int, ndata)
+          setup_mdmc_control_params%md_steps_per_trajectory = number_int(1)
+          
+        case("mc-steps")       
+          call get_value(attributes,"number",read_int,status)
+					ndata = 0
+          call build_data_array(read_int, number_int, ndata)
+          setup_mdmc_control_params%mc_steps = number_int(1)           
+            
+        case("temperature")       
+          call get_value(attributes,"val",read_db,status)
+					ndata = 0
+          call build_data_array(read_db, number_db, ndata)
+          
+          ! to convert to dimensionless units multiply by 8.314/1000 K^-1
+          setup_mdmc_control_params%temperature = 0.008314 * number_db(1)            
+            
+        case("time-step")       
+          call get_value(attributes,"val",read_db,status)
+					ndata = 0
+          call build_data_array(read_db, number_db, ndata)
+          setup_mdmc_control_params%time_step = number_db(1) 
+                               
+      end select
+    end if
+        
 		
     ! if in gpe
 
@@ -224,6 +278,38 @@ contains
           call build_data_array(read_db, number_db, ndata)
           
           call add_func_param(target_lj_pe%params, "r-cut", number_db(1))      
+          
+      end select
+    end if
+
+
+    ! if in fom
+
+    if (in_fom) then
+      select case(name)
+        case("rdf-fom")       
+          call add_potential(common_fom_list, target_rdf_fom)
+          
+        case("rdf-data")
+          !call get_value(attributes,"val",read_db,status)
+					!ndata = 0
+          !call build_data_array(read_db, number_db, ndata)
+          
+          !call add_func_param(target_lj_pe%params, "sigma", number_db(1))
+          
+        case("scale-factor")
+          !call get_value(attributes,"val",read_db,status)
+					!ndata = 0
+          !call build_data_array(read_db, number_db, ndata)
+          
+          !call add_func_param(target_lj_pe%params, "epsilon", number_db(1))
+          
+        case("sigma")
+          !call get_value(attributes,"val",read_db,status)
+					!ndata = 0
+          !call build_data_array(read_db, number_db, ndata)
+          
+          !call add_func_param(target_lj_pe%params, "r-cut", number_db(1))      
           
       end select
     end if
@@ -317,7 +403,9 @@ contains
         if (in_md_control == .true.) then
           call run_md_control(common_config, setup_md_control_params)
         end if
-        
+        if (in_mdmc_control == .true.) then
+          call run_mdmc_control(common_config, setup_mdmc_control_params)
+        end if
         
       case("structure")
         if (in_structure) then

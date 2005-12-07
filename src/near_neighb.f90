@@ -1,5 +1,6 @@
 module near_neighb_class
 use structure_class
+use histogram_class
 
   implicit none
 
@@ -59,11 +60,58 @@ use structure_class
     real(db), dimension(:), allocatable :: dists !
     
     type (cell_list) :: cells
+    
+    
+    ! a histogram
+    logical :: histogram_needs_updating = .true.
+    type (histogram) :: hist
   end type near_neighb_list
 
 
-
 contains
+
+  subroutine nn_update_histogram(nn_list)
+    type (near_neighb_list), intent(inout) :: nn_list
+    
+    integer :: i, which_bin
+    real(db) :: rr_max, bin_length, rr
+    
+    
+    if (nn_list%histogram_needs_updating == .false.) then
+      ! for now simply stop program - since for now should only
+      ! call this subroutine when the histogram actually needs to be
+      ! updated
+      
+      print *, "ERROR in nn_update_histogram"
+      stop
+    else
+      nn_list%histogram_needs_updating = .false.
+    end if
+    
+    ! for now also assumes that distances are stored as r2
+    ! and I have put this if statement in so that I don't forget to
+    ! change the code in this function when I no longer assume this
+    
+    if (nn_list%what_is_stored /= "r2") then
+      print *, "ERROR: what_is_stored is different from r2"
+      print *, "Time to update code in nn_update_histogram subroutine"
+      stop
+    end if
+    
+    rr_max = nn_list%hist%r_max**2
+    bin_length = nn_list%hist%bin_length
+    nn_list%hist%h = 0
+     
+    do i = 1, size(nn_list%dists) 
+      rr = nn_list%dists(1) 
+      if (rr < rr_max) then
+        which_bin = ceiling(sqrt(rr)/bin_length) 
+        nn_list%hist%h(which_bin) = nn_list%hist%h(which_bin) + 1
+      end if
+    end do
+    
+  end subroutine nn_update_histogram
+
 
   subroutine update_stored_nn_values(str, nn_list)
     type (structure), intent(in) :: str

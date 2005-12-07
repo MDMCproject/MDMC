@@ -111,15 +111,17 @@ contains
   end subroutine swap_atoms
   
   
-  subroutine save_structure(s, filename)
+  subroutine save_structure(s, filename, temperature)
     use flib_wxml
     use tic_toc_class
     type (structure), intent(in) :: s  
     character(len=*), intent(in) :: filename
+    real(db), optional, intent(in) :: temperature
   
     type (xmlf_t) :: xf
     
     integer :: i
+    real(db) :: density 
   
   
     write(*,'(3a)') "Write ", trim(filename), " to disk"
@@ -128,7 +130,22 @@ contains
     
     call xml_AddXMLDeclaration(xf, "UTF-8")
     call xml_NewElement(xf, "molecule")
+    
+    if (present(temperature)) then
+    call xml_AddAttribute(xf, "title", "T = " // trim(str(temperature, format="(f10.5)")) // &
+                                         " K: rho = " // trim(str(density, format="(f10.5)")) &
+                                         // " atoms/AA-3")
+    else  
+      density = size(s%atoms) / product(s%box_edges)
+      call xml_AddAttribute(xf, "title", "rho = " // str(density, format="(f10.5)") &
+                                         // "atoms/AA-3")
+    end if
+    
     call xml_AddAttribute(xf, "title", get_current_date_and_time())
+    
+    call xml_NewElement(xf, "this-file-was-created")
+    call xml_AddAttribute(xf, "when", get_current_date_and_time())
+    call xml_EndElement(xf, "this-file-was-created")
     
     call xml_NewElement(xf, "box-edges")
     call xml_AddAttribute(xf, "units", "AA")

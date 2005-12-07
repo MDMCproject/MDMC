@@ -3,6 +3,7 @@ use various_constants_class
 use structure_class
 use func_param_class
 use lennard_jones_class
+use rdf_fom_class
 
 implicit none
 
@@ -15,10 +16,12 @@ implicit none
   type func_list
     private
     type (lj_pe_container), pointer :: pt_lj_pe => null()
+    type (rdf_fom_container), pointer :: pt_rdf_fom => null()
   end type func_list
 
   interface add_potential
     module procedure add_lj_pe_container
+    module procedure add_rdf_fom_container
   end interface
   
 contains
@@ -29,13 +32,21 @@ contains
     
     list%pt_lj_pe => pe_target
   end subroutine add_lj_pe_container
+  
+  
+  subroutine add_rdf_fom_container(list, fom_target)
+    type (func_list), intent(inout) :: list
+    type (rdf_fom_container), target, intent(in) :: fom_target
+    
+    list%pt_rdf_fom => fom_target
+  end subroutine add_rdf_fom_container  
 
   
   function func_val(str, list) result (val)
     type (structure), intent(in) :: str
     type (func_list), intent(in) :: list
     real (db) :: val
- 
+
     val = lj_val(str, list%pt_lj_pe)
   end function func_val
   
@@ -46,7 +57,16 @@ contains
     type (near_neighb_list), intent(in) :: nn_list    
     real (db) :: val
  
-    val = lj_val_nn(str, list%pt_lj_pe, nn_list)
+ 
+    if ( associated (list%pt_lj_pe) ) then
+      val = lj_val_nn(str, list%pt_lj_pe, nn_list)
+    else if ( associated (list%pt_rdf_fom) ) then
+      val = rdf_fom_val_nn(str, list%pt_rdf_fom, nn_list)  
+    else
+      print *, "ERROR in func_val_nn"
+      stop
+    end if
+    
   end function func_val_nn  
   
   

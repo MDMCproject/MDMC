@@ -17,10 +17,11 @@
   
   
   <fom>
-    <pdf-fom filename="somefile" />
-    <sf-fom filename="somefile" />
-    <average-coor-fom />
-    <coordination-fom />
+    <rdf-fom>
+      <rdf-data filename="output/rdf_density0_02125temp85.xml" />
+      <scale-factor val="1.0" />
+      <sigma val="1.0" />
+    </rdf-fom>
   </fom>
   
   <gpe>
@@ -36,10 +37,10 @@
     <!-- <lookup-data-potential /> -->
   </gpe>
   
-  <control-object name="md_control">
+  <control-object name="mdmc_control">
 
-    <step-limit number="1000" />
-    <average-over-this-many-step number="200" />
+    <md-steps-per-trajectory number="200" />
+    <mc-steps number="5" />
     
     <temperature units="Kelvin" val="85.0" />
     <time-step units="10e-13s" val="0.1075" />
@@ -50,20 +51,6 @@
       <delta-r units="AA" val="1.362" />      
     </use-near-neighbour-method> 
     
-    <!-- to not perform initial temperature calibration either comment
-         out the element below or set total-step to zero -->
-    <perform-initial-temperature-calibration>
-      <total-step-temp-cali number="400" />
-      <adjust-temp-at-interval number="20" />
-    </perform-initial-temperature-calibration>
-
-    <!-- To calculate radial dist-func comment out the element below -->
-    <calculate-rdf>
-      <r-max units="AA" val="13.62" />
-      <number-bins number="200" /> 
-      <cal-rdf-at-interval number="50" />
-      <average-over-this-many-rdf number="10" />  
-    </calculate-rdf> 
         
   </control-object>
 

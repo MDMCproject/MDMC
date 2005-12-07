@@ -1,7 +1,7 @@
 module histogram_class
 use various_constants_class
 use structure_class
-use near_neighb_class
+!use near_neighb_class
 
 implicit none
 
@@ -32,23 +32,45 @@ contains
   
   end function make_histogram
   
-  
-  subroutine cal_histogram_nn(hist, nn)
-    type (histogram), intent(inout) :: hist
-    type (near_neighb_list), intent(in) :: nn
+  function copy_histogram(hist_in) result(hist_out)
+    type (histogram), intent(in) :: hist_in
+    type (histogram) :: hist_out
     
-    if (nn%what_is_stored == "r2") then
-       
-    !
-    else if (nn%what_is_stored == "r") then
-    !
+    integer :: n_bin
     
-    else
-    !
+    n_bin = size(hist_in%h)
     
+    if (n_bin < 1) then
+      print *, "ERROR in copy histogram"
+      print *, "Try to copy empty histogram"
+      stop
     end if
     
-  end subroutine cal_histogram_nn  
+    hist_out%r_max = hist_in%r_max
+    hist_out%bin_length = hist_in%bin_length
+    
+    allocate(hist_out%h(n_bin))
+    hist_out%h = hist_in%h
+  
+  end function copy_histogram  
+  
+  
+!  subroutine cal_histogram_nn(hist, nn)
+!    type (histogram), intent(inout) :: hist
+!    type (near_neighb_list), intent(in) :: nn
+    
+!    if (nn%what_is_stored == "r2") then
+       
+    !
+!    else if (nn%what_is_stored == "r") then
+    !
+    
+!    else
+    !
+    
+!    end if
+    
+!  end subroutine cal_histogram_nn  
   
   
   subroutine cal_histogram(hist, str)

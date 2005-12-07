@@ -20,6 +20,7 @@ contains
     
     real (db) :: time_now = 0.0    
     integer :: i
+    real(db) :: density  ! used for cal input argument to save_rdf
     
     real(db) :: sum_kin_energy = 0.0
     real(db) :: temp_adjust_factor
@@ -122,8 +123,12 @@ contains
           ! of these and reset rdf sum container
           
           if ( mod(i-c%total_step_temp_cali, c%cal_rdf_at_interval*c%average_over_this_many_rdf) == 0 ) then
+            
             my_rdf_sum%g_of_r = my_rdf_sum%g_of_r / c%average_over_this_many_rdf
-            call save_rdf(my_rdf_sum)
+            
+            density = size(my_ps%str%atoms)/product(my_ps%str%box_edges)
+            call save_rdf(my_rdf_sum, c%temperature, density)
+            
             my_rdf_sum%g_of_r = 0.0
           end if
         

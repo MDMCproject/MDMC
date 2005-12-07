@@ -78,9 +78,10 @@ contains
   end subroutine cal_rdf
 
 
-  subroutine save_rdf(a_rdf)
+  subroutine save_rdf(a_rdf, temperature, density)
     use flib_wxml
     type (rdf), intent(in) :: a_rdf
+    real(db), optional, intent(in) :: temperature, density
 
     type (xmlf_t) :: xf
     integer :: i, n_bin
@@ -111,12 +112,26 @@ contains
     
     call xml_AddXMLDeclaration(xf, "UTF-8")
     call xml_NewElement(xf, "rdf")
-    call xml_AddAttribute(xf, "title", "Generated " // get_current_date_and_time())
+    
+    if (present(temperature) .and. present(density)) then
+      call xml_AddAttribute(xf, "title", "T = " // trim(str(temperature, format="(f10.5)")) // &
+                                         " K: rho = " // trim(str(density, format="(f10.5)")) &
+                                         // " atoms/AA-3")
+    else if (present(temperature)) then 
+      call xml_AddAttribute(xf, "title", "T = " // str(temperature, format="(f10.5)") // &
+                                         "K")
+    else  if (present(density)) then 
+      call xml_AddAttribute(xf, "title", "rho = " // str(density, format="(f10.5)") &
+                                         // "atoms/AA-3")
+    end if
+    
     call xml_AddAttribute(xf, "units", "AA")
-    call xml_AddAttribute(xf, "n-bins", str(n_bin))
+    call xml_AddAttribute(xf, "n-bin", str(n_bin))
+    call xml_AddAttribute(xf, "r-max", str(a_rdf%hist%r_max, format="(f10.5)"))
     
-    
-
+    call xml_NewElement(xf, "this-file-was-created")
+    call xml_AddAttribute(xf, "when", get_current_date_and_time())
+    call xml_EndElement(xf, "this-file-was-created")
     
     do i = 1, n_bin
       !write(*,'(2f12.6)') (i-0.5)*a_rdf%hist%bin_length, a_rdf%g_of_r(i)

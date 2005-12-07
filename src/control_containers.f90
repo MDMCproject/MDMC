@@ -31,7 +31,22 @@ implicit none
   end type md_control_container
 
 
-  type (md_control_container) :: setup_md_control_params
+  type mdmc_control_container
+    integer :: md_steps_per_trajectory   ! number of MD steps per trajectory
+    integer :: mc_steps   ! number of Monte carlo steps
+    
+    real(db) :: temperature   ! stored internally in units of 120.279K (=1000/8.314K)
+    real(db) :: time_step     ! stored internally in units of 10e-13seconds
+    
+    !logical :: use_near_neighbour_method = .false.
+    real(db) :: r_cut = 0.0   ! cal the potential only to this value. If r_cut == 0.0 it is assumed that
+                              ! use_near_neighbour_method = .false.
+    real(db) :: delta_r       ! buffer region so that the near-neighbour pairs includes
+                              ! all pairs with distances less than r_cut+delta_r
+  end type mdmc_control_container
 
+
+  type (md_control_container) :: setup_md_control_params
+  type (mdmc_control_container) :: setup_mdmc_control_params
 
 end module control_containers_class

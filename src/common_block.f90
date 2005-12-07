@@ -2,6 +2,7 @@ module common_block_class
 use configuration_class
 use function_class
 
+
   type(configuration) :: common_config
 
   ! Used to 'simulate' dynamical polymorphism, see module
@@ -14,7 +15,9 @@ use function_class
 
 
   type(func_list) :: common_pe_list
+  type(func_list) :: common_fom_list
   type (lj_pe_container), target :: target_lj_pe
+  type (rdf_fom_container), target :: target_rdf_fom
 
 
 end module common_block_class
