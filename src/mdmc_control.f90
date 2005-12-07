@@ -2,7 +2,6 @@ module mdmc_control_class
 use configuration_class
 use function_class
 use common_block_class, only : common_config, common_pe_list, common_fom_list, target_rdf_fom
-!use common_potential_block_class
 use phasespace_class
 use md_properties_class
 use control_containers_class
@@ -66,6 +65,7 @@ contains
           
         call md_accum_properties(my_props)
       
+        sum_kin_energy = sum_kin_energy + my_props%kin_energy%val
       end do  
         
       ! print out stuff
@@ -86,6 +86,13 @@ contains
       
       print *, "FOM = ", func_val_nn(my_ps%str, common_fom_list, my_ps%neighb_list)
             
+      
+      ! adjust the temperature
+      temp_adjust_factor = sqrt(c%md_steps_per_trajectory * 1.5 * c%temperature / &
+              sum_kin_energy * (size(my_ps%str%atoms)-1.0) / size(my_ps%str%atoms)) 
+      my_ps%p = my_ps%p * temp_adjust_factor
+      sum_kin_energy = 0.0
+      
       
     end do
    

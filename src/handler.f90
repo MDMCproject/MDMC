@@ -15,17 +15,17 @@ use control_containers_class
   public :: startup_handler
   
 
-  logical, private  :: in_constraints = .false., in_structure = .false. 
+  logical, private  :: in_constraints = .false.
 	logical, private  :: in_gpe = .false., in_fom = .false.
 	logical, private  :: in_md_control = .false., in_mdmc_control = .false.
   
-  real(db), private :: density   
-  integer, dimension(ndim), private :: n_atoms  ! both to be passed to 
+  !real(db), private :: density   
+  !integer, dimension(ndim), private :: n_atoms  ! both to be passed to 
                                              ! make_simple_cubic_structure
                                              
   integer, dimension(ndim), private :: n_param
   
-  character(len=99), private :: what_init_structure_to_build
+  !character(len=99), private :: what_init_structure_to_build
 contains
   
   subroutine startup_handler(filename)
@@ -68,26 +68,6 @@ contains
 
 
     select case(trim(name))
-      case("structure")
-        call get_value(attributes,"filename",filename,status)
-        if (status == 0) then
-          ! do nothing since this structure has already been read in mdmc.f90
-        else
-          in_structure = .true.
-          
-          
-          ! which initial structure to create
-          
-          call get_value(attributes,"what-init-structure-to-build", &
-                         what_init_structure_to_build, status)
-          if (status /= 0) then
-            write (*,*) "ERROR Initial structure type not specified in input file"
-            stop
-          end if
-            
-        end if
-
-
       case("constraints")
         in_constraints = .true.
 				
@@ -289,27 +269,21 @@ contains
       select case(name)
         case("rdf-fom")       
           call add_potential(common_fom_list, target_rdf_fom)
-          
-        case("rdf-data")
-          !call get_value(attributes,"val",read_db,status)
-					!ndata = 0
-          !call build_data_array(read_db, number_db, ndata)
-          
-          !call add_func_param(target_lj_pe%params, "sigma", number_db(1))
+      
           
         case("scale-factor")
-          !call get_value(attributes,"val",read_db,status)
-					!ndata = 0
-          !call build_data_array(read_db, number_db, ndata)
+          call get_value(attributes,"val",read_db,status)
+					ndata = 0
+          call build_data_array(read_db, number_db, ndata)
           
-          !call add_func_param(target_lj_pe%params, "epsilon", number_db(1))
+          target_rdf_fom%scale_factor = number_db(1)
           
         case("sigma")
-          !call get_value(attributes,"val",read_db,status)
-					!ndata = 0
-          !call build_data_array(read_db, number_db, ndata)
+          call get_value(attributes,"val",read_db,status)
+					ndata = 0
+          call build_data_array(read_db, number_db, ndata)
           
-          !call add_func_param(target_lj_pe%params, "r-cut", number_db(1))      
+          target_rdf_fom%weight = 1 / (number_db(1)*number_db(1))  
           
       end select
     end if
@@ -325,58 +299,7 @@ contains
           call add_constraint(common_config, target_fnc_constr)
       end select
     end if
-
     
-    ! if in structure
-    
-    if (in_structure) then
-      select case(name)
-        case("density")          
-          ! read density value into read_dp(1)
-          call get_value(attributes,"val",read_db,status)
-          ndata = 0
-          call build_data_array(read_db, number_db, ndata)
-          
-          ! read units
-          call get_value(attributes,"units",units,status)
-          
-          if (units == "atom/AA3") then
-            density = number_db(1)
-          else
-            ! convert other units to atom/AA3 somehow
-          end if
-          
-        case("ar")
-          ! check that dimensions of input file matches that of ndim
-          number_int(1) = number_of_entries(attributes)
-          if (number_int(1) /= ndim) then
-            write(*,'(a,i2)') "ndim ", ndim
-            write(*,'(a,i2)') "number of ar attributes ", number_int(1)
-            write(*,*) "ERROR, ndim not equal number of ar attr"
-            stop
-          end if
-          
-          ! read number of atoms into read_int(1)
-          call get_value(attributes,"nx",read_int,status)
-          ndata = 0
-          call build_data_array(read_int, number_int, ndata)          
-          n_atoms(1) = number_int(1)
-          if (ndim > 1) then
-            call get_value(attributes,"ny",read_int,status)
-            ndata = 0
-            call build_data_array(read_int, number_int, ndata)          
-            n_atoms(2) = number_int(1)
-          end if
-          
-          if (ndim > 2) then
-            call get_value(attributes,"nz",read_int,status)
-            ndata = 0
-            call build_data_array(read_int, number_int, ndata)          
-            n_atoms(3) = number_int(1)
-          end if
-          
-      end select
-    end if
     
   end subroutine begin_element
 
@@ -407,23 +330,6 @@ contains
           call run_mdmc_control(common_config, setup_mdmc_control_params)
         end if
         
-      case("structure")
-        if (in_structure) then
-        select case(what_init_structure_to_build)
-          case("simple-cubic")
-            call make_simple_cubic_structure(density, n_atoms)
-            
-          case("fcc")
-            call make_fcc_structure(density, n_atoms)
-            
-          case default
-            write (*,*) "ERROR initial what-init-structure-to-build attribute"
-            write (*,*) "in input file not recognized"
-            write (*,'(2a)') "what-init-structure-to-build = ", what_init_structure_to_build
-            stop         
-        end select
-        in_structure = .false.
-        end if
     end select
 
   end subroutine end_element

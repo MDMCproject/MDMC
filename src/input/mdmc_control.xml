@@ -40,7 +40,7 @@
   <control-object name="mdmc_control">
 
     <md-steps-per-trajectory number="200" />
-    <mc-steps number="5" />
+    <mc-steps number="40" />
     
     <temperature units="Kelvin" val="85.0" />
     <time-step units="10e-13s" val="0.1075" />

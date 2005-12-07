@@ -38,8 +38,8 @@
   
   <control-object name="md_control">
 
-    <step-limit number="1000" />
-    <average-over-this-many-step number="200" />
+    <step-limit number="10000" />
+    <average-over-this-many-step number="2000" />
     
     <temperature units="Kelvin" val="85.0" />
     <time-step units="10e-13s" val="0.1075" />
@@ -53,8 +53,8 @@
     <!-- to not perform initial temperature calibration either comment
          out the element below or set total-step to zero -->
     <perform-initial-temperature-calibration>
-      <total-step-temp-cali number="400" />
-      <adjust-temp-at-interval number="20" />
+      <total-step-temp-cali number="4000" />
+      <adjust-temp-at-interval number="200" />
     </perform-initial-temperature-calibration>
 
     <!-- To calculate radial dist-func comment out the element below -->
@@ -62,7 +62,7 @@
       <r-max units="AA" val="13.62" />
       <number-bins number="200" /> 
       <cal-rdf-at-interval number="50" />
-      <average-over-this-many-rdf number="10" />  
+      <average-over-this-many-rdf number="100" />  
     </calculate-rdf> 
         
   </control-object>

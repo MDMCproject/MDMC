@@ -85,6 +85,11 @@ contains
       
       ps%str%r = ps%str%r + delta_t * ps%p * ps%inv_mass
  
+ 
+      ! change status of histogram
+      
+      ps%neighb_list%histogram_needs_updating = .true.
+      
       
       ! calculate derivatives for time t=t+h
       ! but wrap around first

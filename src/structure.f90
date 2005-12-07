@@ -141,8 +141,6 @@ contains
                                          // "atoms/AA-3")
     end if
     
-    call xml_AddAttribute(xf, "title", get_current_date_and_time())
-    
     call xml_NewElement(xf, "this-file-was-created")
     call xml_AddAttribute(xf, "when", get_current_date_and_time())
     call xml_EndElement(xf, "this-file-was-created")

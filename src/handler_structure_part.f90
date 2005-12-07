@@ -63,7 +63,7 @@ contains
     character(len=40) :: units
     character(len=120) :: filename
 
-
+   ! write(*,*) name
     select case(trim(name))
       case("structure")
         call get_value(attributes,"filename",filename,status)
@@ -154,21 +154,20 @@ contains
   subroutine end_element(name)
     character(len=*), intent(in)   :: name
   
-    if (in_structure) then
-    select case(what_init_structure_to_build)
-      case("simple-cubic")
-        call make_simple_cubic_structure(density, n_atoms)
-        
-      case("fcc")
-        call make_fcc_structure(density, n_atoms)
-        
-      case default
-        write (*,*) "ERROR initial what-init-structure-to-build attribute"
-        write (*,*) "in input file not recognized"
-        write (*,'(2a)') "what-init-structure-to-build = ", what_init_structure_to_build
-        stop         
-    end select
-    in_structure = .false.
+    if (name == "structure") then
+      select case(trim(what_init_structure_to_build))
+        case("simple-cubic")
+          call make_simple_cubic_structure(density, n_atoms)
+          
+        case("fcc")
+          call make_fcc_structure(density, n_atoms)
+          
+        case default
+          write (*,*) "ERROR initial what-init-structure-to-build attribute"
+          write (*,*) "in input file not recognized"
+          write (*,'(2a)') "what-init-structure-to-build = ", what_init_structure_to_build
+          stop         
+      end select
     end if
 
   end subroutine end_element
