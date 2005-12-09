@@ -4,6 +4,7 @@ use various_constants_class
 implicit none
 
   public :: get_func_param_val, update_func_param
+  public :: does_func_param_exist, add_func_param
 
   type func_param
     private

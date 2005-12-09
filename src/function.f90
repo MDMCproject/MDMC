@@ -11,7 +11,8 @@ implicit none
   public :: func_deriv, func_deriv_nn
 
 
-  private ::  add_lj_pe_container
+  private :: add_lj_pe_container
+  private :: add_rdf_fom_container
 
   type func_list
     !private
@@ -19,7 +20,7 @@ implicit none
     type (rdf_fom_container), pointer :: pt_rdf_fom => null()
   end type func_list
 
-  interface add_potential
+  interface add_function
     module procedure add_lj_pe_container
     module procedure add_rdf_fom_container
   end interface

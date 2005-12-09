@@ -4,7 +4,7 @@ use various_constants_class
 implicit none
 
   public :: apply_boundary_condition
-  public :: copy_structure
+  public :: copy_structure, save_structure
   public :: swap_atoms
 
   type atom
@@ -31,7 +31,6 @@ implicit none
     ! within -box_edge(1)/2 and box_edge(1)/2
     real(db), dimension(ndim) :: box_edges  
                            
-    !real(db) :: density    ! in units of atom/AA3
     character(len=120) :: title = " "
   end type structure
 
@@ -104,6 +103,7 @@ contains
   
   end function copy_structure
 
+  
   subroutine swap_atoms(a_structure, atom_number1, atom_number2)
     type (structure), intent(inout) :: a_structure
     integer, intent(in) :: atom_number1, atom_number2

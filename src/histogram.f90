@@ -1,9 +1,13 @@
 module histogram_class
 use various_constants_class
 use structure_class
-!use near_neighb_class
 
 implicit none
+
+
+  public :: make_histogram
+  public :: copy_histogram
+  public :: cal_histogram
 
 
   ! it is assumed that histogram stores distances in bins of size

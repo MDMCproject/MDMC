@@ -1,10 +1,6 @@
 module handler_structure_part_class
 use flib_sax
-use common_block_class
-use md_control_class
-use mdmc_control_class
 use structure_reader_class
-use control_containers_class
 
   implicit none
   

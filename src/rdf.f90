@@ -8,6 +8,9 @@ use tic_toc_class
 implicit none
 
 
+  public :: make_rdf, cal_rdf, save_rdf
+
+
   ! it is assumed that histogram stores distances in bins of size
   ! bin_length; with the first bin representing distances between
   ! zero and bin_length and the last bin representing distances
@@ -49,22 +52,22 @@ contains
   end function make_rdf
   
   
-  subroutine cal_rdf_nn(hist, nn)
-    type (histogram), intent(inout) :: hist
-    type (near_neighb_list), intent(in) :: nn
+!  subroutine cal_rdf_nn(hist, nn)
+!    type (histogram), intent(inout) :: hist
+!    type (near_neighb_list), intent(in) :: nn
     
-    if (nn%what_is_stored == "r2") then
+!    if (nn%what_is_stored == "r2") then
        
     !
-    else if (nn%what_is_stored == "r") then
+!    else if (nn%what_is_stored == "r") then
     !
     
-    else
+!    else
     !
     
-    end if
+!    end if
     
-  end subroutine cal_rdf_nn  
+!  end subroutine cal_rdf_nn  
   
   
   subroutine cal_rdf(a_rdf, str)

@@ -5,8 +5,6 @@ use histogram_class
   implicit none
 
   public :: make_near_neighb_list
-  public :: build_near_neighb_with_cell    ! once finishing error checking the code
-  public :: build_near_neighb_without_cell ! these two will become private methods
   public :: build_near_neighb
   public :: update_nn_list_flags
   public :: update_stored_nn_values
@@ -18,7 +16,8 @@ use histogram_class
   private :: get_num_near_neighb 
   private :: get_num_near_neighb_with_cell  ! using cell method
   private :: get_num_near_neighb_without_cell  ! not using cell method
-  
+  private :: build_near_neighb_with_cell    
+  private :: build_near_neighb_without_cell   
   
   ! the below is the fastest and most compressed collection of single link
   ! list I have ever seen. Its drawback is that it is a pain to handle but

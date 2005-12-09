@@ -18,14 +18,9 @@ use control_containers_class
   logical, private  :: in_constraints = .false.
 	logical, private  :: in_gpe = .false., in_fom = .false.
 	logical, private  :: in_md_control = .false., in_mdmc_control = .false.
-  
-  !real(db), private :: density   
-  !integer, dimension(ndim), private :: n_atoms  ! both to be passed to 
-                                             ! make_simple_cubic_structure
                                              
   integer, dimension(ndim), private :: n_param
   
-  !character(len=99), private :: what_init_structure_to_build
 contains
   
   subroutine startup_handler(filename)
@@ -243,7 +238,7 @@ contains
     if (in_gpe) then
       select case(name)
         case("lj-potential")       
-          call add_potential(common_pe_list, target_lj_pe)
+          call add_function(common_pe_list, target_lj_pe)
           
         case("sigma")
           call get_value(attributes,"val",read_db,status)
@@ -275,7 +270,7 @@ contains
     if (in_fom) then
       select case(name)
         case("rdf-fom")       
-          call add_potential(common_fom_list, target_rdf_fom)
+          call add_function(common_fom_list, target_rdf_fom)
       
           
         case("scale-factor")
