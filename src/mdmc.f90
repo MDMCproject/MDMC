@@ -20,7 +20,6 @@ program mdmc
   write (*,*) "Enter pathname/filename"
   read *, filename 
     
-  
   ! Because of bug in otherwise very useful xmlf90 library 
   ! need to read in input file in bits...... 
   

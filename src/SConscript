@@ -1,10 +1,13 @@
 Import('env_exe')
 
-list = Split("""various_constants.f90 variable.f90 structure.f90 
-      near_neighb.f90 phasespace.f90 fnc_constraint.f90 
+list = Split("""various_constants.f90 func_param.f90 structure.f90 
+      histogram.f90 tic_toc.f90 rdf.f90
+      near_neighb.f90 phasespace.f90 fnc_constraint.f90 rdf_fom.f90
       configuration.f90 common_block.f90 structure_reader.f90 
-      lennard_jones.f90 gpe.f90 common_potential_block.f90
-      fnc_constraint_reader.f90 md_properties.f90 md_control.f90 handler.f90 mdmc.f90""")
+      lennard_jones.f90 function.f90 fnc_constraint_reader.f90 
+      md_properties.f90 control_containers.f90 fom_readers.f90
+      md_control.f90 mc_control.f90 mdmc_control.f90 handler.f90 
+      handler_structure_part.f90 mdmc.f90""")
 
 
 if env_exe['PLATFORM'] == 'win32':
@@ -14,5 +17,7 @@ else:
   env_exe.Append(FORTRANFLAGS = ' -Ixmlf90-1.2/macros/modules')
   env_exe.Replace(LINK = 'ifort')
 
-mdmc = env_exe.Program('mdmc', list, LIBS='xmlf90_sax', LIBPATH='xmlf90-1.2/macros/lib')
+libraries = Split("""xmlf90_sax xmlf90_wxml xmlf90_xpath""")
+
+mdmc = env_exe.Program('mdmc', list, LIBS=libraries, LIBPATH='xmlf90-1.2/macros/lib')
 #env_local

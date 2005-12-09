@@ -18,6 +18,8 @@ else:
 # directory......
 env_lib = env.Copy()
 #SConscript('xmlf90-1.2/sax/SConscript', exports='env_lib')
+#SConscript('xmlf90-1.2/xpath/SConscript', exports='env_lib')
+#SConscript('xmlf90-1.2/wxml/SConscript', exports='env_lib')
 
 # building executable
 env_exe = env.Copy()
