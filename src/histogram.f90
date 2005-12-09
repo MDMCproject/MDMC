@@ -25,6 +25,7 @@ contains
     integer, intent(in) :: n_bin
     type (histogram) :: hist
     
+    
     hist%bin_length = r_max / n_bin 
     hist%r_max = r_max
     

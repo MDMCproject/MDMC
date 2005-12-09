@@ -31,8 +31,8 @@ contains
     real (db) :: rr, rri, rri3
     
     
-		sigma = get_func_param_val(container%params, "sigma")  !container%params%p(1)%val
-		epsilon = get_func_param_val(container%params, "epsilon") !container%params%p(2)%val
+		sigma = get_func_param_val(container%params, "sigma")  
+		epsilon = get_func_param_val(container%params, "epsilon") 
     epsilon_times4 = 4*epsilon
     sigma2 = sigma * sigma
     

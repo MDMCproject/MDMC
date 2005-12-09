@@ -1,0 +1,13 @@
+Table 1 in Verlet July 1967
+
+Rapaport units: rho = 0.85: T = 0.88: beta*P/rho = 1.64
+
+In physical units: rho = 0.02153atoms/AA^3: T = 105.424K: P = 507.2atm
+
+
+Verlet run with 864 atoms and cutoff 2.5*3.405AA=8.5125AA
+
+
+Here run with fcc 8x8x8 and cutoff 10.5125 and got the following P = 686 - 170 = 516atm +- 28atm
+
+which is very good agreement

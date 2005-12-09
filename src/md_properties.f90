@@ -107,7 +107,7 @@ contains
     write(*,'(a,2f12.6)') "Etot(KJ/mol) = ", props%tot_energy%ave, props%tot_energy%esd    
     write(*,'(a,2f12.6)') "T(K) = ", (2.0/ndim)*(1000.0/8.314)*props%kin_energy%ave, &
                                   (2.0/ndim)*(1000.0/8.314)*props%kin_energy%esd
-    write(*,'(a,2f12.6)') "P(atm) = ", 16387.2*props%pressure%ave, props%pressure%esd
+    write(*,'(a,2f12.6)') "P(atm) = ", 16387.2*props%pressure%ave, 16387.2*props%pressure%esd
     !write(*,'(a,2f12.6)') "Epot = ", props%tot_energy%ave - props%kin_energy%ave
 
   end subroutine md_print_properties

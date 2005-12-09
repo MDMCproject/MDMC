@@ -160,6 +160,13 @@ contains
           call get_value(attributes,"val",read_db,status)
 					ndata = 0
           call build_data_array(read_db, number_db, ndata)
+          
+          ! it is assumed for now that r-max should be smaller than L/2 here
+          
+          if (number_db(1) > minval(common_config%str%box_edges)/2.0) then
+            number_db(1) = minval(common_config%str%box_edges)/2.0
+          end if
+          
           setup_md_control_params%r_max = number_db(1)    
           
         case("number-bins")       

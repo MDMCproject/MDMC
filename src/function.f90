@@ -14,7 +14,7 @@ implicit none
   private ::  add_lj_pe_container
 
   type func_list
-    private
+    !private
     type (lj_pe_container), pointer :: pt_lj_pe => null()
     type (rdf_fom_container), pointer :: pt_rdf_fom => null()
   end type func_list

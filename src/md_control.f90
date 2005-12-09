@@ -24,6 +24,13 @@ contains
     
     real(db) :: sum_kin_energy = 0.0
     real(db) :: temp_adjust_factor
+    
+    ! to calculate pressure correction
+    
+    real(db) :: pressure_corr
+    real(db) :: sig_r_cut3
+    real(db) :: sigma, epsilon
+  
   
     ! md storage containers
 
@@ -36,6 +43,8 @@ contains
 		
     write(*,*) "In run_md_control"
 
+
+
     call tic
 
     ! initiate phasespace
@@ -44,7 +53,7 @@ contains
                         c%temperature)
     my_rdf = make_rdf(product(my_ps%str%box_edges), size(my_ps%str%atoms), &
                       c%r_max, c%number_bins)
-    
+  
                       
     ! this is a rdf container for accumulation rdf's
     
@@ -101,6 +110,25 @@ contains
           stop
         end if
         
+        ! print out pressure correction term 
+        
+        if ( associated (common_pe_list%pt_lj_pe) ) then
+          if (c%r_cut /= 0.0) then
+            density = size(my_ps%str%atoms)/product(my_ps%str%box_edges)
+            sigma = get_func_param_val(common_pe_list%pt_lj_pe%params, "sigma")  
+		        epsilon = get_func_param_val(common_pe_list%pt_lj_pe%params, "epsilon")
+            sig_r_cut3 = (sigma / c%r_cut)**3
+            pressure_corr = 32.0 * pi_value* density**2 * sigma**3 * epsilon * &
+                            (sig_r_cut3**3 - 1.5*sig_r_cut3) / 9.0
+                            
+            ! and to convert to atm
+            
+            pressure_corr = pressure_corr * 16387.2
+            
+            write(*,'(a,f12.6)') "P_corr(atm) = ", pressure_corr
+          end if
+        end if
+        
         call md_reset_properties(my_props)
         write(*, '(a,i8,a,f12.4,a)') "MD steps = ", i, " MD run-time = ", time_now, "*10e-13"
       end if
@@ -143,6 +171,7 @@ contains
     
     print *, ' '
     print *, 'Job took ', toc(), ' seconds to execute.'
+    print *, 'Box size ', my_ps%str%box_edges
   end subroutine run_md_control
 
 end module md_control_class

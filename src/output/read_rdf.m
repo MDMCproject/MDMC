@@ -14,3 +14,5 @@ for i = 0 : mylist.getLength()-1
 end 
 
 plot(r, g, format)
+xlabel('r[0.1nm]')
+ylabel('g(r)')

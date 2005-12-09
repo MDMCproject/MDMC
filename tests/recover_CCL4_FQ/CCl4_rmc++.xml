@@ -1,14 +1,13 @@
-<structure title="CCL4">
+<molecule title="CCL4">
 
-  <unitcell>
-    <cubic half-cell-edge="10.0" />
-  </unitcell>
+  <box_edges units="AA" x="10.0" y="10.0" z="10.0" />
 
 <!--  <summary-information>
     <number-each-element elementtype="C Cl" count="2048 8192">
-  </summary-information> -->
-  
-<molecule number="10240">
+  </summary-information> 
+ -->
+<atomArray number="10240" units="AA" >
+
 <atom id="1" elementType="C" x3="-31.129517241348" y3="-29.15188894635" z3="-27.400754019828" />
 <atom id="2" elementType="C" x3="-29.083938881694" y3="-28.05273297303" z3="-22.835484009306" />
 <atom id="3" elementType="C" x3="-27.684153170988" y3="-30.184471110858" z3="-11.88342144942" />
@@ -10249,5 +10248,6 @@
 <atom id="10238" elementType="Cl" x3="31.251223448448" y3="29.585635489662" z3="8.454069191454" />
 <atom id="10239" elementType="Cl" x3="26.14757721525" y3="31.625616390846" z3="19.967561971164" />
 <atom id="10240" elementType="Cl" x3="30.173317276182" y3="-31.656342500796" z3="29.111025787758" />
+
+</atomArray>
 </molecule>
-</structure>
