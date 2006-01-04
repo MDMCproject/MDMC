@@ -10,8 +10,10 @@ implicit none
     private
     character(len=99) :: name
     real(db) :: val  
-    real(db) :: limit_min
-    real(db) :: limit_max
+    logical :: fixed = .true.
+    real(db) :: min_limit
+    real(db) :: max_limit
+    real(db) :: random_max_move
   end type func_param
 
 

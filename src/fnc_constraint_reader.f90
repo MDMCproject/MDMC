@@ -42,18 +42,17 @@ contains
     character(len=*), intent(in)   :: name
     type(dictionary_t), intent(in) :: attributes
     
-    integer :: status, ndata=0
+    integer :: status
     character(len=40) :: control_object_name, read_number_atoms, read_dp
-    integer :: number_atoms(1);
+    integer :: number_atoms;
     character(len=120) :: filename
     real(db) :: number_dp(1)
 
     select case(name)
       case("molecule")
         !call get_value(attributes,"number", read_number_atoms,status)
-        !call build_data_array(read_number_atoms, number_atoms, ndata)
         !write(*,*) number_atoms
-        !allocate(common_config%str%atoms(number_atoms(1)))
+        !allocate(common_config%str%atoms(number_atoms))
         count_number_atoms = 1    
 
 	

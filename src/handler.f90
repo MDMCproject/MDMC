@@ -5,6 +5,7 @@ use md_control_class
 use mdmc_control_class
 use structure_reader_class
 use control_containers_class
+use converters_class
 
   implicit none
   
@@ -54,9 +55,9 @@ contains
     character(len=*), intent(in)   :: name
     type(dictionary_t), intent(in) :: attributes
     
-    integer :: status, ndata=0, n
-    real(db) :: number_db(1)
-    integer :: number_int(1)
+    integer :: status, n
+    real(db) :: number_db
+    !integer :: number_int
     character(len=40) :: read_db, read_int
     character(len=40) :: control_object_name, units
     character(len=120) :: filename
@@ -96,56 +97,40 @@ contains
       
         case("delta-r")       
           call get_value(attributes,"val",read_db,status)
-					ndata = 0
-          call build_data_array(read_db, number_db, ndata)
-          setup_md_control_params%delta_r = number_db(1)
+          setup_md_control_params%delta_r = string_to_db(read_db)
           
         case("r-cut")       
           call get_value(attributes,"val",read_db,status)
-					ndata = 0
-          call build_data_array(read_db, number_db, ndata)
-          setup_md_control_params%r_cut = number_db(1)
+          setup_md_control_params%r_cut = string_to_db(read_db)
           
         case("step-limit")       
           call get_value(attributes,"number",read_int,status)
-					ndata = 0
-          call build_data_array(read_int, number_int, ndata)
-          setup_md_control_params%step_limit = number_int(1)
+          setup_md_control_params%step_limit = string_to_int(read_int)
           
         case("average-over-this-many-step")       
           call get_value(attributes,"number",read_int,status)
-					ndata = 0
-          call build_data_array(read_int, number_int, ndata)
-          setup_md_control_params%average_over_this_many_step = number_int(1)     
+          setup_md_control_params%average_over_this_many_step = string_to_int(read_int)
           
         !case("perform-initial-temperature-calibration")
         !  setup_md_control_params%perform_initial_temperature_calibration = .true.               
           
         case("total-step-temp-cali")       
           call get_value(attributes,"number",read_int,status)
-					ndata = 0
-          call build_data_array(read_int, number_int, ndata)
-          setup_md_control_params%total_step_temp_cali = number_int(1)       
+          setup_md_control_params%total_step_temp_cali = string_to_int(read_int)
           
         case("adjust-temp-at-interval")       
           call get_value(attributes,"number",read_int,status)
-					ndata = 0
-          call build_data_array(read_int, number_int, ndata)
-          setup_md_control_params%adjust_temp_at_interval = number_int(1)          
+          setup_md_control_params%adjust_temp_at_interval = string_to_int(read_int)
             
         case("temperature")       
           call get_value(attributes,"val",read_db,status)
-					ndata = 0
-          call build_data_array(read_db, number_db, ndata)
           
           ! to convert to dimensionless units multiply by 8.314/1000 K^-1
-          setup_md_control_params%temperature = 0.008314 * number_db(1)            
+          setup_md_control_params%temperature = 0.008314 * string_to_db(read_db)
             
         case("time-step")       
           call get_value(attributes,"val",read_db,status)
-					ndata = 0
-          call build_data_array(read_db, number_db, ndata)
-          setup_md_control_params%time_step = number_db(1) 
+          setup_md_control_params%time_step = string_to_db(read_db)
                
         
         case("calculate-rdf")
@@ -153,34 +138,27 @@ contains
           
         case("r-max")       
           call get_value(attributes,"val",read_db,status)
-					ndata = 0
-          call build_data_array(read_db, number_db, ndata)
           
           ! it is assumed for now that r-max should be smaller than L/2 here
           
-          if (number_db(1) > minval(common_config%str%box_edges)/2.0) then
-            number_db(1) = minval(common_config%str%box_edges)/2.0
+          number_db = string_to_db(read_db)
+          if (number_db > minval(common_config%str%box_edges)/2.0) then
+            number_db = minval(common_config%str%box_edges)/2.0
           end if
           
-          setup_md_control_params%r_max = number_db(1)    
+          setup_md_control_params%r_max = number_db    
           
         case("number-bins")       
           call get_value(attributes,"number",read_int,status)
-					ndata = 0
-          call build_data_array(read_int, number_int, ndata)
-          setup_md_control_params%number_bins = number_int(1)                 
+          setup_md_control_params%number_bins = string_to_int(read_int)                 
                           
         case("cal-rdf-at-interval")       
           call get_value(attributes,"number",read_int,status)
-					ndata = 0
-          call build_data_array(read_int, number_int, ndata)
-          setup_md_control_params%cal_rdf_at_interval = number_int(1)
+          setup_md_control_params%cal_rdf_at_interval = string_to_int(read_int)
           
         case("average-over-this-many-rdf")       
           call get_value(attributes,"number",read_int,status)
-					ndata = 0
-          call build_data_array(read_int, number_int, ndata)
-          setup_md_control_params%average_over_this_many_rdf = number_int(1)
+          setup_md_control_params%average_over_this_many_rdf = string_to_int(read_int)
                                
       end select
     end if
@@ -193,41 +171,29 @@ contains
       
         case("delta-r")       
           call get_value(attributes,"val",read_db,status)
-					ndata = 0
-          call build_data_array(read_db, number_db, ndata)
-          setup_mdmc_control_params%delta_r = number_db(1)
+          setup_mdmc_control_params%delta_r = string_to_db(read_db)
           
         case("r-cut")       
           call get_value(attributes,"val",read_db,status)
-					ndata = 0
-          call build_data_array(read_db, number_db, ndata)
-          setup_mdmc_control_params%r_cut = number_db(1)
+          setup_mdmc_control_params%r_cut = string_to_db(read_db)
           
         case("md-steps-per-trajectory")       
           call get_value(attributes,"number",read_int,status)
-					ndata = 0
-          call build_data_array(read_int, number_int, ndata)
-          setup_mdmc_control_params%md_steps_per_trajectory = number_int(1)
+          setup_mdmc_control_params%md_steps_per_trajectory = string_to_int(read_int)
           
         case("mc-steps")       
           call get_value(attributes,"number",read_int,status)
-					ndata = 0
-          call build_data_array(read_int, number_int, ndata)
-          setup_mdmc_control_params%mc_steps = number_int(1)           
+          setup_mdmc_control_params%mc_steps = string_to_int(read_int)           
             
         case("temperature")       
           call get_value(attributes,"val",read_db,status)
-					ndata = 0
-          call build_data_array(read_db, number_db, ndata)
           
           ! to convert to dimensionless units multiply by 8.314/1000 K^-1
-          setup_mdmc_control_params%temperature = 0.008314 * number_db(1)            
+          setup_mdmc_control_params%temperature = 0.008314 * string_to_db(read_db)            
             
         case("time-step")       
           call get_value(attributes,"val",read_db,status)
-					ndata = 0
-          call build_data_array(read_db, number_db, ndata)
-          setup_mdmc_control_params%time_step = number_db(1) 
+          setup_mdmc_control_params%time_step = string_to_db(read_db)
                                
       end select
     end if
@@ -242,24 +208,18 @@ contains
           
         case("sigma")
           call get_value(attributes,"val",read_db,status)
-					ndata = 0
-          call build_data_array(read_db, number_db, ndata)
-          
-          call add_func_param(target_lj_pe%params, "sigma", number_db(1))
+  
+          call add_func_param(target_lj_pe%params, "sigma", string_to_db(read_db))
           
         case("epsilon")
           call get_value(attributes,"val",read_db,status)
-					ndata = 0
-          call build_data_array(read_db, number_db, ndata)
-          
-          call add_func_param(target_lj_pe%params, "epsilon", number_db(1))
+
+          call add_func_param(target_lj_pe%params, "epsilon", string_to_db(read_db))
           
         case("r-cut")
           call get_value(attributes,"val",read_db,status)
-					ndata = 0
-          call build_data_array(read_db, number_db, ndata)
-          
-          call add_func_param(target_lj_pe%params, "r-cut", number_db(1))      
+
+          call add_func_param(target_lj_pe%params, "r-cut", string_to_db(read_db))      
           
       end select
     end if
@@ -275,17 +235,13 @@ contains
           
         case("scale-factor")
           call get_value(attributes,"val",read_db,status)
-					ndata = 0
-          call build_data_array(read_db, number_db, ndata)
-          
-          target_rdf_fom%scale_factor = number_db(1)
+          target_rdf_fom%scale_factor = string_to_db(read_db)
           
         case("sigma")
           call get_value(attributes,"val",read_db,status)
-					ndata = 0
-          call build_data_array(read_db, number_db, ndata)
           
-          target_rdf_fom%weight = 1 / (number_db(1)*number_db(1))  
+          number_db = string_to_db(read_db)
+          target_rdf_fom%weight = 1 / (number_db*number_db)  
           
       end select
     end if

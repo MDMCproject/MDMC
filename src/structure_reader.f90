@@ -1,6 +1,7 @@
 module structure_reader_class
 use common_block_class, only : common_config
 use various_constants_class
+use converters_class
 
 
   implicit none
@@ -139,11 +140,10 @@ contains
     character(len=*), intent(in)   :: name
     type(dictionary_t), intent(in) :: attributes
     
-    integer :: status, ndata=0
-    real(db) :: number_db(1)
+    integer :: status
     character(len=40) :: read_db
     character(len=40) :: control_object_name, read_number_atoms
-    integer :: number_atoms(1)
+    integer :: number_atoms
     
     character(len=120) :: filename
 
@@ -153,19 +153,13 @@ contains
         
       case("box-edges")
         call get_value(attributes,"x", read_db,status)
-        ndata = 0
-        call build_data_array(read_db, number_db, ndata)
-        common_config%str%box_edges(1) = number_db(1)
+        common_config%str%box_edges(1) = string_to_db(read_db)
 
         call get_value(attributes,"y", read_db,status)
-        ndata = 0
-        call build_data_array(read_db, number_db, ndata)
-        common_config%str%box_edges(2) = number_db(1)
+        common_config%str%box_edges(2) = string_to_db(read_db)
 
         call get_value(attributes,"z", read_db,status)
-        ndata = 0
-        call build_data_array(read_db, number_db, ndata)
-        common_config%str%box_edges(3) = number_db(1)
+        common_config%str%box_edges(3) = string_to_db(read_db)
         
     
       case("atomArray")
@@ -176,27 +170,20 @@ contains
           stop
         end if       
         
-        ndata = 0        
-        call build_data_array(read_number_atoms, number_atoms, ndata)
-        allocate(common_config%str%atoms(number_atoms(1)))  ! allocate mass, name...
-        allocate(common_config%str%r(number_atoms(1), ndim))  ! allocate coordinates
+        number_atoms = string_to_int(read_number_atoms)
+        allocate(common_config%str%atoms(number_atoms))  ! allocate mass, name...
+        allocate(common_config%str%r(number_atoms, ndim))  ! allocate coordinates
         count_number_atoms = 1
 
       case("atom")
         call get_value(attributes,"x3", read_db,status)
-        ndata = 0
-        call build_data_array(read_db, number_db, ndata)
-        common_config%str%r(count_number_atoms,1) = number_db(1)
+        common_config%str%r(count_number_atoms,1) = string_to_db(read_db)
 
         call get_value(attributes,"y3", read_db,status)
-        ndata = 0
-        call build_data_array(read_db, number_db, ndata)
-        common_config%str%r(count_number_atoms,2) = number_db(1)
+        common_config%str%r(count_number_atoms,2) = string_to_db(read_db)
 
         call get_value(attributes,"z3", read_db,status)
-        ndata = 0
-        call build_data_array(read_db, number_db, ndata)
-        common_config%str%r(count_number_atoms,3) = number_db(1)
+        common_config%str%r(count_number_atoms,3) = string_to_db(read_db)
 
         count_number_atoms = count_number_atoms + 1        
 

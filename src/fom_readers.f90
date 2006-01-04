@@ -1,6 +1,7 @@
 module fom_readers_class
 use common_block_class
 use various_constants_class
+use converters_class
 
   implicit none
   
@@ -48,9 +49,9 @@ contains
     character(len=*), intent(in)   :: name
     type(dictionary_t), intent(in) :: attributes
     
-    integer :: status, ndata=0
-    real(db) :: number_db(1)
-    integer :: number_int(1)
+    integer :: status
+    real(db) :: number_db
+    integer :: number_int
     character(len=40) :: read_db, read_int    
     
 
@@ -59,20 +60,18 @@ contains
         call get_value(attributes,"title", target_rdf_fom%title, status)
         
         call get_value(attributes,"r-max", read_db,status)
-        ndata = 0
-        call build_data_array(read_db, number_db, ndata) 
+        number_db = string_to_db(read_db) 
         
         call get_value(attributes,"n-bin", read_int,status)
-        ndata = 0
-        call build_data_array(read_int, number_int, ndata)
+        number_int = string_to_int(read_int)
 
         
         target_rdf_fom%rdf_data = make_rdf(product(common_config%str%box_edges), &
-                                  size(common_config%str%atoms), number_db(1), &
-                                  number_int(1))
+                                  size(common_config%str%atoms), number_db, &
+                                  number_int)
         target_rdf_fom%rdf_cal = make_rdf(product(common_config%str%box_edges), &
-                                  size(common_config%str%atoms), number_db(1), &
-                                  number_int(1))        
+                                  size(common_config%str%atoms), number_db, &
+                                  number_int)        
                         
         count_number_atoms = 1
 
@@ -80,25 +79,20 @@ contains
       case("g-of-r")
 
         call get_value(attributes,"g", read_db,status)
-        ndata = 0
-        call build_data_array(read_db, number_db, ndata)
-        target_rdf_fom%rdf_data%g_of_r(count_number_atoms) = number_db(1)
+        target_rdf_fom%rdf_data%g_of_r(count_number_atoms) = string_to_db(read_db)
    
         count_number_atoms = count_number_atoms + 1        
 
 
       case("scale-factor")
         call get_value(attributes,"val", read_db,status)
-        ndata = 0
-        call build_data_array(read_db, number_db, ndata)
-        target_rdf_fom%scale_factor = number_db(1)
+        target_rdf_fom%scale_factor = string_to_db(read_db)
         
               
       case("sigma")
         call get_value(attributes,"val", read_db,status)
-        ndata = 0
-        call build_data_array(read_db, number_db, ndata)
-        target_rdf_fom%weight = 1/(number_db(1)*number_db(1))
+        number_db = string_to_db(read_db)
+        target_rdf_fom%weight = 1/(number_db*number_db)
         
         	
     end select

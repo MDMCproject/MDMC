@@ -52,9 +52,8 @@ contains
     character(len=*), intent(in)   :: name
     type(dictionary_t), intent(in) :: attributes
     
-    integer :: status, ndata=0, n
-    real(db) :: number_db(1)
-    integer :: number_int(1)
+    integer :: status, n
+    integer :: number_int
     character(len=40) :: read_db, read_int
     character(len=40) :: units
     character(len=120) :: filename
@@ -92,45 +91,37 @@ contains
         case("density")          
           ! read density value into read_dp(1)
           call get_value(attributes,"val",read_db,status)
-          ndata = 0
-          call build_data_array(read_db, number_db, ndata)
           
           ! read units
           call get_value(attributes,"units",units,status)
-          
+
           if (units == "atom/AA3") then
-            density = number_db(1)
+            density = string_to_db(read_db)
           else
             ! convert other units to atom/AA3 somehow
           end if
           
         case("ar")
           ! check that dimensions of input file matches that of ndim
-          number_int(1) = number_of_entries(attributes)
-          if (number_int(1) /= ndim) then
+          number_int = number_of_entries(attributes)
+          if (number_int /= ndim) then
             write(*,'(a,i2)') "ndim ", ndim
-            write(*,'(a,i2)') "number of ar attributes ", number_int(1)
+            write(*,'(a,i2)') "number of ar attributes ", number_int
             write(*,*) "ERROR, ndim not equal number of ar attr"
             stop
           end if
           
           ! read number of atoms into read_int(1)
-          call get_value(attributes,"nx",read_int,status)
-          ndata = 0
-          call build_data_array(read_int, number_int, ndata)          
-          n_atoms(1) = number_int(1)
+          call get_value(attributes,"nx",read_int,status)         
+          n_atoms(1) = string_to_int(read_int)
           if (ndim > 1) then
-            call get_value(attributes,"ny",read_int,status)
-            ndata = 0
-            call build_data_array(read_int, number_int, ndata)          
-            n_atoms(2) = number_int(1)
+            call get_value(attributes,"ny",read_int,status)         
+            n_atoms(2) = string_to_int(read_int)
           end if
           
           if (ndim > 2) then
-            call get_value(attributes,"nz",read_int,status)
-            ndata = 0
-            call build_data_array(read_int, number_int, ndata)          
-            n_atoms(3) = number_int(1)
+            call get_value(attributes,"nz",read_int,status)         
+            n_atoms(3) = string_to_int(read_int)
           end if
           
       end select

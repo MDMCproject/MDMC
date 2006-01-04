@@ -18,7 +18,7 @@
   
   <fom>
     <rdf-fom>
-      <rdf-data filename="output/rdf_density0_02125temp85.xml" />
+      <rdf-data filename="../data/Argon_liquid_P1atm/rdf_density0_02125temp85.xml" />
       <scale-factor val="1.0" />
       <sigma val="1.0" />
     </rdf-fom>
