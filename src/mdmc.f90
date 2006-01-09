@@ -17,6 +17,14 @@ program mdmc
   logical :: build_structure_from_model = .true.
   
   
+  ! set build in random generator function seeds
+  ! note only need to do this once 
+  
+  integer :: n_seeds
+  call random_seed(size=n_seeds)
+  call random_seed(put=(/(i, i = 1, n_seeds)/))
+  
+  
   write (*,*) "Enter pathname/filename"
   read *, filename 
     

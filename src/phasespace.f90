@@ -140,7 +140,7 @@ contains
     real (db), intent(in) :: r_cut, delta_r, temperature
     type (phasespace) :: ps
 
-    integer :: n_tot, i, n_seeds
+    integer :: n_tot, i
     !real(db), dimension(ndim) :: momentum_sum  ! mainly for debugging    
     real(db) :: momentum_scale
     real(db), dimension(ndim) :: dummy_vec
@@ -183,22 +183,12 @@ contains
       ps%p(2*i,:) = - momentum_scale
     end do 
     
-    ! write(*,'(a,f12.6)') "a check ", sum(ps%p*ps%p) / ((n_tot-1)*3.0)
-  
-    call random_seed(size=n_seeds)
-    call random_seed(put=(/(i, i = 1, n_seeds)/))
 
-    !write(*,'(a,f)') "length to aim for = ", momentum_scale
-    !stop
     do i = 1, n_tot
       call random_number(ps%p(i,:))
-      !write(*,'(a,f)') "length before rescaling = ", sqrt(sum(ps%p(i,:)*ps%p(i,:)))
       ps%p(i,:) = ps%p(i,:) * momentum_scale / sqrt(sum(ps%p(i,:)*ps%p(i,:)))
-      !write(*,'(a,f)') "length after rescaling = ", sqrt(sum(ps%p(i,:)*ps%p(i,:)))
     end do 
-  
-    !stop
-    
+      
     dummy_vec = sum(ps%p,1) / n_tot
     
     do i = 1, n_tot

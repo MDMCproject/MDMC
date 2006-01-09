@@ -168,22 +168,64 @@ contains
     
     if (in_mdmc_control) then
       select case(name)
-      
-        case("delta-r")       
-          call get_value(attributes,"val",read_db,status)
-          setup_mdmc_control_params%delta_r = string_to_db(read_db)
+ 
+     case("total-steps-to-settle-system")       
+          call get_value(attributes,"number",read_int,status)
+          setup_mdmc_control_params%total_steps_to_settle_system = string_to_int(read_int)       
           
-        case("r-cut")       
+        case("average-over-this-many-step")       
+          call get_value(attributes,"number",read_int,status)
+          setup_mdmc_control_params%average_over_this_many_step = string_to_int(read_int) 
+          
+        case("total-step-temp-cali")       
+          call get_value(attributes,"number",read_int,status)
+          setup_mdmc_control_params%total_step_temp_cali = string_to_int(read_int)
+          
+        case("adjust-temp-at-interval")       
+          call get_value(attributes,"number",read_int,status)
+          setup_mdmc_control_params%adjust_temp_at_interval = string_to_int(read_int)
+          
+                            
+        case("md-steps-first-part")       
+          call get_value(attributes,"number",read_int,status)
+          setup_mdmc_control_params%md_steps_first_part = string_to_int(read_int)
+          
+        case("r-max")       
           call get_value(attributes,"val",read_db,status)
-          setup_mdmc_control_params%r_cut = string_to_db(read_db)
+          
+          ! it is assumed for now that r-max should be smaller than L/2 here
+          
+          number_db = string_to_db(read_db)
+          if (number_db > minval(common_config%str%box_edges)/2.0) then
+            number_db = minval(common_config%str%box_edges)/2.0
+          end if
+          
+          setup_mdmc_control_params%r_max = number_db    
+          
+        case("number-bins")       
+          call get_value(attributes,"number",read_int,status)
+          setup_mdmc_control_params%number_bins = string_to_int(read_int)                 
+                          
+        case("cal-rdf-at-interval")       
+          call get_value(attributes,"number",read_int,status)
+          setup_mdmc_control_params%cal_rdf_at_interval = string_to_int(read_int)
+          
+        case("average-over-this-many-rdf")       
+          call get_value(attributes,"number",read_int,status)
+          setup_mdmc_control_params%average_over_this_many_rdf = string_to_int(read_int)
+                                  
+          
+        case("mc-steps")       
+          call get_value(attributes,"number",read_int,status)
+          setup_mdmc_control_params%mc_steps = string_to_int(read_int)            
+
+          
           
         case("md-steps-per-trajectory")       
           call get_value(attributes,"number",read_int,status)
           setup_mdmc_control_params%md_steps_per_trajectory = string_to_int(read_int)
           
-        case("mc-steps")       
-          call get_value(attributes,"number",read_int,status)
-          setup_mdmc_control_params%mc_steps = string_to_int(read_int)           
+          
             
         case("temperature")       
           call get_value(attributes,"val",read_db,status)
@@ -194,6 +236,19 @@ contains
         case("time-step")       
           call get_value(attributes,"val",read_db,status)
           setup_mdmc_control_params%time_step = string_to_db(read_db)
+
+        case("temperature-mc")       
+          call get_value(attributes,"val",read_db,status)
+          setup_mdmc_control_params%temperature_mc = string_to_db(read_db)
+                    
+          
+        case("delta-r")       
+          call get_value(attributes,"val",read_db,status)
+          setup_mdmc_control_params%delta_r = string_to_db(read_db)
+          
+        case("r-cut")       
+          call get_value(attributes,"val",read_db,status)
+          setup_mdmc_control_params%r_cut = string_to_db(read_db)   
                                
       end select
     end if
@@ -208,13 +263,54 @@ contains
           
         case("sigma")
           call get_value(attributes,"val",read_db,status)
-  
           call add_func_param(target_lj_pe%params, "sigma", string_to_db(read_db))
+          
+          call get_value(attributes,"fixed",read_db,status)
+          
+          if (status == 0) then 
+            if (trim(read_db) == "no") then
+              call set_func_param_fixed(target_lj_pe%params, "sigma", .false.)
+              
+              call get_value(attributes,"min",read_db,status)
+              call set_func_param_min(target_lj_pe%params, "sigma", &
+                                      string_to_db(read_db))
+                                      
+              call get_value(attributes,"max",read_db,status)
+              call set_func_param_max(target_lj_pe%params, "sigma", &
+                                      string_to_db(read_db)) 
+                                      
+              call get_value(attributes,"max-move",read_db,status)
+              call set_func_param_max_move(target_lj_pe%params, "sigma", &
+                                      string_to_db(read_db))   
+                                      
+                                                                       
+            end if
+          end if
           
         case("epsilon")
           call get_value(attributes,"val",read_db,status)
-
           call add_func_param(target_lj_pe%params, "epsilon", string_to_db(read_db))
+           
+          call get_value(attributes,"fixed",read_db,status)
+          
+          if (status == 0) then 
+            if (trim(read_db) == "no") then
+              call set_func_param_fixed(target_lj_pe%params, "epsilon", .false.)
+              
+              call get_value(attributes,"min",read_db,status)
+              call set_func_param_min(target_lj_pe%params, "epsilon", &
+                                      string_to_db(read_db))
+                                      
+              call get_value(attributes,"max",read_db,status)
+              call set_func_param_max(target_lj_pe%params, "epsilon", &
+                                      string_to_db(read_db)) 
+                                      
+              call get_value(attributes,"max-move",read_db,status)
+              call set_func_param_max_move(target_lj_pe%params, "epsilon", &
+                                      string_to_db(read_db))                                                            
+            end if
+          end if          
+          
           
         case("r-cut")
           call get_value(attributes,"val",read_db,status)

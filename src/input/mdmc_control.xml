@@ -26,9 +26,9 @@
   
   <gpe>
     <lj-potential>
-      <sigma units="AA" val="3.405" />
-      <epsilon units="KJ/mole" val="0.9960172" />
-      
+      <sigma units="AA" val="3.405"             fixed="no" min="2.0" max="6.0" max-move="0.5" />
+      <epsilon units="KJ/mole" val="0.9960172"  fixed="no" min="0.0" max="10.0" max-move="0.1" />
+
       <!-- you can argue whether r-cut here is a property of this potentially,
            but for now you can optionally specify an r-cut value here, which
            simply put the potential to zero for all r values higher than r-cut -->
@@ -39,11 +39,30 @@
   
   <control-object name="mdmc_control">
 
+    <total-steps-to-settle-system number="5000" />
+    <average-over-this-many-step number="1000" />
+    <!-- to not perform initial temperature calibration either comment
+         out the element below or set total-step to zero -->
+    <perform-initial-temperature-calibration>
+      <total-step-temp-cali number="3000" />
+      <adjust-temp-at-interval number="200" />
+    </perform-initial-temperature-calibration>
+    
+    <md-steps-first-part number="1000" />
+    <calculate-rdf>
+      <r-max units="AA" val="20.0" />
+      <number-bins number="200" /> 
+      <cal-rdf-at-interval number="50" />
+      <average-over-this-many-rdf number="20" />  
+    </calculate-rdf>    
+     
+    <mc-steps number="5" />   
+    
     <md-steps-per-trajectory number="200" />
-    <mc-steps number="40" />
     
     <temperature units="Kelvin" val="85.0" />
     <time-step units="10e-13s" val="0.1075" />
+    <temperature-mc val="1.0" />
     
     <!-- To not use nearest neighbour method comment out the element below -->
     <use-near-neighbour-method>

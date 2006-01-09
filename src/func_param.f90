@@ -3,17 +3,21 @@ use various_constants_class
 
 implicit none
 
-  public :: get_func_param_val, update_func_param
+  public :: get_func_param_val
+  public :: set_func_param_min, set_func_param_max
+  public :: set_func_param_fixed, set_func_param_max_move
+  public :: set_func_param_val
   public :: does_func_param_exist, add_func_param
+  public :: random_move_func_params
 
   type func_param
     private
     character(len=99) :: name
     real(db) :: val  
     logical :: fixed = .true.
-    real(db) :: min_limit
-    real(db) :: max_limit
-    real(db) :: random_max_move
+    real(db) :: min
+    real(db) :: max
+    real(db) :: max_move   ! max length this parameter is allowed to move
   end type func_param
 
 
@@ -23,8 +27,46 @@ implicit none
     type (func_param), dimension(MAX_ITEMS) :: p
   end type func_params
 
-
 contains
+
+  subroutine write_func_param_to_file(params, xf)
+    use flib_wxml
+    type (func_params), intent(inout) :: params
+    type (xmlf_t), intent(inout) :: xf   
+    
+    integer :: i
+    
+    do i = 1, params%number_of_items     
+      call xml_NewElement(xf, trim(params%p(i)%name)) 
+      call xml_AddAttribute(xf, "val", str(params%p(i)%val, format="(es12.5)"))
+      call xml_EndElement(xf, trim(params%p(i)%name))
+    end do
+  
+  end subroutine write_func_param_to_file
+
+
+  subroutine random_move_func_params(params)
+    type (func_params), intent(inout) :: params
+    
+    integer :: i
+   
+    real (db) :: ran_num
+    
+    do i = 1, params%number_of_items
+      if (params%p(i)%fixed == .false.) then
+	      call random_number(ran_num)  
+  	    
+  	    !params%p(i)%val = 1.0
+  	    
+        params%p(i)%val = params%p(i)%val + params%p(i)%max_move*(ran_num-0.5)
+        
+        if (params%p(i)%val < params%p(i)%min) params%p(i)%val = params%p(i)%min
+        if (params%p(i)%val > params%p(i)%max) params%p(i)%val = params%p(i)%max
+      end if
+    end do
+    
+  end subroutine random_move_func_params
+
 
   function does_func_param_exist(params, name) result (val)
     type (func_params), intent(in) :: params
@@ -70,6 +112,106 @@ contains
   end function get_func_param_val
 
 
+  subroutine set_func_param_min(params, name, min)
+    type (func_params), intent(inout) :: params
+    character(len=*), intent(in) :: name
+    real (db), intent(in) :: min
+    
+    integer :: i
+   
+    
+    do i = 1, params%number_of_items
+      if (trim(params%p(i)%name) == trim(name)) then
+        params%p(i)%min = min
+        return
+      end if
+    end do
+    
+    ! if hasn't returned by this stage then name was not found
+    ! and a error should be thrown but for now brute force
+    
+    write (*,*) "ERROR in set_func_param_min"
+    write (*,'(3a)') "name = ", name, " not found"
+    stop
+    
+  end subroutine set_func_param_min
+  
+  
+  subroutine set_func_param_max(params, name, max)
+    type (func_params), intent(inout) :: params
+    character(len=*), intent(in) :: name
+    real (db), intent(in) :: max
+    
+    integer :: i
+   
+    
+    do i = 1, params%number_of_items
+      if (trim(params%p(i)%name) == trim(name)) then
+        params%p(i)%max = max
+        return
+      end if
+    end do
+    
+    ! if hasn't returned by this stage then name was not found
+    ! and a error should be thrown but for now brute force
+    
+    write (*,*) "ERROR in set_func_param_max"
+    write (*,'(3a)') "name = ", name, " not found"
+    stop
+    
+  end subroutine set_func_param_max
+  
+  
+  subroutine set_func_param_fixed(params, name, fixed)
+    type (func_params), intent(inout) :: params
+    character(len=*), intent(in) :: name
+    logical, intent(in) :: fixed
+    
+    integer :: i
+   
+    
+    do i = 1, params%number_of_items
+      if (trim(params%p(i)%name) == trim(name)) then
+        params%p(i)%fixed = fixed
+        return
+      end if
+    end do
+    
+    ! if hasn't returned by this stage then name was not found
+    ! and a error should be thrown but for now brute force
+    
+    write (*,*) "ERROR in set_func_param_fixed"
+    write (*,'(3a)') "name = ", name, " not found"
+    stop
+    
+  end subroutine set_func_param_fixed
+
+
+  subroutine set_func_param_max_move(params, name, max_move)
+    type (func_params), intent(inout) :: params
+    character(len=*), intent(in) :: name
+    real (db), intent(in) :: max_move
+    
+    integer :: i
+   
+    
+    do i = 1, params%number_of_items
+      if (trim(params%p(i)%name) == trim(name)) then
+        params%p(i)%max_move = max_move
+        return
+      end if
+    end do
+    
+    ! if hasn't returned by this stage then name was not found
+    ! and a error should be thrown but for now brute force
+    
+    write (*,*) "ERROR in set_func_param_max_move"
+    write (*,'(3a)') "name = ", name, " not found"
+    stop
+    
+  end subroutine set_func_param_max_move
+  
+
   subroutine add_func_param(params, name, val)
     type (func_params), intent(inout) :: params
     character(len=*), intent(in) :: name
@@ -92,7 +234,7 @@ contains
   end subroutine add_func_param
   
   
-  subroutine update_func_param(params, name, val)
+  subroutine set_func_param_val(params, name, val)
     type (func_params), intent(inout) :: params
     character(len=*), intent(in) :: name
     real (db), intent(in) :: val
@@ -110,11 +252,11 @@ contains
     ! if hasn't returned by this stage then name was not found
     ! and a error should be thrown but for now brute force
     
-    write (*,*) "ERROR in get_func_param_val"
+    write (*,*) "ERROR in set_func_param_val"
     write (*,'(3a)') "name = ", name, " not found"
     stop  
 
-  end subroutine update_func_param
+  end subroutine set_func_param_val
     
     
 end module func_param_class

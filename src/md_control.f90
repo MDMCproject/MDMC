@@ -2,7 +2,6 @@ module md_control_class
 use configuration_class
 use function_class
 use common_block_class, only : common_config, common_pe_list
-!use common_potential_block_class
 use phasespace_class
 use md_properties_class
 use control_containers_class
@@ -38,8 +37,7 @@ contains
     type (md_properties) :: my_props
     real(db) :: pressure_comp = 0.0, pot_energy = 0.0
     type (rdf) :: my_rdf, my_rdf_sum
-	
-		!call make_structure("input/test.xml")
+	  
 		
     write(*,*) "In run_md_control"
 
@@ -50,7 +48,8 @@ contains
     ! initiate phasespace
     
     my_ps = make_phasespace(a_config%str, c%r_cut, c%delta_r, &
-                        c%temperature)
+                        c%temperature)                      
+                        
     my_rdf = make_rdf(product(my_ps%str%box_edges), size(my_ps%str%atoms), &
                       c%r_max, c%number_bins)
   
