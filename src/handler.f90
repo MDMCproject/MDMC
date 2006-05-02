@@ -349,7 +349,7 @@ contains
       select case(name)
         case("fnc_constraint")
           call get_value(attributes,"filename",filename,status)
-          call make_fnc_constraint(filename)
+          !call make_fnc_constraint(filename)
           call add_constraint(common_config, target_fnc_constr)
       end select
     end if
@@ -384,6 +384,27 @@ contains
           call run_mdmc_control(common_config, setup_mdmc_control_params)
         end if
         
+      case("use-near-neighbour-method")
+      
+        ! it is assumed that r-cut+delta-r should be smaller than L/2, hence
+        ! check for this below and if necessary change r-cut accordingly
+        
+        if (setup_md_control_params%r_cut /= 0.0) then
+          if (setup_md_control_params%r_cut+setup_md_control_params%delta_r > &
+              minval(common_config%str%box_edges)/2.0) then
+            setup_md_control_params%r_cut = minval(common_config%str%box_edges)/2.0 &
+              - setup_md_control_params%delta_r
+          end if
+          
+          ! Print to screen
+    
+          write(*, *) " "
+          print *, 'Nearest neighbour method will be used with: '
+          write(*,'(a,f12.6)') "   r-cut = ", setup_md_control_params%r_cut 
+          write(*,'(a,f12.6)') "   delta-r = ", setup_md_control_params%delta_r
+          write(*, *) " "
+        end if
+   
     end select
 
   end subroutine end_element

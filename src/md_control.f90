@@ -109,7 +109,12 @@ contains
           stop
         end if
         
-        ! print out pressure correction term 
+        
+        ! Print out pressure correction term 
+        ! Notice, the calculation is limited for simplicity to the case where
+        ! we use the neighest nearbour method since some r_cut value is needed
+        ! to cal sig_r_cut3 below. For the case where nn-method not use we could
+        ! perhaps define a r_cut value to L/2 or something like that
         
         if ( associated (common_pe_list%pt_lj_pe) ) then
           if (c%r_cut /= 0.0) then
@@ -120,13 +125,14 @@ contains
             pressure_corr = 32.0 * pi_value* density**2 * sigma**3 * epsilon * &
                             (sig_r_cut3**3 - 1.5*sig_r_cut3) / 9.0
                             
-            ! and to convert to atm
+            ! convert to atm
             
             pressure_corr = pressure_corr * 16387.2
             
             write(*,'(a,f12.6)') "P_corr(atm) = ", pressure_corr
           end if
         end if
+        
         
         call md_reset_properties(my_props)
         write(*, '(a,i8,a,f12.4,a)') "MD steps = ", i, " MD run-time = ", time_now, "*10e-13"
@@ -170,7 +176,7 @@ contains
     
     print *, ' '
     print *, 'Job took ', toc(), ' seconds to execute.'
-    print *, 'Box size ', my_ps%str%box_edges
+
   end subroutine run_md_control
 
 end module md_control_class

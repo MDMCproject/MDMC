@@ -36,10 +36,16 @@ contains
 
   end subroutine make_structure
 
+
+  ! returns a structure which is locally simple cubic. However, this does not
+  ! imply that the resulting box containing the atoms is cubic - this
+  ! is only the case when unitcells_xyz(1:3) contains three identical integers
+  ! for the number of unit cells in the x,y and z directions. 
+  ! Further the resulting structure is returned with its center at the origin.
   
-  subroutine make_simple_cubic_structure(density, n_atoms)
+  subroutine make_simple_cubic_structure(density, unitcells_xyz)
     real(db), intent(in) :: density
-    integer, dimension(ndim) :: n_atoms
+    integer, dimension(ndim) :: unitcells_xyz
     
     real(db), dimension(ndim) :: edges
     real(db), dimension(ndim) :: gap, put_atom_at ! gap between atoms
@@ -47,20 +53,25 @@ contains
     integer :: n = 1, nx, ny, nz, n_tot
     
     
-    ! calculate box edge and gap
+    ! calculate box edges and gap between atoms
 
-    edges = n_atoms / density**(1.0_db/3.0_db)
+    edges = unitcells_xyz / density**(1.0_db/3.0_db)
     common_config%str%box_edges = edges
-    gap = edges / n_atoms
     
     
-    n_tot = product(n_atoms)
+    ! make the gap between atoms the same in x, y, and z. This means the
+    ! returning structure is locally simple cubic
+         
+    gap = edges / unitcells_xyz       
+    
+    
+    n_tot = product(unitcells_xyz)
     allocate(common_config%str%atoms(n_tot))   ! allocate mass, name...
     allocate(common_config%str%r(n_tot,ndim))  ! allocate coordinates
     
-    do nz = 1, n_atoms(3)
-      do ny = 1, n_atoms(2)
-        do nx = 1, n_atoms(1)
+    do nz = 1, unitcells_xyz(3)
+      do ny = 1, unitcells_xyz(2)
+        do nx = 1, unitcells_xyz(1)
           put_atom_at(1) = nx - 0.5_db
           put_atom_at(2) = ny - 0.5_db
           put_atom_at(3) = nz - 0.5_db
@@ -72,12 +83,29 @@ contains
       end do
     end do
     
+    
+    ! print to screen
+    
+    write(*, *) " "
+    print *, 'Simple cubic structure created: '
+    write(*,'(a,3f12.6)') "   Box size = ", edges
+    print *, '  total number of atoms = ', product(unitcells_xyz)  
+    write(*, *) " "
+        
   end subroutine make_simple_cubic_structure
   
   
-  subroutine make_fcc_structure(density, n_atoms)
+  ! returns a structure which is locally fcc. However, this does not
+  ! imply that the resulting box containing the atoms is cubic - this
+  ! is only the case when unitcells_xyz(1:3) contains three identical integers
+  ! for the number of unit cells in the x,y and z directions. 
+  ! Notice the total number of atoms in the returning structure is
+  ! 4 * product(unitcells_xyz). 
+  ! Further the resulting structure is returned with its center at the origin.
+    
+  subroutine make_fcc_structure(density, unitcells_xyz)
     real(db), intent(in) :: density
-    integer, dimension(ndim) :: n_atoms
+    integer, dimension(ndim) :: unitcells_xyz
     
     real(db), dimension(ndim) :: edges
     real(db), dimension(ndim) :: gap, put_atom_at ! gap between atoms
@@ -85,22 +113,22 @@ contains
     integer :: n = 1, nx, ny, nz, n_tot, j
     
     
-    ! calculate box edge and gap. Notice to accummodate product(n_atoms) 'unit cells'
+    ! calculate box edges and gap. Notice to accummodate product(unitcells_xyz) 'unit cells'
     ! the box is blown up by 4^(1/3) in each direction. The resulting number of atoms
-    ! is therefore 4 * product(n_atoms)
+    ! is therefore 4 * product(unitcells_xyz)
 
-    edges = n_atoms / (density/4.0_db)**(1.0_db/3.0_db)
+    edges = unitcells_xyz / (density/4.0_db)**(1.0_db/3.0_db)
     common_config%str%box_edges = edges
-    gap = edges / n_atoms
+    gap = edges / unitcells_xyz
     
     
-    n_tot = 4*product(n_atoms)
+    n_tot = 4*product(unitcells_xyz)
     allocate(common_config%str%atoms(n_tot))   ! allocate mass, name...
     allocate(common_config%str%r(n_tot,ndim))  ! allocate coordinates
     
-    do nz = 0, n_atoms(3)-1
-      do ny = 0, n_atoms(2)-1
-        do nx = 0, n_atoms(1)-1
+    do nz = 0, unitcells_xyz(3)-1
+      do ny = 0, unitcells_xyz(2)-1
+        do nx = 0, unitcells_xyz(1)-1
           put_atom_at(1) = nx + 0.25_db
           put_atom_at(2) = ny + 0.25_db
           put_atom_at(3) = nz + 0.25_db
@@ -124,6 +152,14 @@ contains
         end do
       end do
     end do
+    
+    ! print to screen
+    
+    write(*, *) " "
+    print *, 'FCC structure created: '
+    write(*,'(a,3f12.6)') "   Box size = ", edges
+    print *, '  total number of atoms = ', 4*product(unitcells_xyz)  
+    write(*, *) " "
     
   end subroutine make_fcc_structure  
   

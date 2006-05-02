@@ -117,7 +117,7 @@ contains
         if (ps%neighb_list%needs_updating == .true.) then
           call build_near_neighb(ps%str, ps%neighb_list)
         else
-          call update_stored_nn_values(ps%str, ps%neighb_list)
+          call cal_nn_distances(ps%str, ps%neighb_list)
         end if
         
         if (extra_args) then

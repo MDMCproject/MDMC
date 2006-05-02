@@ -13,9 +13,9 @@ use structure_reader_class
 
   logical, private  :: in_structure = .false. 
   
+  ! both to be passed to make_simple_cubic_structure or make_fcc_structure
   real(db), private :: density   
-  integer, dimension(ndim), private :: n_atoms  ! both to be passed to 
-                                             ! make_simple_cubic_structure
+  integer, dimension(ndim), private :: unitcells_xyz
                                              
   
   character(len=99), private :: what_init_structure_to_build
@@ -101,8 +101,8 @@ contains
             ! convert other units to atom/AA3 somehow
           end if
           
-        case("ar")
-          ! check that dimensions of input file matches that of ndim
+        case("number-of-unit-cells")
+          ! check that the number of attributes of this element equals ndim
           number_int = number_of_entries(attributes)
           if (number_int /= ndim) then
             write(*,'(a,i2)') "ndim ", ndim
@@ -113,15 +113,15 @@ contains
           
           ! read number of atoms into read_int(1)
           call get_value(attributes,"nx",read_int,status)         
-          n_atoms(1) = string_to_int(read_int)
+          unitcells_xyz(1) = string_to_int(read_int)
           if (ndim > 1) then
             call get_value(attributes,"ny",read_int,status)         
-            n_atoms(2) = string_to_int(read_int)
+            unitcells_xyz(2) = string_to_int(read_int)
           end if
           
           if (ndim > 2) then
             call get_value(attributes,"nz",read_int,status)         
-            n_atoms(3) = string_to_int(read_int)
+            unitcells_xyz(3) = string_to_int(read_int)
           end if
           
       end select
@@ -144,10 +144,10 @@ contains
     if (name == "structure") then
       select case(trim(what_init_structure_to_build))
         case("simple-cubic")
-          call make_simple_cubic_structure(density, n_atoms)
+          call make_simple_cubic_structure(density, unitcells_xyz)
           
         case("fcc")
-          call make_fcc_structure(density, n_atoms)
+          call make_fcc_structure(density, unitcells_xyz)
           
         case default
           write (*,*) "ERROR initial what-init-structure-to-build attribute"

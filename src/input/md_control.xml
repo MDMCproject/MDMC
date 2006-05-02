@@ -1,12 +1,21 @@
 <job>
+
 <!--
   <structure filename="../tests/recover_CCL4_FQ/CCl4_rmc++.xml"> </structure>
 -->
+
+  <!-- When the attribute what-init-structure-to-build is defined the 
+       x-direction box edge length is:
+              nx*(density[atom/AA3])^(-1/3)           when simple cubic
+              4^1/3 * nx*(density[atom/AA3])^(-1/3)   when fcc 
+              
+       Notice the density of liquid Ar at P=1atm and T=85K is 
+       rho = 1.41g/cm^3 = 0.02125atoms/AA3        
+       -->
   <structure what-init-structure-to-build="simple-cubic">
     <title>Liquid Ar</title>
-    <!-- density liquid Ar at P=1atm, T=85K: rho=1.41g/cm^3=0.02125atoms/AA3-->
     <density units="atom/AA3" val="0.02125" />
-    <ar nx="8" ny ="8" nz="8" /> 
+    <number-of-unit-cells nx="8" ny ="8" nz="8" />
   </structure>
   
   <constraints>
@@ -31,8 +40,9 @@
       
       <!-- you can argue whether r-cut here is a property of this potentially,
            but for now you can optionally specify an r-cut value here, which
-           simply put the potential to zero for all r values higher than r-cut -->
-      <r-cut units="AA" val="20000.0" />
+           simply put the potential to zero for all r values higher than r-cut 
+           -->
+      <r-cut units="AA" val="8.5125" />
     </lj-potential>
     <!-- <lookup-data-potential /> -->
   </gpe>
@@ -45,26 +55,38 @@
     <temperature units="Kelvin" val="85.0" />
     <time-step units="10e-13s" val="0.1078" />
     
-    <!-- To not use nearest neighbour method comment out the element below -->
+    
+    <!-- To not use nearest neighbour method include element below.
+         Notice Rapaport recomment delta-r values around 1.2AA.
+         Further if r-cut+delta-r > 'smallest box edge'/2 then
+         set r-cut = 'smallest box edge'/2 - delta-r 
+         -->    
     <use-near-neighbour-method>
-      <r-cut units="AA" val="8.5125" />      <!--  1.12246204831" /> 2.2" />-->
-      <delta-r units="AA" val="1.362" />      
+      <r-cut units="AA" val="1008.5125" />   
+      <delta-r units="AA" val="1.362" />            
     </use-near-neighbour-method> 
     
-    <!-- to not perform initial temperature calibration either comment
-         out the element below or set total-step to zero -->
+    
+    <!-- To not perform initial temperature calibration either comment
+         out the element below or set total-step to zero 
+         -->
     <perform-initial-temperature-calibration>
       <total-step-temp-cali number="4000" />
       <adjust-temp-at-interval number="200" />
     </perform-initial-temperature-calibration>
 
-    <!-- To calculate radial dist-func comment out the element below -->
+
+    <!-- To calculate a rdf include element below. 
+         Notice if r-max > 'smallest box edge'/2 then it is set equal to
+         that value. 
+         -->
     <calculate-rdf>
       <r-max units="AA" val="20.0" />
       <number-bins number="200" /> 
       <cal-rdf-at-interval number="50" />
-      <average-over-this-many-rdf number="100" />  
+      <average-over-this-many-rdf number="100" />
     </calculate-rdf> 
+
         
   </control-object>
 

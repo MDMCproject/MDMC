@@ -7,7 +7,7 @@ use histogram_class
   public :: make_near_neighb_list
   public :: build_near_neighb
   public :: update_nn_list_flags
-  public :: update_stored_nn_values
+  public :: cal_nn_distances     ! populates the dists attribute of the near_neighb_list
 
 
   ! used for the cell method (use rapaport's notation)
@@ -36,9 +36,15 @@ use histogram_class
   ! and secondly by storing distances that are used as input to values to the
   ! various potential and fom functions. Therefore make sure that this stored
   ! values are always up-to-date; this is the case after a near-neighb list
-  ! has just been build and after update_stored_nn_values has been called
+  ! has just been build and after cal_nn_distances has been called
 
   type near_neighb_list
+    ! for the case where it is either decide
+    ! that this list is no-point or requires more
+    ! memory than what can be allocated or otherwise
+    ! what don't what to use near neighbour method
+    logical :: ignore_list = .true.  
+  
     ! the list - for now just pairs of j1, j2
     integer, dimension(:), allocatable :: pairs
     integer :: pairs_allocated
@@ -48,11 +54,6 @@ use histogram_class
     logical :: needs_updating = .true.
     real(db) :: delta_r, r_cut
     real(db) :: max_an_atom_has_moved = 0.0_db
-  
-    ! for the case where it is either decide
-    ! that this list is no-point or requires more
-    ! memory than what can be allocated
-    logical :: ignore_list = .true.
   
     ! storage of numbers for potential later use
     character(len=2) :: what_is_stored
@@ -111,8 +112,8 @@ contains
     
   end subroutine nn_update_histogram
 
-
-  subroutine update_stored_nn_values(str, nn_list)
+  
+  subroutine cal_nn_distances(str, nn_list)
     type (structure), intent(in) :: str
     type (near_neighb_list), intent(inout) :: nn_list
     
@@ -139,7 +140,7 @@ contains
     
       nn_list%what_is_stored = "r2"
       
-  end subroutine update_stored_nn_values
+  end subroutine cal_nn_distances
 
   
   subroutine update_nn_list_flags(max_an_atom_has_moved, nn_list)
@@ -163,23 +164,25 @@ contains
     type (near_neighb_list) :: nn_list
     
     integer :: i
-    integer :: ignore_cell_method = .false.  ! used for determining whether 
-                                             ! to ignore cell method
+    integer :: ignore_cell_method    ! used for determining whether 
+                                     ! to ignore cell method
     integer :: n_tot
     
-    ! first of all determine whether or not to completely ignore the 
+    ! first of all determine whether or not to completely ignore 
     ! using the nearest neighbour method. Perhaps the only reason 
-    ! why you want to do this if the memory storage required out-weights
+    ! why you want to do this is if the memory storage required out-weights
     ! the other benifits - for now simply just assume that everything
-    ! is fine
-    ! The alternative is to not specify an use-near-neighbour-method
-    ! element in the input file in which case this causes r_cut=0.0
+    ! is fine and only if there is no use-near-neighbour-method element 
+    ! specified in the input file (in which case this causes r_cut=0.0)
+    ! will the nn_list be ignored completely.
     
     if (r_cut /= 0.0) then
       nn_list%ignore_list = .false.
+      return
     end if
     
     n_tot = size(str%atoms)
+    
     
     ! stuff to do with when to update neighbor list
     
@@ -189,9 +192,11 @@ contains
     nn_list%max_an_atom_has_moved = 0.0
     
                                               
-    ! do stuff associated with the cell method
+    ! Determine whether or not to use cell method
                                              
     nn_list%cells%num_cells = floor(str%box_edges / (r_cut+delta_r))
+    
+    ignore_cell_method = .false.
     
     do i = 1, ndim
       if (nn_list%cells%num_cells(i) < 4) then
@@ -203,16 +208,16 @@ contains
     
     allocate(nn_list%cells%list(n_tot+product(nn_list%cells%num_cells)))
     
-    !write(*,'(a,3f10.3)') "box_edges ", str%box_edges
-    !write(*,'(a,3i4)') "num_cells ", nn_list%cells%num_cells
     
+    ! get number of nn atom pairs required for the structure: str         
     
-    ! the list        
     nn_list%n_pairs = get_num_near_neighb(nn_list%cells, &
                          str, r_cut+delta_r)
 
-    ! nn_list cannot possibly be bigger than N(N-1)/2 here
-    ! exception should be used below but for now simply use brute force
+    ! nn_list cannot possibly be bigger than N(N-1)/2, where N is the total
+    ! number of atoms in the box. 
+    ! Proper exception handling should have been used below but for now simply 
+    ! use brute force
     
     if (nn_list%n_pairs > n_tot*(n_tot-1) / 2 ) then
       write(*,*) " "
