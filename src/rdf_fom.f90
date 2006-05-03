@@ -40,7 +40,6 @@ contains
       stop
     end if    
 
-    !c%rdf_cal%g_of_r = c%rdf_cal%prefac * nn_list%hist%h
     
     n_bin = size(nn_list%hist%h)
     

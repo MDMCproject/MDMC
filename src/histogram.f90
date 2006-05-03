@@ -16,10 +16,14 @@ implicit none
   ! between (n-bins-1)*bin_length and n_bins*bin_length
   
   type histogram
-    real(db) :: bin_length    ! length of a bin
-    integer, dimension(:), allocatable :: h    ! the histogram 
+    ! Notice r_max = size(h) * bin_length. Hence strictly only one
+    ! of bin_length and r_max are needed, but both are included for
+    ! convenience
     
-    real(db) :: r_max  ! included for convenience
+    real(db) :: bin_length  
+    real(db) :: r_max    
+    
+    integer, dimension(:), allocatable :: h    ! the histogram 
   end type histogram
 
 contains
