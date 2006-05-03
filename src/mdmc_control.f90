@@ -199,7 +199,7 @@ contains
       call md_reset_properties(my_props)
       write(*, '(a,i8,a,f12.4,a)') "MD steps = ", i, " MD run-time = ", time_now, "*10e-13"
       
-      call nn_update_histogram(my_ps%neighb_list)
+      !call nn_update_histogram(my_ps%neighb_list)
       
       print *, "FOM = ", func_val_nn(my_ps%str, common_fom_list, my_ps%neighb_list)
             
