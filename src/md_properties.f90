@@ -139,11 +139,11 @@ contains
     
     props%kin_energy%val = 0.5*sum_mass_v2 / n_atoms
     
-    if (ps%neighb_list%ignore_list == .true.) then
+!    if (ps%neighb_list%ignore_list == .true.) then
       pot_energy = func_val(ps%str, list) / n_atoms
-    else
-      pot_energy = func_val_nn(ps%str, list, ps%neighb_list) / n_atoms
-    end if
+!    else
+!      pot_energy = func_val_nn(ps%str, list, ps%neighb_list) / n_atoms
+!    end if
     
     props%tot_energy%val = pot_energy + props%kin_energy%val
     

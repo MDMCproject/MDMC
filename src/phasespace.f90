@@ -1,6 +1,5 @@
 module phasespace_class
 use structure_class
-use near_neighb_class
 use function_class
 
   implicit none
@@ -32,7 +31,6 @@ use function_class
     real(db), dimension(:), allocatable :: v2
     real(db), dimension(:), allocatable :: mass    
     
-    type (near_neighb_list) :: neighb_list
   end type phasespace
 
 
@@ -84,19 +82,16 @@ contains
       ps%p_div_mass = ps%p * ps%inv_mass
       
       ps%str%r = ps%str%r + delta_t * ps%p * ps%inv_mass
- 
- 
-      ! change status of histogram
-      
-      ps%neighb_list%histogram_needs_updating = .true.
       
       
       ! calculate derivatives for time t=t+h
       ! but wrap around first
+      !
+      ! CODE BELOW NEEDS TO BE PROPERLY MODIFIED TO NEW DESIGN LATER
       
       call apply_boundary_condition(ps%str)   
       
-      if (ps%neighb_list%ignore_list == .true.) then
+      if (ps%str%nn_list%ignore_list == .true.) then
         if (extra_args) then
           call func_deriv(ps%str, ps%deriv, pe_list, pressure_comp, pot_energy)
         else
@@ -105,25 +100,25 @@ contains
       else
         ! stored the velocities at times t=t+h/2. Strictly speaking
         ! these should not be used for calculating the total energy at 
-        ! t=t+h but could but reused for an adjusting-temperature-function
+        ! t=t+h but could be reused for an adjusting-temperature-function
 
         ps%v2 = sum(ps%p_div_mass*ps%p_div_mass,2)
         
         
         ! update nearest neighbour list flags
 
-        call update_nn_list_flags(sqrt(maxval(ps%v2))*delta_t, ps%neighb_list)
+        call update_nn_list_flags(sqrt(maxval(ps%v2))*delta_t, ps%str%nn_list)
         
-        if (ps%neighb_list%needs_updating == .true.) then
-          call build_near_neighb(ps%str, ps%neighb_list)
+        if (ps%str%nn_list%needs_updating == .true.) then
+          call build_near_neighb(ps%str)
         else
-          call cal_nn_distances(ps%str, ps%neighb_list)
+          call cal_nn_distances(ps%str)
         end if
         
         if (extra_args) then
-          call func_deriv_nn(ps%str, ps%deriv, pe_list, ps%neighb_list, pressure_comp, pot_energy)
+          call func_deriv(ps%str, ps%deriv, pe_list, pressure_comp, pot_energy)
         else
-          call func_deriv_nn(ps%str, ps%deriv, pe_list, ps%neighb_list)
+          call func_deriv(ps%str, ps%deriv, pe_list)
         end if
       end if
       
@@ -135,9 +130,9 @@ contains
   end subroutine trajectory_in_phasespace
   
     
-  function make_phasespace(str, r_cut, delta_r, temperature) result (ps)
+  function make_phasespace(str, temperature) result (ps)
     type (structure), intent(in) :: str
-    real (db), intent(in) :: r_cut, delta_r, temperature
+    real (db), intent(in) :: temperature
     type (phasespace) :: ps
 
     integer :: n_tot, i
@@ -146,8 +141,6 @@ contains
     real(db), dimension(ndim) :: dummy_vec
     
     n_tot = size(str%atoms)
-    
-    ps%neighb_list = make_near_neighb_list(str, r_cut, delta_r)
     
     ps%str = copy_structure(str)
     

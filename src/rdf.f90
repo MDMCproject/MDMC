@@ -1,7 +1,6 @@
 module rdf_class
 use various_constants_class
 use structure_class
-use near_neighb_class
 use histogram_class
 use tic_toc_class
 

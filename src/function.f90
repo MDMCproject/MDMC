@@ -7,8 +7,8 @@ use rdf_fom_class
 
 implicit none
 
-  public :: func_val, func_val_nn
-  public :: func_deriv, func_deriv_nn
+  public :: func_val
+  public :: func_deriv
 
 
   private :: add_lj_pe_container
@@ -48,27 +48,15 @@ contains
     type (func_list), intent(in) :: list
     real (db) :: val
 
-    val = lj_val(str, list%pt_lj_pe)
-  end function func_val
-  
-  
-  function func_val_nn(str, list, nn_list) result (val)
-    type (structure), intent(in) :: str
-    type (func_list), intent(in) :: list
-    type (near_neighb_list), intent(in) :: nn_list    
-    real (db) :: val
- 
- 
-    if ( associated (list%pt_lj_pe) ) then
-      val = lj_val_nn(str, list%pt_lj_pe, nn_list)
-    else if ( associated (list%pt_rdf_fom) ) then
-      val = rdf_fom_val_nn(str, list%pt_rdf_fom, nn_list)  
+    if ( associated(list%pt_lj_pe) ) then
+      val = lj_val(str, list%pt_lj_pe)
+    else if ( associated(list%pt_rdf_fom) ) then
+      val = rdf_fom_val(str, list%pt_rdf_fom)
     else
-      print *, "ERROR in func_val_nn"
+      print *, "Error in func_val"
       stop
     end if
-    
-  end function func_val_nn  
+  end function func_val
   
   
   subroutine func_deriv(str, deriv, list, pressure_comp, pot_energy)
@@ -92,27 +80,5 @@ contains
  		
   end subroutine func_deriv
 
-
-  subroutine func_deriv_nn(str, deriv, list, nn_list, pressure_comp, pot_energy)
-    type (structure), intent(in) :: str
-    real(db), dimension(:,:), intent(out) :: deriv
-    type (func_list), intent(in) :: list
-    type (near_neighb_list), intent(in) :: nn_list
- 		real (db), optional, intent(out) :: pressure_comp, pot_energy
- 		    
- 		! test for optional arguments
-    
-    if (present(pressure_comp) .and. present(pot_energy)) then
-      call lj_deriv_nn(str, deriv, list%pt_lj_pe, nn_list, pressure_comp, pot_energy)
-    else if (present(pressure_comp)==.false. .and. present(pot_energy)==.false.) then
-      call lj_deriv_nn(str, deriv, list%pt_lj_pe, nn_list)
-    else
-      write(*,*) "ERROR in func_deriv_nn"
-      write(*,*) "Either both pressure_comp and pot_energy must be present"
-      write(*,*) "none of them."
-      stop    
-    end if 		    
- 		     
-  end subroutine func_deriv_nn   
       
 end module function_class

@@ -4,6 +4,7 @@ use structure_type_definition_class
 
 implicit none
 
+  public :: copy_near_neighb_list
   public :: make_near_neighb_list
   public :: build_near_neighb
   public :: update_nn_list_flags
@@ -18,8 +19,57 @@ implicit none
   private :: get_num_near_neighb_without_cell  ! not using cell method
   private :: build_near_neighb_with_cell    
   private :: build_near_neighb_without_cell  
+  private :: copy_cell_list
 
 contains
+
+  function copy_cell_list(cell_in) result(cell_out)
+    type (cell_list), intent(in) :: cell_in
+    type (cell_list) :: cell_out
+    
+    integer :: i
+    
+    cell_out%ignore_cell_method = cell_in%ignore_cell_method
+    cell_out%num_cells = cell_in%num_cells
+    
+    allocate(cell_out%list(size(cell_in%list))) 
+    cell_out%list = cell_in%list
+    
+  end function copy_cell_list
+
+
+  function copy_near_neighb_list(nn_list_in) result(nn_list_out)
+    type (near_neighb_list), intent(in) :: nn_list_in
+    type (near_neighb_list) :: nn_list_out
+  
+    integer :: i
+    
+    nn_list_out%ignore_list = nn_list_in%ignore_list 
+    
+    if ( nn_list_in%ignore_list == .true. ) then
+      return
+    end if 
+  
+    nn_list_out%pairs_allocated = nn_list_in%pairs_allocated
+    nn_list_out%n_pairs = nn_list_in%n_pairs
+    nn_list_out%needs_updating = nn_list_in%needs_updating
+    nn_list_out%delta_r = nn_list_in%delta_r
+    nn_list_out%r_cut = nn_list_in%r_cut
+    nn_list_out%max_an_atom_has_moved = nn_list_in%max_an_atom_has_moved
+    nn_list_out%what_is_stored = nn_list_in%what_is_stored
+  
+  
+    allocate(nn_list_out%pairs(size(nn_list_in%pairs)))
+    nn_list_out%pairs = nn_list_in%pairs
+
+    
+    allocate(nn_list_out%dists(size(nn_list_in%dists)))
+    nn_list_out%dists = nn_list_in%dists
+    
+    nn_list_out%cells = copy_cell_list(nn_list_in%cells)
+    
+  end function copy_near_neighb_list
+  
   
   subroutine cal_nn_distances(str)
     type (structure), intent(inout) :: str
@@ -84,7 +134,8 @@ contains
     
     if (r_cut /= 0.0) then
       str%nn_list%ignore_list = .false.
-      return
+    else
+      return  
     end if
     
     n_tot = size(str%atoms)
@@ -107,6 +158,7 @@ contains
     do i = 1, ndim
       if (str%nn_list%cells%num_cells(i) < 4) then
         ignore_cell_method = .true.
+        exit
       end if
     end do
     

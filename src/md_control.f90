@@ -47,16 +47,15 @@ contains
 
     ! initiate phasespace
     
-    my_ps = make_phasespace(a_config%str, c%r_cut, c%delta_r, &
-                        c%temperature)                      
+    my_ps = make_phasespace(a_config%str, c%temperature)                      
                         
-    my_rdf = make_rdf(product(my_ps%str%box_edges), size(my_ps%str%atoms), &
+    my_rdf = make_rdf(product(a_config%str%box_edges), size(a_config%str%atoms), &
                       c%r_max, c%number_bins)
   
                       
     ! this is a rdf container for accumulation rdf's
     
-    my_rdf_sum = make_rdf(product(my_ps%str%box_edges), size(my_ps%str%atoms), &
+    my_rdf_sum = make_rdf(product(a_config%str%box_edges), size(a_config%str%atoms), &
                       c%r_max, c%number_bins)
     my_rdf_sum%g_of_r = 0.0
                           

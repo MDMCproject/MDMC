@@ -384,6 +384,8 @@ contains
           call run_mdmc_control(common_config, setup_mdmc_control_params)
         end if
         
+      ! NOTE THE CODE BELOW NEED TO BE CHANGED PROPERLY LATER  
+        
       case("use-near-neighbour-method")
       
         ! it is assumed that r-cut+delta-r should be smaller than L/2, hence
@@ -404,6 +406,14 @@ contains
           write(*,'(a,f12.6)') "   delta-r = ", setup_md_control_params%delta_r
           write(*, *) " "
         end if
+   
+        ! make nn-list. This is regardless of whether it will be used or not because at
+        ! the moment it is in make_near_neighb_list() that str%nn_list%ignore_list is 
+        ! set equal to .false. if it is decided that the nearest neighbour method should 
+        ! be used
+        
+        call make_near_neighb_list(common_config%str, setup_md_control_params%r_cut, & 
+                                   setup_md_control_params%delta_r)
    
     end select
 

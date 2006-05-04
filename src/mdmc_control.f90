@@ -39,15 +39,14 @@ contains
 
     ! initiate phasespace
     
-    my_ps = make_phasespace(a_config%str, c%r_cut, c%delta_r, &
-                        c%temperature)
+    my_ps = make_phasespace(a_config%str, c%temperature)
                         
                         
     ! Notice a design issue: fix this later
     ! the problem is that make_phasespace does not currently properly initiate 
     ! the histogram (not a problem to fix later)
     
-    my_ps%neighb_list%hist = copy_histogram(target_rdf_fom%rdf_data%hist)
+!    my_ps%neighb_list%hist = copy_histogram(target_rdf_fom%rdf_data%hist)
                                                
                         
                
@@ -201,7 +200,7 @@ contains
       
       !call nn_update_histogram(my_ps%neighb_list)
       
-      print *, "FOM = ", func_val_nn(my_ps%str, common_fom_list, my_ps%neighb_list)
+!      print *, "FOM = ", func_val_nn(my_ps%str, common_fom_list, my_ps%neighb_list)
             
       
       ! adjust the temperature
