@@ -16,9 +16,19 @@ use converters_class
   public :: startup_handler
   
 
-  logical, private  :: in_constraints = .false.
-	logical, private  :: in_gpe = .false., in_fom = .false.
-	logical, private  :: in_md_control = .false., in_mdmc_control = .false.
+  logical, private  :: in_constraints = .false., in_use_near_neighbour_method = .false.
+  logical, private  :: in_gpe = .false., in_fom = .false.
+  logical, private  :: in_md_control = .false., in_mdmc_control = .false.
+  
+  ! nn_list_r_cut and nn_list_delta_r are the two attributes that are needed to setup
+  ! a nearest neighbour list. 
+  ! Notice that if nn_list_r_cut stays equal to 0.0 then nn_list%ignore_list stays 
+  ! equal to .true. when attempting to make a nearest neighbour list with 
+  ! make_near_neighb_list()
+  ! nn_list_delta_r defines the buffer region so that the near-neighbour pairs includes
+  ! all pairs with distances less than r_cut+delta_r
+  real(db), private :: nn_list_r_cut = 0.0                                      
+  real(db), private :: nn_list_delta_r       
                                              
   integer, dimension(ndim), private :: n_param
   
@@ -66,15 +76,18 @@ contains
     select case(trim(name))
       case("constraints")
         in_constraints = .true.
-				
-		  case("gpe")
-			  in_gpe = .true.
+
+      case("use-near-neighbour-method")
+        in_use_near_neighbour_method = .true.
+      
+      case("gpe")
+        in_gpe = .true.
 			  
-		  case("fom")
-			  in_fom = .true.			  
+      case("fom")
+        in_fom = .true.			  
         
       case("control-object")
-	      call get_value(attributes,"name",control_object_name,status)
+	    call get_value(attributes,"name",control_object_name,status)
 	
 	
         select case(control_object_name)
@@ -87,22 +100,24 @@ contains
 	
     end select
 
-    
-    ! if in md_control
-    if (in_md_control) then
+
+    ! if in use-near-neighbour-method
+    if (in_use_near_neighbour_method) then
       select case(name)
-      
-        !case("use-near-neighbour-method")
-        !  setup_md_control_params%use_near_neighbour_method = .true.
-      
         case("delta-r")       
           call get_value(attributes,"val",read_db,status)
-          setup_md_control_params%delta_r = string_to_db(read_db)
+          nn_list_delta_r = string_to_db(read_db)
           
         case("r-cut")       
           call get_value(attributes,"val",read_db,status)
-          setup_md_control_params%r_cut = string_to_db(read_db)
-          
+          nn_list_r_cut = string_to_db(read_db)      
+      end select
+    end if    
+    
+         
+    ! if in md_control
+    if (in_md_control) then
+      select case(name)
         case("step-limit")       
           call get_value(attributes,"number",read_int,status)
           setup_md_control_params%step_limit = string_to_int(read_int)
@@ -158,8 +173,7 @@ contains
           
         case("average-over-this-many-rdf")       
           call get_value(attributes,"number",read_int,status)
-          setup_md_control_params%average_over_this_many_rdf = string_to_int(read_int)
-                               
+          setup_md_control_params%average_over_this_many_rdf = string_to_int(read_int)                       
       end select
     end if
 
@@ -169,7 +183,7 @@ contains
     if (in_mdmc_control) then
       select case(name)
  
-     case("total-steps-to-settle-system")       
+        case("total-steps-to-settle-system")       
           call get_value(attributes,"number",read_int,status)
           setup_mdmc_control_params%total_steps_to_settle_system = string_to_int(read_int)       
           
@@ -240,16 +254,6 @@ contains
         case("temperature-mc")       
           call get_value(attributes,"val",read_db,status)
           setup_mdmc_control_params%temperature_mc = string_to_db(read_db)
-                    
-          
-        case("delta-r")       
-          call get_value(attributes,"val",read_db,status)
-          setup_mdmc_control_params%delta_r = string_to_db(read_db)
-          
-        case("r-cut")       
-          call get_value(attributes,"val",read_db,status)
-          setup_mdmc_control_params%r_cut = string_to_db(read_db)   
-                               
       end select
     end if
         
@@ -382,28 +386,24 @@ contains
         end if
         if (in_mdmc_control == .true.) then
           call run_mdmc_control(common_config, setup_mdmc_control_params)
-        end if
-        
-      ! NOTE THE CODE BELOW NEED TO BE CHANGED PROPERLY LATER  
+        end if 
         
       case("use-near-neighbour-method")
       
         ! it is assumed that r-cut+delta-r should be smaller than L/2, hence
         ! check for this below and if necessary change r-cut accordingly
         
-        if (setup_md_control_params%r_cut /= 0.0) then
-          if (setup_md_control_params%r_cut+setup_md_control_params%delta_r > &
-              minval(common_config%str%box_edges)/2.0) then
-            setup_md_control_params%r_cut = minval(common_config%str%box_edges)/2.0 &
-              - setup_md_control_params%delta_r
+        if (nn_list_r_cut /= 0.0) then
+          if (nn_list_r_cut+nn_list_delta_r > minval(common_config%str%box_edges)/2.0) then
+            nn_list_r_cut = minval(common_config%str%box_edges)/2.0 - nn_list_delta_r
           end if
           
           ! Print to screen
     
           write(*, *) " "
           print *, 'Nearest neighbour method will be used with: '
-          write(*,'(a,f12.6)') "   r-cut = ", setup_md_control_params%r_cut 
-          write(*,'(a,f12.6)') "   delta-r = ", setup_md_control_params%delta_r
+          write(*,'(a,f12.6)') "   r-cut = ", nn_list_r_cut 
+          write(*,'(a,f12.6)') "   delta-r = ", nn_list_delta_r
           write(*, *) " "
         end if
    
@@ -412,8 +412,7 @@ contains
         ! set equal to .false. if it is decided that the nearest neighbour method should 
         ! be used
         
-        call make_near_neighb_list(common_config%str, setup_md_control_params%r_cut, & 
-                                   setup_md_control_params%delta_r)
+        call make_near_neighb_list(common_config%str, nn_list_r_cut, nn_list_delta_r)
    
     end select
 

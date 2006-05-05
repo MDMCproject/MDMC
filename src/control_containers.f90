@@ -10,12 +10,6 @@ implicit none
     
     real(db) :: temperature   ! stored internally in units of 120.279K (=1000/8.314K)
     real(db) :: time_step     ! stored internally in units of 10e-13seconds
-    
-    !logical :: use_near_neighbour_method = .false.
-    real(db) :: r_cut = 0.0   ! cal the potential only to this value. If r_cut == 0.0 it is assumed that
-                              ! use_near_neighbour_method = .false.
-    real(db) :: delta_r       ! buffer region so that the near-neighbour pairs includes
-                              ! all pairs with distances less than r_cut+delta_r
                               
     !logical :: perform_initial_temperature_calibration = .false.
     integer :: total_step_temp_cali = 0    ! the total number of MD steps where the temperature is adjusted
@@ -58,12 +52,6 @@ implicit none
     real(db) :: temperature   ! stored internally in units of 120.279K (=1000/8.314K)
     real(db) :: time_step     ! stored internally in units of 10e-13seconds
     real(db) :: temperature_mc   ! used in metropolis
-    
-    !logical :: use_near_neighbour_method = .false.
-    real(db) :: r_cut = 0.0   ! cal the potential only to this value. If r_cut == 0.0 it is assumed that
-                              ! use_near_neighbour_method = .false.
-    real(db) :: delta_r       ! buffer region so that the near-neighbour pairs includes
-                              ! all pairs with distances less than r_cut+delta_r
   end type mdmc_control_container
 
 

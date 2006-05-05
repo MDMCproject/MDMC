@@ -18,6 +18,16 @@
     <number-of-unit-cells nx="8" ny ="8" nz="8" />
   </structure>
   
+  <!-- To not use nearest neighbour method include element below.
+      Notice Rapaport recomment delta-r values around 1.2AA.
+      Further if r-cut+delta-r > 'smallest box edge'/2 then
+      set r-cut = 'smallest box edge'/2 - delta-r 
+      -->    
+  <use-near-neighbour-method>
+    <r-cut units="AA" val="1008.5125" />   
+    <delta-r units="AA" val="1.362" />            
+  </use-near-neighbour-method>   
+  
   <constraints>
     <fnc-constraint filename="fnc.xml"></fnc-constraint>
     <cutoff-constraint />
@@ -54,17 +64,6 @@
     
     <temperature units="Kelvin" val="85.0" />
     <time-step units="10e-13s" val="0.1078" />
-    
-    
-    <!-- To not use nearest neighbour method include element below.
-         Notice Rapaport recomment delta-r values around 1.2AA.
-         Further if r-cut+delta-r > 'smallest box edge'/2 then
-         set r-cut = 'smallest box edge'/2 - delta-r 
-         -->    
-    <use-near-neighbour-method>
-      <r-cut units="AA" val="1008.5125" />   
-      <delta-r units="AA" val="1.362" />            
-    </use-near-neighbour-method> 
     
     
     <!-- To not perform initial temperature calibration either comment

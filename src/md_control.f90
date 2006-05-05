@@ -116,11 +116,11 @@ contains
         ! perhaps define a r_cut value to L/2 or something like that
         
         if ( associated (common_pe_list%pt_lj_pe) ) then
-          if (c%r_cut /= 0.0) then
+          if (a_config%str%nn_list%r_cut /= 0.0) then
             density = size(my_ps%str%atoms)/product(my_ps%str%box_edges)
             sigma = get_func_param_val(common_pe_list%pt_lj_pe%params, "sigma")  
 		        epsilon = get_func_param_val(common_pe_list%pt_lj_pe%params, "epsilon")
-            sig_r_cut3 = (sigma / c%r_cut)**3
+            sig_r_cut3 = (sigma / a_config%str%nn_list%r_cut)**3
             pressure_corr = 32.0 * pi_value* density**2 * sigma**3 * epsilon * &
                             (sig_r_cut3**3 - 1.5*sig_r_cut3) / 9.0
                             
