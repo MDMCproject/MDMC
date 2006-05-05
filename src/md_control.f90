@@ -36,7 +36,8 @@ contains
     type (phasespace) :: my_ps
     type (md_properties) :: my_props
     real(db) :: pressure_comp = 0.0, pot_energy = 0.0
-    type (rdf) :: my_rdf, my_rdf_sum
+    type (rdf) :: my_rdf
+    type (histogram) :: my_histogram
 	  
 		
     write(*,*) "In run_md_control"
@@ -45,19 +46,15 @@ contains
 
     call tic
 
-    ! initiate phasespace
+    ! initiate
     
     my_ps = make_phasespace(a_config%str, c%temperature)                      
+    
+    my_histogram = make_histogram(c%r_max, c%number_bins)
                         
     my_rdf = make_rdf(product(a_config%str%box_edges), size(a_config%str%atoms), &
                       c%r_max, c%number_bins)
-  
-                      
-    ! this is a rdf container for accumulation rdf's
-    
-    my_rdf_sum = make_rdf(product(a_config%str%box_edges), size(a_config%str%atoms), &
-                      c%r_max, c%number_bins)
-    my_rdf_sum%g_of_r = 0.0
+ 
                           
     
     do i = 1, c%step_limit
@@ -143,11 +140,7 @@ contains
       if (c%calculate_rdf) then
         if (i > c%total_step_temp_cali) then
           if ( mod(i-c%total_step_temp_cali, c%cal_rdf_at_interval) == 0 ) then
-            call cal_rdf(my_rdf, my_ps%str)
-            
-            ! add to rdf sum container
-            
-            my_rdf_sum%g_of_r = my_rdf_sum%g_of_r + my_rdf%g_of_r
+            call accum_histogram(my_histogram, my_ps%str)
           end if
           
           
@@ -156,12 +149,12 @@ contains
           
           if ( mod(i-c%total_step_temp_cali, c%cal_rdf_at_interval*c%average_over_this_many_rdf) == 0 ) then
             
-            my_rdf_sum%g_of_r = my_rdf_sum%g_of_r / c%average_over_this_many_rdf
+            call cal_rdf(my_rdf, my_histogram)
             
-            density = size(my_ps%str%atoms)/product(my_ps%str%box_edges)
-            call save_rdf(my_rdf_sum, c%temperature, density)
+            density = size(my_ps%str%atoms) / product(my_ps%str%box_edges)
+            call save_rdf(my_rdf, c%temperature, density)
             
-            my_rdf_sum%g_of_r = 0.0
+            call clear_histogram(my_histogram)
           end if
         
         end if

@@ -45,7 +45,7 @@ contains
   
   function func_val(str, list) result (val)
     type (structure), intent(in) :: str
-    type (func_list), intent(in) :: list
+    type (func_list), intent(inout) :: list
     real (db) :: val
 
     if ( associated(list%pt_lj_pe) ) then

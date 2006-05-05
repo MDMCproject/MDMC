@@ -13,6 +13,9 @@ implicit none
     type (rdf) :: rdf_data
     type (rdf) :: rdf_cal
     
+    ! used for calculating rdf_cal
+    type (histogram) :: hist
+    
     real(db) :: scale_factor = 1.0
     real(db) :: weight = 1.0
     
@@ -26,17 +29,18 @@ contains
 
   function rdf_fom_val(str, c) result (val)
     type (structure), intent(in) :: str
-  	type (rdf_fom_container), intent(in) :: c
+  	type (rdf_fom_container), intent(inout) :: c
     real (db) :: val
   
     real(db) :: n_bin  
-
+   
+    n_bin = size(c%rdf_data%val)
     
-    n_bin = size(c%rdf_cal%hist%h)
+    call cal_histogram(c%hist, str)
+    call cal_rdf(c%rdf_cal, c%hist) 
     
     val = c%weight / n_bin * &
-          sum((c%rdf_data%g_of_r - c%scale_factor*c%rdf_cal%g_of_r)**2)
-
+      sum((c%rdf_data%val - c%scale_factor*c%rdf_cal%val)**2)
 
   end function rdf_fom_val
   

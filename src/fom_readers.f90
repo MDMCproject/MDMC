@@ -71,7 +71,8 @@ contains
                                   number_int)
         target_rdf_fom%rdf_cal = make_rdf(product(common_config%str%box_edges), &
                                   size(common_config%str%atoms), number_db, &
-                                  number_int)        
+                                  number_int)  
+        target_rdf_fom%hist = make_histogram(number_db, number_int)               
                         
         count_number_atoms = 1
 
@@ -79,7 +80,7 @@ contains
       case("g-of-r")
 
         call get_value(attributes,"g", read_db,status)
-        target_rdf_fom%rdf_data%g_of_r(count_number_atoms) = string_to_db(read_db)
+        target_rdf_fom%rdf_data%val(count_number_atoms) = string_to_db(read_db)
    
         count_number_atoms = count_number_atoms + 1        
 

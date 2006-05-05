@@ -141,12 +141,12 @@ contains
   !  end do    
           
             
-  !my_rdf_sum%g_of_r = my_rdf_sum%g_of_r / c%average_over_this_many_rdf
+  !my_rdf_sum%val = my_rdf_sum%val / c%average_over_this_many_rdf
             
   !density = size(my_ps%str%atoms)/product(my_ps%str%box_edges)
   !          call save_rdf(my_rdf_sum, c%temperature, density)
             
-  !my_rdf_sum%g_of_r = 0.0
+  !my_rdf_sum%val = 0.0
           
         
         

@@ -31,6 +31,10 @@ implicit none
     logical :: ignore_list = .true.  
   
     ! the list - for now just pairs of j1, j2
+    ! Notice the reason for the n_pairs attribute is that there may be more
+    ! space allocated then there are nearest neigbour pairs for a given structure
+    ! For this reason also when looping over pairs you most not use pairs_allocated
+    ! or size(pairs) but always n_pairs
     integer, dimension(:), allocatable :: pairs
     integer :: pairs_allocated
     integer :: n_pairs

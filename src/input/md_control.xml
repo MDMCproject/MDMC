@@ -24,7 +24,7 @@
       set r-cut = 'smallest box edge'/2 - delta-r 
       -->    
   <use-near-neighbour-method>
-    <r-cut units="AA" val="1008.5125" />   
+    <r-cut units="AA" val="8.5125" />   
     <delta-r units="AA" val="1.362" />            
   </use-near-neighbour-method>   
   

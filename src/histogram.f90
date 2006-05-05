@@ -8,6 +8,7 @@ implicit none
   public :: make_histogram
   public :: copy_histogram
   public :: cal_histogram
+  public :: accum_histogram, clear_histogram
 
 
   ! it is assumed that histogram stores distances in bins of size
@@ -19,15 +20,57 @@ implicit none
     ! Notice r_max = size(h) * bin_length. Hence strictly only one
     ! of bin_length and r_max are needed, but both are included for
     ! convenience
-    
     real(db) :: bin_length  
     real(db) :: r_max    
     
-    integer, dimension(:), allocatable :: h    ! the histogram 
+    integer, dimension(:), allocatable :: val
+    
+    ! used when using accum_histogram
+    integer, dimension(:), allocatable :: sum 
+    
+    ! you may want to add a number of histograms before e.g.
+    ! calculating a rdf
+    !
+    ! Notice if n_accum = 0 the array sum is assumed to be equal to an
+    ! array of zeros
+    integer :: n_accum  
   end type histogram
 
 contains
 
+
+  ! Same as cal_histogram but in additional this function also adds the
+  ! calculated histogram to the hist%sum attribute 
+
+  subroutine accum_histogram(hist, str)
+    type (histogram), intent(inout) :: hist
+    type (structure), intent(in) :: str    
+    
+    ! fill up the hist%val array
+    
+    call cal_histogram(hist, str)
+    
+    
+    ! add the hist%val array to the hist%sum array
+    
+    hist%n_accum = hist%n_accum + 1
+    hist%sum = hist%sum + hist%val
+  
+  end subroutine accum_histogram
+  
+  
+  ! This one is used together with accum_histogram. 
+  ! It resets the hist%n_accum and hist%sum attributes
+  
+  subroutine clear_histogram(hist)
+    type (histogram), intent(inout) :: hist  
+  
+    hist%n_accum = 0
+    hist%sum = 0
+  
+  end subroutine clear_histogram
+  
+  
   function make_histogram(r_max, n_bin) result(hist)
     real(db), intent(in) :: r_max
     integer, intent(in) :: n_bin
@@ -37,7 +80,14 @@ contains
     hist%bin_length = r_max / n_bin 
     hist%r_max = r_max
     
-    allocate(hist%h(n_bin))
+    allocate(hist%val(n_bin))
+    allocate(hist%sum(n_bin))
+    
+    ! initialise
+    
+    !hist%val = 0
+    hist%sum = 0
+    hist%n_accum = 0
   
   end function make_histogram
   
@@ -47,7 +97,7 @@ contains
     
     integer :: n_bin
     
-    n_bin = size(hist_in%h)
+    n_bin = size(hist_in%val)
     
     if (n_bin < 1) then
       print *, "ERROR in copy histogram"
@@ -58,28 +108,10 @@ contains
     hist_out%r_max = hist_in%r_max
     hist_out%bin_length = hist_in%bin_length
     
-    allocate(hist_out%h(n_bin))
-    hist_out%h = hist_in%h
+    allocate(hist_out%val(n_bin))
+    hist_out%val = hist_in%val
   
   end function copy_histogram  
-  
-  
-!  subroutine cal_histogram_nn(hist, nn)
-!    type (histogram), intent(inout) :: hist
-!    type (near_neighb_list), intent(in) :: nn
-    
-!    if (nn%what_is_stored == "r2") then
-       
-    !
-!    else if (nn%what_is_stored == "r") then
-    !
-    
-!    else
-    !
-    
-!    end if
-    
-!  end subroutine cal_histogram_nn  
   
   
   subroutine cal_histogram(hist, str)
@@ -97,32 +129,57 @@ contains
     rr_max = hist%r_max * hist%r_max
     
 		n_tot = size(str%atoms)   ! number of atoms
+      
+    hist%val = 0
+
+    ! Do different summations depending on whether the nearest neighbour list is
+    ! in use    
     
+    if (str%nn_list%ignore_list == .true. .or. str%nn_list%r_cut < hist%r_max) then
     
-    hist%h = 0
-    
-		do i1 = 1, n_tot
-		  do i2 = i1+1, n_tot
-        diff_vec = str%r(i1,:) - str%r(i2,:)
-        
-        do i = 1, ndim
-          if (diff_vec(i) >= 0.5_db * str%box_edges(i)) then
-            diff_vec(i) = diff_vec(i) - str%box_edges(i)
+		  do i1 = 1, n_tot
+		    do i2 = i1+1, n_tot
+          diff_vec = str%r(i1,:) - str%r(i2,:)
+          
+          do i = 1, ndim
+            if (diff_vec(i) >= 0.5_db * str%box_edges(i)) then
+              diff_vec(i) = diff_vec(i) - str%box_edges(i)
+            end if
+            if (diff_vec(i) < -0.5_db * str%box_edges(i)) then
+              diff_vec(i) = diff_vec(i) + str%box_edges(i)
+            end if       
+          end do
+          
+          rr = sum(diff_vec*diff_vec)
+          
+          if (rr < rr_max) then
+            which_bin = ceiling(sqrt(rr)/hist%bin_length) 
+            hist%val(which_bin) = hist%val(which_bin) + 1
           end if
-          if (diff_vec(i) < -0.5_db * str%box_edges(i)) then
-            diff_vec(i) = diff_vec(i) + str%box_edges(i)
-          end if       
-        end do
-        
-        rr = sum(diff_vec*diff_vec)
-        
+  			
+			  end do
+		  end do    
+		
+		else
+		  ! for now also assumes that distances are stored as r2
+      ! and I have put this if statement in so that I don't forget to
+      ! change the code in this function when I no longer assume this
+    
+      if (str%nn_list%what_is_stored /= "r2") then
+        print *, "ERROR: what_is_stored is different from r2"
+        print *, "Time to update code in nn_update_histogram subroutine"
+        stop
+      end if
+     
+      do i = 1, str%nn_list%n_pairs
+        rr = str%nn_list%dists(i) 
         if (rr < rr_max) then
           which_bin = ceiling(sqrt(rr)/hist%bin_length) 
-          hist%h(which_bin) = hist%h(which_bin) + 1
+          hist%val(which_bin) = hist%val(which_bin) + 1
         end if
-			
-			end do
-		end do    
+      end do
+
+		end if
 
   end subroutine cal_histogram
 
