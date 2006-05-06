@@ -9,7 +9,10 @@ implicit none
 
   public :: func_val
   public :: func_deriv
-
+  
+  ! for accummulating and clearing the common histogram attribute
+  public :: func_accum_histogram
+  public :: func_clear_histogram
 
   private :: add_lj_pe_container
   private :: add_rdf_fom_container
@@ -57,6 +60,36 @@ contains
       stop
     end if
   end function func_val
+  
+  
+  subroutine func_accum_histogram(str, list)
+    type (structure), intent(in) :: str
+    type (func_list), intent(inout) :: list
+
+    if ( associated(list%pt_lj_pe) ) then
+      call accum_histogram(list%pt_lj_pe%hist, str)
+    else if ( associated(list%pt_rdf_fom) ) then
+      call accum_histogram(list%pt_rdf_fom%hist, str)
+    else
+      print *, "Error in func_val"
+      stop
+    end if
+  end subroutine func_accum_histogram
+  
+  
+  subroutine func_clear_histogram(str, list)
+    type (structure), intent(in) :: str
+    type (func_list), intent(inout) :: list
+
+    if ( associated(list%pt_lj_pe) ) then
+      call clear_histogram(list%pt_lj_pe%hist)
+    else if ( associated(list%pt_rdf_fom) ) then
+      call clear_histogram(list%pt_rdf_fom%hist)
+    else
+      print *, "Error in func_val"
+      stop
+    end if
+  end subroutine func_clear_histogram
   
   
   subroutine func_deriv(str, deriv, list, pressure_comp, pot_energy)

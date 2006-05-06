@@ -2,6 +2,7 @@ module lennard_jones_class
 use various_constants_class
 use structure_class
 use func_param_class
+use histogram_class
 
 implicit none
 
@@ -11,7 +12,9 @@ implicit none
   private :: lj_val_nn, lj_val_without_nn
 
   type lj_pe_container
+    ! stuff which is in common for all function containers
     type (func_params) :: params
+    type (histogram) :: hist
   end type lj_pe_container
 
 

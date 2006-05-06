@@ -110,60 +110,10 @@ contains
  ! ---------------  finished settling the system -------------- !               
                
                
- ! --------------- calculate rdf and first fom   -------------- !
- 
- !   do i = 1, c%average_over_this_many_rdf
-
-
- !     do j = 1, c%average_over_this_many_rdf      
-      
-        ! do one trajectory of length = 1 where pressure_comp and pot_energy is also
-        ! calculated
-      
-        !call trajectory_in_phasespace(my_ps, common_pe_list, 1, c%time_step)
-  !      call trajectory_in_phasespace(my_ps, common_pe_list, 1, c%time_step, & 
-  !                                  pressure_comp, pot_energy)
-      
-        !call md_cal_properties(my_ps, my_props, common_pe_list)
-  !      call md_cal_properties(my_ps, my_props, common_pe_list, pressure_comp, pot_energy)              
-      
-               
-        ! accumulate the calculated MD property values
-        
-  !      call md_accum_properties(my_props)
-  !    end do
-                     
-  !    call nn_update_histogram(my_ps%neighb_list)
-            
-            
-  !    my_hist_sum%h = my_hist_sum%h + my_ps%neighb_list%hist%h
-      
-  !  end do    
-          
-            
-  !my_rdf_sum%val = my_rdf_sum%val / c%average_over_this_many_rdf
-            
-  !density = size(my_ps%str%atoms)/product(my_ps%str%box_edges)
-  !          call save_rdf(my_rdf_sum, c%temperature, density)
-            
-  !my_rdf_sum%val = 0.0
-          
-        
-        
-        
-               
-               
-               
-               
-               
-               
-               
-               
-               
-                        
+                      
 
     do i = 1, c%mc_steps
-      time_now = c%time_step * i * c%md_steps_per_trajectory  ! perhaps print out 
+      time_now = c%time_step * i * c%md_steps_per_trajectory  
       
       ! do one trajectory
       
