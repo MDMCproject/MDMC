@@ -38,10 +38,16 @@ contains
     real(db) :: pressure_comp = 0.0, pot_energy = 0.0
     type (rdf) :: my_rdf
     type (histogram) :: my_histogram
+    
+    integer :: print_to_file = 111
+    integer :: print_to_screen = 0
+	  
+	  if (print_to_file /= 0) then
+	    open(print_to_file, file="output/job_summary.txt")
+	  end if
 	  
 		
-    write(*,*) "In run_md_control"
-
+    write(print_to_file, *) "In run_md_control"
 
 
     call tic
@@ -50,10 +56,10 @@ contains
     
     my_ps = make_phasespace(a_config%str, c%temperature)                      
     
-    my_histogram = make_histogram(c%r_max, c%number_bins)
+    my_histogram = make_histogram(c%r_max, c%bin_length)
                         
     my_rdf = make_rdf(product(a_config%str%box_edges), size(a_config%str%atoms), &
-                      c%r_max, c%number_bins)
+                      c%r_max, c%bin_length)
  
                           
     
@@ -79,9 +85,7 @@ contains
         if (mod(i,c%adjust_temp_at_interval) == 0) then
           temp_adjust_factor = sqrt(c%adjust_temp_at_interval * 1.5 * c%temperature / &
               sum_kin_energy * (size(my_ps%str%atoms)-1.0) / size(my_ps%str%atoms))
-          !write(*,*) sum_kin_energy / c%adjust_temp_at_interval   
           my_ps%p = my_ps%p * temp_adjust_factor
-          !write(*,*) sum(my_ps%p * my_ps%p) * 0.5 / size(my_ps%str%atoms)
           sum_kin_energy = 0.0
         end if
       end if
@@ -96,7 +100,7 @@ contains
       ! print out stuff and interval = average_over_this_many_steps
         
       if (mod(i,c%average_over_this_many_step) == 0) then 
-        call md_print_properties(my_props)
+        call md_print_properties(print_to_file, my_props)
         
         if (sum(sum(my_ps%p,1)) > 0.0001) then
           write(*,*) "ERROR:"
@@ -125,13 +129,14 @@ contains
             
             pressure_corr = pressure_corr * 16387.2
             
-            write(*,'(a,f12.6)') "P_corr(atm) = ", pressure_corr
+            write(print_to_file,'(a,f12.6)') "P_corr(atm) = ", pressure_corr
           end if
         end if
         
         
         call md_reset_properties(my_props)
-        write(*, '(a,i8,a,f12.4,a)') "MD steps = ", i, " MD run-time = ", time_now, "*10e-13"
+        write(print_to_file, '(a,i8,a,f12.4,a)') "MD steps = ", i, " MD run-time = ", time_now, "*10e-13"
+        write(print_to_screen, '(a,i8,a,f12.4,a)') "MD steps = ", i, " MD run-time = ", time_now, "*10e-13"
       end if
       
       
@@ -166,8 +171,13 @@ contains
    
     call save_structure(my_ps%str, "output/argon_structure.xml")
     
-    print *, ' '
-    print *, 'Job took ', toc(), ' seconds to execute.'
+    write(print_to_file, *) " "
+    write(print_to_file, '(a,f12.4,a)') "Job took ", toc(), " seconds to execute."
+    
+    
+    if (print_to_file /= 0) then
+	    close(print_to_file)
+	  end if
 
   end subroutine run_md_control
 

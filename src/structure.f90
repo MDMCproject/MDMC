@@ -5,29 +5,15 @@ use structure_nn_methods_class
 
 implicit none
 
+  !public :: apply_boundary_condition_one_atom  (moved to structure_type_definition because used in
+  !                                              structure_nn_methods)
   public :: apply_boundary_condition
-  public :: apply_boundary_condition_one_atom
   public :: copy_structure, save_structure
   public :: swap_atoms
 
 contains
 
-  subroutine apply_boundary_condition_one_atom(vec, box_edges)
-    real (db), dimension(ndim), intent(inout) :: vec
-    real (db), dimension(ndim), intent(in) :: box_edges
-    
-    integer :: i
-    
-    do i = 1, ndim
-      if (vec(i) >= 0.5 * box_edges(i)) then
-        vec(i) = vec(i) - box_edges(i)
-      end if
-      if (vec(i) < -0.5 * box_edges(i)) then
-        vec(i) = vec(i) + box_edges(i)
-      end if       
-    end do
-    
-  end subroutine apply_boundary_condition_one_atom
+
   
 
   ! apply periodic boundary conditions, however assume here that atoms have

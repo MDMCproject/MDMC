@@ -33,7 +33,7 @@ contains
   
     real(db) :: n_bin  
    
-    n_bin = size(c%rdf_data%val)
+    n_bin = size(c%rdf_cal%val)
     
     ! in case hist%n_accum > 0 then this implies that this histogram
     ! has been calculated by some other means (that is in particular
@@ -46,7 +46,7 @@ contains
     call cal_rdf(c%rdf_cal, c%hist) 
     
     val = c%weight / n_bin * &
-      sum((c%rdf_data%val - c%scale_factor*c%rdf_cal%val)**2)
+      sum((c%rdf_data%val(1:n_bin) - c%scale_factor*c%rdf_cal%val)**2)
 
   end function rdf_fom_val
   

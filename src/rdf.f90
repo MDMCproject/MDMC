@@ -16,15 +16,15 @@ implicit none
   ! between (n-bins-1)*bin_length and n_bins*bin_length
   
   type rdf
-    ! Notice r_max = size(h) * bin_length. Hence strictly only one
-    ! of bin_length and r_max are needed, but both are included for
-    ! convenience
-    ! Also, notice the bin_length and r_max are e.g. used in cal_rdf
+    ! Notice bin_length and is e.g. used in cal_rdf
     ! to make sure that the histogram passed to that function is 
-    ! compatable with how g(r) is defined in this type
+    ! compatable with how g(r) is defined here
     
     real(db) :: bin_length  
-    real(db) :: r_max  
+    
+    
+    ! Notice the val values are always to be the g(r) values at the
+    ! center of each bin. I.e. at 0.5*bin_length, 1.5*bin_length etc.... 
     
     real(db), dimension(:), allocatable :: val
     real(db), dimension(:), allocatable :: prefac   ! g(r)=histogram*prefac
@@ -36,20 +36,21 @@ implicit none
 
 contains
 
-  function make_rdf(volume, n_atoms, r_max, n_bin) result(a_rdf)
-    real(db), intent(in) :: volume, r_max
-    integer, intent(in) :: n_atoms, n_bin
+  function make_rdf(volume, n_atoms, r_max, bin_length) result(a_rdf)
+    real(db), intent(in) :: volume, r_max, bin_length
+    integer, intent(in) :: n_atoms
     type (rdf) :: a_rdf
     
     real(db) :: temp, r_i
-    integer :: i
+    integer :: i, n_bin
     
-    a_rdf%r_max = r_max
-    a_rdf%bin_length = r_max / n_bin
+    !a_rdf%r_max = r_max
+    a_rdf%bin_length = bin_length
  
  
     ! make val attribute
     
+    n_bin = floor(r_max/bin_length)
     allocate(a_rdf%val(n_bin))
     a_rdf%val = 0.0
  
@@ -59,7 +60,7 @@ contains
     allocate(a_rdf%prefac(n_bin))
     
 
-    temp = volume / (2.0 * pi_value * (n_atoms**2) * a_rdf%bin_length**3 )
+    temp = volume / (2.0 * pi_value * (n_atoms**2) * bin_length**3 )
     
     do i = 1, n_bin
       r_i = i - 0.5_db
@@ -88,6 +89,9 @@ contains
   end subroutine cal_rdf
 
 
+  ! Notice the a_rdf%val array are assumed to represent g(r) at the center
+  ! of each. That means at: 0.5*bin_length, 1.5*bin_length etc......
+  
   subroutine save_rdf(a_rdf, temperature, density)
     use flib_wxml
     type (rdf), intent(in) :: a_rdf
@@ -136,8 +140,11 @@ contains
     end if
     
     call xml_AddAttribute(xf, "units", "AA")
-    call xml_AddAttribute(xf, "n-bin", str(n_bin))
-    call xml_AddAttribute(xf, "r-max", str(a_rdf%r_max, format="(f10.5)"))
+    call xml_AddAttribute(xf, "bin-length", str(a_rdf%bin_length, format="(f10.5)"))
+    
+    ! Save an r_max value which is slightly too big. This is to do with the primitive way
+    ! the function which reads in such a file works -> see fom_readers.f90
+    call xml_AddAttribute(xf, "r-max", str(a_rdf%bin_length*(n_bin+0.01), format="(f10.5)"))
     
     call xml_NewElement(xf, "this-file-was-created")
     call xml_AddAttribute(xf, "when", get_current_date_and_time())

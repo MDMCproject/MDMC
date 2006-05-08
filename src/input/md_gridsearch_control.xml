@@ -39,6 +39,7 @@
   <fom>
     <rdf-fom>
       <rdf-data filename="../data/Argon_liquid_P1atm/rdf_density0_02125temp85.xml" />
+      <r-max units="AA" val="8.5125" />
       <scale-factor val="1.0" />
       <sigma val="1.0" />
     </rdf-fom>
@@ -53,39 +54,39 @@
            but for now you can optionally specify an r-cut value here, which
            simply put the potential to zero for all r values higher than r-cut 
            -->
-      <r-cut units="AA" val="7.491" />
+      <r-cut units="AA" val="70000.0" />  
     </lj-potential>
     <!-- <lookup-data-potential /> -->
   </gpe>
   
-  <control-object name="mdmc_control">
+  <control-object name="md_gridsearch_control">
+  
+    <temperature units="Kelvin" val="85.0" />
+    <time-step units="10e-13s" val="0.1078" />  
 
-    <total-steps-to-settle-system number="5000" />
-    <average-over-this-many-step number="1000" />
+    <!-- Specify stuff with is done only once
     
-    <!-- to not perform initial temperature calibration either comment
-         out the element below or set total-step to zero 
+         The average-over attribute of the total-steps-initial-equilibration
+         element specifies how many steps to average over when calculating
+         MD properties 
          -->
+    <total-steps-initial-equilibration number="15000" average-over="1000" />
     <perform-initial-temperature-calibration>
-      <total-step-temp-cali number="3000" />
+      <total-step-temp-cali number="8000" />
       <adjust-temp-at-interval number="200" />
     </perform-initial-temperature-calibration>
     
-    <md-steps-first-part number="1000" />
+    
+    <mc-steps number="5" /> 
+    <temperature-mc val="0.2" />    
+    
+    <!-- specify stuff which is repeated mc-steps times 
+         -->
+    <md-steps-repeated-equilibration number="1000" average-over="200" />
     <calculate-rdf>
-      <r-max units="AA" val="20.0" />
-      <number-bins number="200" /> 
       <cal-rdf-at-interval number="50" />
       <average-over-this-many-rdf number="20" />  
     </calculate-rdf>    
-     
-    <mc-steps number="5" />   
-    
-    <md-steps-per-trajectory number="200" />
-    
-    <temperature units="Kelvin" val="85.0" />
-    <time-step units="10e-13s" val="0.1075" />
-    <temperature-mc val="1.0" />
         
   </control-object>
 

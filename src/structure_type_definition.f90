@@ -3,6 +3,9 @@ use various_constants_class
 
 implicit none
 
+  ! moved here because used in structure_nn_methods 
+  public :: apply_boundary_condition_one_atom
+
 
   ! the below is the fastest and most compressed collection of single link
   ! list I have ever seen. Its drawback is that it is a pain to handle but
@@ -89,5 +92,24 @@ implicit none
     
     type (near_neighb_list) :: nn_list
   end type structure
+  
+contains
+
+  subroutine apply_boundary_condition_one_atom(vec, box_edges)
+    real (db), dimension(ndim), intent(inout) :: vec
+    real (db), dimension(ndim), intent(in) :: box_edges
+    
+    integer :: i
+    
+    do i = 1, ndim
+      if (vec(i) >= 0.5 * box_edges(i)) then
+        vec(i) = vec(i) - box_edges(i)
+      end if
+      if (vec(i) < -0.5 * box_edges(i)) then
+        vec(i) = vec(i) + box_edges(i)
+      end if       
+    end do
+    
+  end subroutine apply_boundary_condition_one_atom  
   
 end module structure_type_definition_class

@@ -17,11 +17,7 @@ implicit none
   ! between (n-bins-1)*bin_length and n_bins*bin_length
   
   type histogram
-    ! Notice r_max = size(h) * bin_length. Hence strictly only one
-    ! of bin_length and r_max are needed, but both are included for
-    ! convenience
-    real(db) :: bin_length  
-    real(db) :: r_max    
+    real(db) :: bin_length   
     
     integer, dimension(:), allocatable :: val
     
@@ -71,17 +67,16 @@ contains
   end subroutine clear_histogram
   
   
-  function make_histogram(r_max, n_bin) result(hist)
-    real(db), intent(in) :: r_max
-    integer, intent(in) :: n_bin
+  function make_histogram(r_max, bin_length) result(hist)
+    real(db), intent(in) :: r_max, bin_length
     type (histogram) :: hist
     
     
-    hist%bin_length = r_max / n_bin 
-    hist%r_max = r_max
+    hist%bin_length = bin_length 
+    !hist%r_max = r_max
     
-    allocate(hist%val(n_bin))
-    allocate(hist%sum(n_bin))
+    allocate(hist%val(floor(r_max/bin_length)))
+    allocate(hist%sum(floor(r_max/bin_length)))
     
     ! initialise
     
@@ -105,7 +100,7 @@ contains
       stop
     end if
     
-    hist_out%r_max = hist_in%r_max
+    !hist_out%r_max = hist_in%r_max
     hist_out%bin_length = hist_in%bin_length
     
     allocate(hist_out%val(n_bin))
@@ -118,24 +113,25 @@ contains
     type (histogram), intent(inout) :: hist
     type (structure), intent(in) :: str
     
-    real(db) :: rr_max
+    real(db) :: rr_max, r_max
     integer :: n_tot        ! number of atoms
     integer :: i, i1, i2
     integer :: which_bin    ! where which_bin=1 is the first bin: [0:bin_length]
     real (db) :: rr
-		real (db), dimension(ndim) :: diff_vec   
+    real (db), dimension(ndim) :: diff_vec   
 		
 		
-    rr_max = hist%r_max * hist%r_max
+	r_max = hist%bin_length * size(hist%val)
+    rr_max = r_max * r_max
     
-		n_tot = size(str%atoms)   ! number of atoms
+    n_tot = size(str%atoms)   ! number of atoms
       
     hist%val = 0
 
     ! Do different summations depending on whether the nearest neighbour list is
     ! in use    
     
-    if (str%nn_list%ignore_list == .true. .or. str%nn_list%r_cut < hist%r_max) then
+    if (str%nn_list%ignore_list == .true. .or. str%nn_list%r_cut < r_max) then
     
 		  do i1 = 1, n_tot
 		    do i2 = i1+1, n_tot

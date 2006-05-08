@@ -28,7 +28,6 @@ contains
     if (str%nn_list%ignore_list == .true.) then
       val = lj_val_without_nn(str, container)
     else
-    
       ! will remove unnessary 3rd arg later
       val = lj_val_nn(str, container, str%nn_list)
     end if
@@ -198,7 +197,6 @@ contains
     epsilon_times4 = 4*epsilon
     sigma2 = sigma * sigma
     
-    ! r_cut = 2.0_db**(1.0_db / 6.0_db) * sigma
     
     if (does_func_param_exist(container%params, "r-cut")) then
       r_cut = get_func_param_val(container%params, "r-cut")
@@ -240,7 +238,7 @@ contains
     type (near_neighb_list), intent(in) :: nn_list
     real (db) :: val
   
-    integer :: i1, i2, n_tot, j
+    integer :: n_tot, j
     real (db) :: r_cut, rr_cut 
     real (db) :: sigma, epsilon 
     real (db) :: epsilon_times4    ! 4 * epsilon
@@ -252,9 +250,6 @@ contains
     epsilon = get_func_param_val(container%params, "epsilon") 
     epsilon_times4 = 4*epsilon
     sigma2 = sigma * sigma
-    
-
-    ! r_cut = 2.0_db**(1.0_db / 6.0_db) * sigma
     
     if (does_func_param_exist(container%params, "r-cut")) then
       r_cut = get_func_param_val(container%params, "r-cut")
@@ -276,8 +271,8 @@ contains
     
     do j = 1, nn_list%n_pairs
 
-  	  i1 = nn_list%pairs(2*j-1)
-  	  i2 = nn_list%pairs(2*j)
+  	  !i1 = nn_list%pairs(2*j-1)
+  	  !i2 = nn_list%pairs(2*j)
       
       rr = nn_list%dists(j)
       

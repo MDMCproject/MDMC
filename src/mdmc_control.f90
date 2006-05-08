@@ -32,7 +32,13 @@ contains
     real(db) :: pressure_comp = 0.0, pot_energy = 0.0
     type (rdf) :: my_rdf, my_rdf_sum
 	
-		
+    integer :: print_to_file = 111
+    integer :: print_to_screen = 0
+	  
+	  if (print_to_file /= 0) then
+	    open(print_to_file, file="output/job_summary.txt")
+	  end if
+	  		
     write(*,*) "In run_md_control"
 
     call tic
@@ -53,7 +59,7 @@ contains
 ! -------------- settling the system ---------------- !
 
 
-    do i = 1, c%total_steps_to_settle_system
+    do i = 1, c%total_steps_initial_equilibration
       time_now = c%time_step * i   ! perhaps print this one out 
       
       ! do one trajectory of length = 1 where pressure_comp and pot_energy is also
@@ -89,8 +95,8 @@ contains
         
       ! print out stuff and interval = average_over_this_many_steps
         
-      if (mod(i,c%average_over_this_many_step) == 0) then 
-        call md_print_properties(my_props)
+      if (mod(i,c%average_over_initial_equilibration) == 0) then 
+        call md_print_properties(print_to_file, my_props)
         
         if (sum(sum(my_ps%p,1)) > 0.0001) then
           write(*,*) "ERROR:"
@@ -113,11 +119,11 @@ contains
                       
 
     do i = 1, c%mc_steps
-      time_now = c%time_step * i * c%md_steps_per_trajectory  
+!      time_now = c%time_step * i * c%md_steps_per_trajectory  
       
       ! do one trajectory
       
-      do i_md = 1, c%md_steps_per_trajectory
+      do i_md = 1, c%md_steps_repeated_equilibration
       
         !call trajectory_in_phasespace(my_ps, common_pe_list, 1, c%time_step)
         call trajectory_in_phasespace(my_ps, common_pe_list, 1, c%time_step, & 
@@ -136,7 +142,7 @@ contains
         
       ! print out stuff
         
-      call md_print_properties(my_props)
+      call md_print_properties(print_to_file, my_props)
         
       if (sum(sum(my_ps%p,1)) > 0.0001) then
         write(*,*) "ERROR:"
@@ -154,9 +160,9 @@ contains
             
       
       ! adjust the temperature
-      temp_adjust_factor = sqrt(c%md_steps_per_trajectory * 1.5 * c%temperature / &
-              sum_kin_energy * (size(my_ps%str%atoms)-1.0) / size(my_ps%str%atoms)) 
-      my_ps%p = my_ps%p * temp_adjust_factor
+!      temp_adjust_factor = sqrt(c%md_steps_per_trajectory * 1.5 * c%temperature / &
+!              sum_kin_energy * (size(my_ps%str%atoms)-1.0) / size(my_ps%str%atoms)) 
+!      my_ps%p = my_ps%p * temp_adjust_factor
       sum_kin_energy = 0.0
       
       
@@ -166,6 +172,11 @@ contains
     
     print *, ' '
     print *, 'Job took ', toc(), ' seconds to execute.'
+    
+    if (print_to_file /= 0) then
+	    close(print_to_file)
+	  end if    
+    
   end subroutine run_mdmc_control
 
 end module mdmc_control_class

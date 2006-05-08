@@ -50,8 +50,7 @@ contains
     type(dictionary_t), intent(in) :: attributes
     
     integer :: status
-    real(db) :: number_db
-    integer :: number_int
+    real(db) :: number_db, number_db2
     character(len=40) :: read_db, read_int    
     
 
@@ -62,17 +61,13 @@ contains
         call get_value(attributes,"r-max", read_db,status)
         number_db = string_to_db(read_db) 
         
-        call get_value(attributes,"n-bin", read_int,status)
-        number_int = string_to_int(read_int)
+        call get_value(attributes,"bin-length", read_db,status)
+        number_db2 = string_to_db(read_db)
 
         
         target_rdf_fom%rdf_data = make_rdf(product(common_config%str%box_edges), &
                                   size(common_config%str%atoms), number_db, &
-                                  number_int)
-        target_rdf_fom%rdf_cal = make_rdf(product(common_config%str%box_edges), &
-                                  size(common_config%str%atoms), number_db, &
-                                  number_int)  
-        target_rdf_fom%hist = make_histogram(number_db, number_int)               
+                                  number_db2)            
                         
         count_number_atoms = 1
 

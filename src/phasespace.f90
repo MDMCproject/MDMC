@@ -86,41 +86,28 @@ contains
       
       ! calculate derivatives for time t=t+h
       ! but wrap around first
-      !
-      ! CODE BELOW NEEDS TO BE PROPERLY MODIFIED TO NEW DESIGN LATER
       
-      call apply_boundary_condition(ps%str)   
+      call apply_boundary_condition(ps%str)       
       
-      if (ps%str%nn_list%ignore_list == .true.) then
-        if (extra_args) then
-          call func_deriv(ps%str, ps%deriv, pe_list, pressure_comp, pot_energy)
-        else
-          call func_deriv(ps%str, ps%deriv, pe_list)
-        end if
-      else
-        ! stored the velocities at times t=t+h/2. Strictly speaking
-        ! these should not be used for calculating the total energy at 
-        ! t=t+h but could be reused for an adjusting-temperature-function
-
-        ps%v2 = sum(ps%p_div_mass*ps%p_div_mass,2)
-        
+      ! if nn-list in use - update it to the new atomic coordinates first
+      
+      if (ps%str%nn_list%ignore_list == .false.) then
+         ps%v2 = sum(ps%p_div_mass*ps%p_div_mass,2)
         
         ! update nearest neighbour list flags
 
         call update_nn_list_flags(sqrt(maxval(ps%v2))*delta_t, ps%str%nn_list)
         
-        if (ps%str%nn_list%needs_updating == .true.) then
-          call build_near_neighb(ps%str)
-        else
-          call cal_nn_distances(ps%str)
-        end if
-        
-        if (extra_args) then
-          call func_deriv(ps%str, ps%deriv, pe_list, pressure_comp, pot_energy)
-        else
-          call func_deriv(ps%str, ps%deriv, pe_list)
-        end if
+        call build_near_neighb(ps%str)       
       end if
+        
+
+      if (extra_args) then
+        call func_deriv(ps%str, ps%deriv, pe_list, pressure_comp, pot_energy)
+      else
+        call func_deriv(ps%str, ps%deriv, pe_list)
+      end if
+
       
       ! now get momenta in sync with positions and ready for the next loop
       ps%p = ps%p - delta_t_half * ps%deriv     

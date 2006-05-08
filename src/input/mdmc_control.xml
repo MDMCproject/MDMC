@@ -39,6 +39,7 @@
   <fom>
     <rdf-fom>
       <rdf-data filename="../data/Argon_liquid_P1atm/rdf_density0_02125temp85.xml" />
+      <r-max units="AA" val="8.5125" />
       <scale-factor val="1.0" />
       <sigma val="1.0" />
     </rdf-fom>

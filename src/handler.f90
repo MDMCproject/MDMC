@@ -3,6 +3,7 @@ use flib_sax
 use common_block_class
 use md_control_class
 use mdmc_control_class
+use md_gridsearch_control_class
 use structure_reader_class
 use control_containers_class
 use converters_class
@@ -19,6 +20,10 @@ use converters_class
   logical, private  :: in_constraints = .false., in_use_near_neighbour_method = .false.
   logical, private  :: in_gpe = .false., in_fom = .false.
   logical, private  :: in_md_control = .false., in_mdmc_control = .false.
+  
+  ! Notice use the setup param container from md_gridsearch_control as is used for
+  ! mdmc_control - see code below
+  logical, private :: in_md_gridsearch_control = .false.
   
   ! nn_list_r_cut and nn_list_delta_r are the two attributes that are needed to setup
   ! a nearest neighbour list. 
@@ -96,6 +101,9 @@ contains
             
           case("mdmc_control")
             in_mdmc_control = .true.
+            
+          case("md_gridsearch_control")
+            in_md_gridsearch_control = .true.
         end select
 	
     end select
@@ -150,7 +158,7 @@ contains
         
         case("calculate-rdf")
           setup_md_control_params%calculate_rdf = .true.   
-          
+        
         case("r-max")       
           call get_value(attributes,"val",read_db,status)
           
@@ -163,9 +171,9 @@ contains
           
           setup_md_control_params%r_max = number_db    
           
-        case("number-bins")       
-          call get_value(attributes,"number",read_int,status)
-          setup_md_control_params%number_bins = string_to_int(read_int)                 
+        case("bin-length")       
+          call get_value(attributes,"val",read_db,status)
+          setup_md_control_params%bin_length = string_to_db(read_db)                                           
                           
         case("cal-rdf-at-interval")       
           call get_value(attributes,"number",read_int,status)
@@ -173,23 +181,23 @@ contains
           
         case("average-over-this-many-rdf")       
           call get_value(attributes,"number",read_int,status)
-          setup_md_control_params%average_over_this_many_rdf = string_to_int(read_int)                       
+          setup_md_control_params%average_over_this_many_rdf = string_to_int(read_int)                  
+          
       end select
     end if
 
 
     ! if in mdmc_control
     
-    if (in_mdmc_control) then
+    if (in_mdmc_control .or. in_md_gridsearch_control) then
       select case(name)
  
-        case("total-steps-to-settle-system")       
+        case("total-steps-initial-equilibration")       
           call get_value(attributes,"number",read_int,status)
-          setup_mdmc_control_params%total_steps_to_settle_system = string_to_int(read_int)       
+          setup_mdmc_control_params%total_steps_initial_equilibration = string_to_int(read_int)  
           
-        case("average-over-this-many-step")       
-          call get_value(attributes,"number",read_int,status)
-          setup_mdmc_control_params%average_over_this_many_step = string_to_int(read_int) 
+          call get_value(attributes,"average-over",read_int,status)
+          setup_mdmc_control_params%average_over_initial_equilibration = string_to_int(read_int)                
           
         case("total-step-temp-cali")       
           call get_value(attributes,"number",read_int,status)
@@ -197,28 +205,14 @@ contains
           
         case("adjust-temp-at-interval")       
           call get_value(attributes,"number",read_int,status)
-          setup_mdmc_control_params%adjust_temp_at_interval = string_to_int(read_int)
-          
+          setup_mdmc_control_params%adjust_temp_at_interval = string_to_int(read_int)          
                             
-        case("md-steps-first-part")       
+        case("md-steps-repeated-equilibration")       
           call get_value(attributes,"number",read_int,status)
-          setup_mdmc_control_params%md_steps_first_part = string_to_int(read_int)
+          setup_mdmc_control_params%md_steps_repeated_equilibration = string_to_int(read_int)
           
-        case("r-max")       
-          call get_value(attributes,"val",read_db,status)
-          
-          ! it is assumed for now that r-max should be smaller than L/2 here
-          
-          number_db = string_to_db(read_db)
-          if (number_db > minval(common_config%str%box_edges)/2.0) then
-            number_db = minval(common_config%str%box_edges)/2.0
-          end if
-          
-          setup_mdmc_control_params%r_max = number_db    
-          
-        case("number-bins")       
-          call get_value(attributes,"number",read_int,status)
-          setup_mdmc_control_params%number_bins = string_to_int(read_int)                 
+          call get_value(attributes,"average-over",read_int,status)
+          setup_mdmc_control_params%average_over_repeated_equilibration = string_to_int(read_int)                        
                           
         case("cal-rdf-at-interval")       
           call get_value(attributes,"number",read_int,status)
@@ -232,13 +226,6 @@ contains
         case("mc-steps")       
           call get_value(attributes,"number",read_int,status)
           setup_mdmc_control_params%mc_steps = string_to_int(read_int)            
-
-          
-          
-        case("md-steps-per-trajectory")       
-          call get_value(attributes,"number",read_int,status)
-          setup_mdmc_control_params%md_steps_per_trajectory = string_to_int(read_int)
-          
           
             
         case("temperature")       
@@ -331,15 +318,26 @@ contains
       select case(name)
         case("rdf-fom")       
           call add_function(common_fom_list, target_rdf_fom)
-      
+          
+        case("r-max")
+          call get_value(attributes,"val",read_db,status)
+          number_db = string_to_db(read_db) 
+          
+          ! It is assumed here that a rdf-fom attribute is positioned
+          ! about the r-max attribute (i.e. this attribute)
+          
+          target_rdf_fom%rdf_cal = make_rdf(product(common_config%str%box_edges), &
+              size(common_config%str%atoms), number_db, &
+              target_rdf_fom%rdf_data%bin_length)  
+          target_rdf_fom%hist = make_histogram(number_db, &
+              target_rdf_fom%rdf_data%bin_length)          
           
         case("scale-factor")
           call get_value(attributes,"val",read_db,status)
-          target_rdf_fom%scale_factor = string_to_db(read_db)
+            target_rdf_fom%scale_factor = string_to_db(read_db)
           
         case("sigma")
           call get_value(attributes,"val",read_db,status)
-          
           number_db = string_to_db(read_db)
           target_rdf_fom%weight = 1 / (number_db*number_db)  
           
@@ -386,6 +384,9 @@ contains
         end if
         if (in_mdmc_control == .true.) then
           call run_mdmc_control(common_config, setup_mdmc_control_params)
+        end if
+        if (in_md_gridsearch_control == .true.) then
+          call run_md_gridsearch_control(common_config, setup_mdmc_control_params)           
         end if 
         
       case("use-near-neighbour-method")

@@ -8,7 +8,6 @@ implicit none
   public :: make_near_neighb_list
   public :: build_near_neighb
   public :: update_nn_list_flags
-  public :: cal_nn_distances     ! populates the dists attribute of the near_neighb_list
 
 
   ! used for the cell method (use rapaport's notation)
@@ -20,6 +19,7 @@ implicit none
   private :: build_near_neighb_with_cell    
   private :: build_near_neighb_without_cell  
   private :: copy_cell_list
+  private :: cal_nn_distances     ! populates the dists attribute of the near_neighb_list only  
 
 contains
 
@@ -69,35 +69,6 @@ contains
     nn_list_out%cells = copy_cell_list(nn_list_in%cells)
     
   end function copy_near_neighb_list
-  
-  
-  subroutine cal_nn_distances(str)
-    type (structure), intent(inout) :: str
-    
-    integer :: i1, i2, j, i
-    real(db), dimension(3) :: diff_vec
-    
-    do j = 1, str%nn_list%n_pairs
-  	  i1 = str%nn_list%pairs(2*j-1)
-  	  i2 = str%nn_list%pairs(2*j)
-      
-      diff_vec = str%r(i1,:) - str%r(i2,:)
-        
-      do i = 1, ndim
-        if (diff_vec(i) >= 0.5_db * str%box_edges(i)) then
-          diff_vec(i) = diff_vec(i) - str%box_edges(i)
-        end if
-        if (diff_vec(i) < -0.5_db * str%box_edges(i)) then
-          diff_vec(i) = diff_vec(i) + str%box_edges(i)
-        end if       
-      end do
-        
-      str%nn_list%dists(j) = sum(diff_vec*diff_vec)
-    end do
-    
-      str%nn_list%what_is_stored = "r2"
-      
-  end subroutine cal_nn_distances
 
   
   subroutine update_nn_list_flags(max_an_atom_has_moved, nn_list)
@@ -207,6 +178,11 @@ contains
       write(*,*) " "
     end if
     
+    
+    ! a nn-list is here a member of a structure type. It is implicitely assumed
+    ! this nn-list is always in sync with the structure, therefore:
+    
+    call build_near_neighb(str)
 
   end subroutine make_near_neighb_list
 
@@ -214,13 +190,10 @@ contains
   subroutine build_near_neighb(str)
     type (structure), intent(inout) :: str
     
-    ! Error check
-    if (str%nn_list%needs_updating == .false.) then
-      write(*,'(a)') "ERROR in build_near_neighb"
-      write(*,'(a)') "Not allowed to rebuild nn_list when"
-      write(*,'(a)') "needs_updating == .false."
-      stop
-    end if
+    ! For now you are not allowed to call this function
+    ! when nn_list%ignore_list == .true.
+    ! This restriction will probably be removed later
+    
     if (str%nn_list%ignore_list == .true.) then
       write(*,'(a)') "ERROR in build_near_neighb"
       write(*,'(a)') "Not allowed to rebuild nn_list when"
@@ -228,7 +201,21 @@ contains
       stop
     end if
     
-    str%nn_list%needs_updating = .false.
+    ! if needs_updating = .false. then the nn-list is assumed to still
+    ! be ok - hence no need building a new one. However, the atoms may
+    ! have moved and the nn_list%dists still needs to be updated to these
+    ! new atomic positions
+    !
+    ! Perhaps at some point will somehow make build_near_neighb or another
+    ! function a 'permament' member of structure such that whenever the 
+    ! atomic position coordinates are changed the nn_list is updated
+    ! accordingly
+    
+    if (str%nn_list%needs_updating == .false.) then
+      call cal_nn_distances(str)
+      return
+    end if
+    
     
     if (str%nn_list%cells%ignore_cell_method == .true.) then
       call build_near_neighb_without_cell(str)
@@ -236,10 +223,17 @@ contains
       call build_near_neighb_with_cell(str)
     end if
     
+    
+    ! at this point a fresh nn-list has just been build, hence
+    
+    str%nn_list%needs_updating = .false.
+    
   end subroutine build_near_neighb
 
 
 !!!!!!!!!!!!!!!!!!!!!!! private functions/subroutines !!!!!!!!!!!!!!!!!!!!!!! 
+  
+  ! build new nn-list and populate dists array with, for now, r2 values
   
   subroutine build_near_neighb_without_cell(str)
     type (structure), intent(inout) :: str
@@ -257,21 +251,14 @@ contains
     rr_cut_neighbour = r_cut_neighbour*r_cut_neighbour    
     
     num = 0
-	  do i1 = 1, n_tot
-		  do i2 = i1+1, n_tot
-      diff_vec = str%r(i1,:) - str%r(i2,:)
+    do i1 = 1, n_tot
+      do i2 = i1+1, n_tot
+        diff_vec = str%r(i1,:) - str%r(i2,:)
       
-      do i = 1, ndim
-          if (diff_vec(i) >= 0.5 * str%box_edges(i)) then
-          diff_vec(i) = diff_vec(i) - str%box_edges(i)
-          end if
-          if (diff_vec(i) < -0.5 * str%box_edges(i)) then
-          diff_vec(i) = diff_vec(i) + str%box_edges(i)
-          end if
-      end do
+        call apply_boundary_condition_one_atom(diff_vec, str%box_edges)
       
-      rr = sum(diff_vec*diff_vec)
-      if (rr < rr_cut_neighbour) then
+        rr = sum(diff_vec*diff_vec)
+        if (rr < rr_cut_neighbour) then
           num = num + 1
           
           if (num > str%nn_list%pairs_allocated) then
@@ -282,16 +269,18 @@ contains
           str%nn_list%pairs(2*num-1) = i1
           str%nn_list%pairs(2*num) = i2          
           str%nn_list%dists(num) = rr
-      end if
+        end if
   		
-		  end do
-	  end do
+      end do
+    end do
     
     ! update number of pairs
     str%nn_list%n_pairs = num
     
   end subroutine build_near_neighb_without_cell
-    
+  
+  
+  ! same as build_near_neighb_without_cell but using cell method
   
   subroutine build_near_neighb_with_cell(str)
     type (structure), intent(inout) :: str
@@ -310,8 +299,6 @@ contains
   
     offset_vals = reshape( (/0,0,0, 1,0,0, 1,1,0, 0,1,0, -1,1,0, 0,0,1, 1,0,1, 1,1,1, 0,1,1, -1,1,1, -1,0,1, -1,-1,1, 0,-1,1, 1,-1,1/), & 
                   shape(offset_vals))
-    
-    
     
     n_tot = size(str%atoms)
     r_cut_neighbour = str%nn_list%r_cut + str%nn_list%delta_r
@@ -368,10 +355,6 @@ contains
       ! until -1 is encountered
       str%nn_list%cells%list(cp_1d) = i
       
-      !write(*, '(a,i10)') "i = ", i
-      !write(*, '(a,3f10.3)') "dummy ", dummy
-      !write(*, '(a,3i10)') "cp_3d ", cp_3d
-      !write(*, '(a,i10)') "cp_1d ",cp_1d
 
     end do
     
@@ -463,6 +446,32 @@ contains
   end subroutine build_near_neighb_with_cell
 
 
+  ! populate the dists array only, for now, with r2 values. This function
+  ! does not 'build' a new nn-list but assumes the existing nn-list is still
+  ! ok
+  
+  subroutine cal_nn_distances(str)
+    type (structure), intent(inout) :: str
+    
+    integer :: i1, i2, j, i
+    real(db), dimension(3) :: diff_vec
+    
+    do j = 1, str%nn_list%n_pairs
+  	  i1 = str%nn_list%pairs(2*j-1)
+  	  i2 = str%nn_list%pairs(2*j)
+      
+      diff_vec = str%r(i1,:) - str%r(i2,:)
+        
+      call apply_boundary_condition_one_atom(diff_vec, str%box_edges)
+        
+      str%nn_list%dists(j) = sum(diff_vec*diff_vec)
+    end do
+    
+      str%nn_list%what_is_stored = "r2"
+      
+  end subroutine cal_nn_distances
+  
+  
   function get_num_near_neighb(cells, str, r_cut_neighbour) &
          result (num)
     type (cell_list), intent(inout) :: cells
