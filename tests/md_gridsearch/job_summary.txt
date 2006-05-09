@@ -1,0 +1,392 @@
+ In run_md_gridsearch_control
+Starting Epot values sigma =       2.2000 and epsilon =       0.9960
+  
+Average over this many moves =   1000
+Etot(KJ/mol) =     0.193764    0.784702
+T(K) =   102.013759   64.317792
+P(atm) =   195.585736  364.541914
+  
+Average over this many moves =   1000
+Etot(KJ/mol) =    -0.367174    0.040193
+T(K) =    86.704566    1.757887
+P(atm) =   119.070923   43.763203
+  
+Average over this many moves =   1000
+Etot(KJ/mol) =    -0.518945    0.042131
+T(K) =    86.788057    1.563402
+P(atm) =   107.536847   39.733168
+  
+Average over this many moves =   1000
+Etot(KJ/mol) =    -0.635313    0.010245
+T(K) =    84.777318    1.791565
+P(atm) =    83.375352   36.370184
+  
+Average over this many moves =   1000
+Etot(KJ/mol) =    -0.599212    0.018096
+T(K) =    84.425286    1.859619
+P(atm) =    77.710661   36.870208
+  
+Average over this many moves =   1000
+Etot(KJ/mol) =    -0.632477    0.019539
+T(K) =    85.387400    2.426924
+P(atm) =    84.534865   44.655520
+  
+Average over this many moves =   1000
+Etot(KJ/mol) =    -0.712327    0.044924
+T(K) =    85.971366    3.474768
+P(atm) =    96.237418   42.706249
+  
+Average over this many moves =   1000
+Etot(KJ/mol) =    -0.686198    0.015349
+T(K) =    84.641622    2.254735
+P(atm) =    83.907108   45.316814
+  
+Average over this many moves =   1000
+Etot(KJ/mol) =    -0.692695    0.005561
+T(K) =    87.780406    1.750757
+P(atm) =    98.364978   47.232443
+  
+Average over this many moves =   1000
+Etot(KJ/mol) =    -0.690808    0.007540
+T(K) =    88.065859    2.072943
+P(atm) =   105.759526   46.392002
+  
+Average over this many moves =   1000
+Etot(KJ/mol) =    -0.662423    0.006250
+T(K) =    81.600150    1.694792
+P(atm) =    63.358755   39.740672
+  
+Average over this many moves =   1000
+Etot(KJ/mol) =    -0.666787    0.005275
+T(K) =    82.469176    1.227790
+P(atm) =    82.820201   40.189812
+  
+Average over this many moves =   1000
+Etot(KJ/mol) =    -0.667026    0.005472
+T(K) =    82.970170    1.646649
+P(atm) =    84.577357   36.244696
+  
+Average over this many moves =   1000
+Etot(KJ/mol) =    -0.668101    0.007543
+T(K) =    83.642754    2.321890
+P(atm) =    64.385931   41.371800
+  
+Average over this many moves =   1000
+Etot(KJ/mol) =    -0.683787    0.009563
+T(K) =    86.332861    2.074248
+P(atm) =    82.039249   45.498622
+  
+Taken      10.3910 seconds to execute initial equilibration.
+  
+Now Epot values sigma =       2.2000 and epsilon =       0.9960
+  
+Start cal FOM with sigma =       2.2000
+  
+FOM =       0.7150
+Finished cal FOM. Time:      11.5630
+  
+Now Epot values sigma =       2.6000 and epsilon =       0.9960
+  
+Start a repeated MD run with sigma =       2.6000
+  
+  
+Average over this many moves =   1000
+Etot(KJ/mol) =     0.321893    1.782785
+T(K) =   155.449006  128.868165
+P(atm) =   741.929893 1058.473568
+  
+Average over this many moves =   1000
+Etot(KJ/mol) =    -0.733536    0.013509
+T(K) =    85.468644    2.180497
+P(atm) =   254.519433   46.445796
+  
+Average over this many moves =   1000
+Etot(KJ/mol) =    -0.763248    0.017472
+T(K) =    84.942878    1.323077
+P(atm) =   252.239525   44.905267
+  
+Average over this many moves =   1000
+Etot(KJ/mol) =    -0.788549    0.008951
+T(K) =    84.619360    1.360360
+P(atm) =   242.005669   27.702467
+  
+Average over this many moves =   1000
+Etot(KJ/mol) =    -0.751942    0.017682
+T(K) =    84.704008    1.284100
+P(atm) =   248.422371   45.874803
+  
+Average over this many moves =   1000
+Etot(KJ/mol) =    -0.754964    0.011785
+T(K) =    85.762564    1.271405
+P(atm) =   242.937580   44.697839
+  
+Average over this many moves =   1000
+Etot(KJ/mol) =    -0.739353    0.017579
+T(K) =    85.148934    1.601352
+P(atm) =   242.994541   31.421648
+  
+Average over this many moves =   1000
+Etot(KJ/mol) =    -0.735800    0.012931
+T(K) =    84.315767    1.204695
+P(atm) =   242.290444   47.621872
+  
+Average over this many moves =   1000
+Etot(KJ/mol) =    -0.746599    0.014339
+T(K) =    86.034903    1.690297
+P(atm) =   245.690763   30.585455
+  
+Average over this many moves =   1000
+Etot(KJ/mol) =    -0.744485    0.009932
+T(K) =    84.554341    1.330255
+P(atm) =   266.341403   43.600063
+Finished repeated MD trajectory. Time:      17.5630
+  
+Start cal FOM with sigma =       2.6000
+  
+FOM =       0.4429
+Finished cal FOM. Time:      18.6090
+  
+Now Epot values sigma =       3.0000 and epsilon =       0.9960
+  
+Start a repeated MD run with sigma =       3.0000
+  
+  
+Average over this many moves =   1000
+Etot(KJ/mol) =     0.067485    1.447024
+T(K) =   141.010931   92.192177
+P(atm) =  1459.766261 1093.468838
+  
+Average over this many moves =   1000
+Etot(KJ/mol) =    -0.876677    0.021765
+T(K) =    84.983839    1.158937
+P(atm) =   835.247336   44.905658
+  
+Average over this many moves =   1000
+Etot(KJ/mol) =    -0.887018    0.018241
+T(K) =    84.907838    1.554766
+P(atm) =   828.103602   45.616440
+  
+Average over this many moves =   1000
+Etot(KJ/mol) =    -0.874590    0.028560
+T(K) =    84.708735    1.539225
+P(atm) =   830.876075   54.415535
+  
+Average over this many moves =   1000
+Etot(KJ/mol) =    -0.867181    0.017318
+T(K) =    84.827561    1.300919
+P(atm) =   827.475038   49.055951
+  
+Average over this many moves =   1000
+Etot(KJ/mol) =    -0.883837    0.020672
+T(K) =    85.475300    1.369656
+P(atm) =   824.827179   45.987709
+  
+Average over this many moves =   1000
+Etot(KJ/mol) =    -0.856086    0.019316
+T(K) =    84.729473    1.315709
+P(atm) =   823.357061   44.844330
+  
+Average over this many moves =   1000
+Etot(KJ/mol) =    -0.865975    0.031005
+T(K) =    84.883757    1.374415
+P(atm) =   839.239713   44.470328
+  
+Average over this many moves =   1000
+Etot(KJ/mol) =    -0.867050    0.020904
+T(K) =    84.659138    1.525541
+P(atm) =   835.932718   60.242645
+  
+Average over this many moves =   1000
+Etot(KJ/mol) =    -0.861606    0.018054
+T(K) =    84.713403    1.477238
+P(atm) =   818.943780   47.456746
+Finished repeated MD trajectory. Time:      24.4690
+  
+Start cal FOM with sigma =       3.0000
+  
+FOM =       0.2164
+Finished cal FOM. Time:      25.5000
+  
+Now Epot values sigma =       3.4000 and epsilon =       0.9960
+  
+Start a repeated MD run with sigma =       3.4000
+  
+  
+Average over this many moves =   1000
+Etot(KJ/mol) =     0.846462    1.549206
+T(K) =   147.285756   83.534532
+P(atm) =  3697.898835 1509.200440
+  
+Average over this many moves =   1000
+Etot(KJ/mol) =    -0.350051    0.036459
+T(K) =    85.215359    2.023272
+P(atm) =  2551.308648   48.343700
+  
+Average over this many moves =   1000
+Etot(KJ/mol) =    -0.369242    0.025000
+T(K) =    85.251324    1.907225
+P(atm) =  2500.909904   49.324587
+  
+Average over this many moves =   1000
+Etot(KJ/mol) =    -0.369219    0.041242
+T(K) =    84.633717    1.921433
+P(atm) =  2499.873370   50.085006
+  
+Average over this many moves =   1000
+Etot(KJ/mol) =    -0.360485    0.034806
+T(K) =    84.851636    1.720700
+P(atm) =  2519.791354   47.945959
+  
+Average over this many moves =   1000
+Etot(KJ/mol) =    -0.371927    0.025356
+T(K) =    84.108438    1.703153
+P(atm) =  2523.552445   48.646075
+  
+Average over this many moves =   1000
+Etot(KJ/mol) =    -0.380051    0.034835
+T(K) =    84.215147    2.030659
+P(atm) =  2528.931647   59.309182
+  
+Average over this many moves =   1000
+Etot(KJ/mol) =    -0.390529    0.024891
+T(K) =    83.700448    1.767209
+P(atm) =  2541.518808   46.153797
+  
+Average over this many moves =   1000
+Etot(KJ/mol) =    -0.367700    0.040807
+T(K) =    84.456117    1.407790
+P(atm) =  2515.325952   44.306782
+  
+Average over this many moves =   1000
+Etot(KJ/mol) =    -0.364013    0.031624
+T(K) =    84.305262    1.780910
+P(atm) =  2520.443967   48.662014
+Finished repeated MD trajectory. Time:      31.4380
+  
+Start cal FOM with sigma =       3.4000
+  
+FOM =       0.0006
+Finished cal FOM. Time:      32.4840
+  
+Now Epot values sigma =       3.8000 and epsilon =       0.9960
+  
+Start a repeated MD run with sigma =       3.8000
+  
+  
+Average over this many moves =   1000
+Etot(KJ/mol) =     3.863912    1.772454
+T(K) =   161.114476   71.785026
+P(atm) =  8744.369817 2274.431012
+  
+Average over this many moves =   1000
+Etot(KJ/mol) =     1.969336    0.067724
+T(K) =    88.493043    3.242567
+P(atm) =  6088.994437  165.336465
+  
+Average over this many moves =   1000
+Etot(KJ/mol) =     1.863447    0.023614
+T(K) =    86.596733    2.029421
+P(atm) =  5752.034077  111.473248
+  
+Average over this many moves =   1000
+Etot(KJ/mol) =     1.824266    0.006809
+T(K) =    85.239126    2.221583
+P(atm) =  5680.305298  111.991948
+  
+Average over this many moves =   1000
+Etot(KJ/mol) =     1.829136    0.005591
+T(K) =    85.774669    2.263496
+P(atm) =  5613.881783  103.224600
+  
+Average over this many moves =   1000
+Etot(KJ/mol) =     1.843810    0.007812
+T(K) =    87.574730    2.098813
+P(atm) =  5577.715289  107.499223
+  
+Average over this many moves =   1000
+Etot(KJ/mol) =     1.859471    0.006820
+T(K) =    88.596665    2.307572
+P(atm) =  5589.417654  108.084491
+  
+Average over this many moves =   1000
+Etot(KJ/mol) =     1.882885    0.010296
+T(K) =    89.292186    2.167799
+P(atm) =  5631.653165  102.249618
+  
+Average over this many moves =   1000
+Etot(KJ/mol) =     1.914417    0.011438
+T(K) =    91.320798    2.335894
+P(atm) =  5640.233470  108.931715
+  
+Average over this many moves =   1000
+Etot(KJ/mol) =     1.954246    0.016762
+T(K) =    93.067571    2.388193
+P(atm) =  5704.511246  113.239337
+Finished repeated MD trajectory. Time:      38.2030
+  
+Start cal FOM with sigma =       3.8000
+  
+FOM =       0.3102
+Finished cal FOM. Time:      39.2340
+  
+Now Epot values sigma =       4.2000 and epsilon =       0.9960
+  
+Start a repeated MD run with sigma =       4.2000
+  
+  
+Average over this many moves =   1000
+Etot(KJ/mol) =     8.565980    1.996388
+T(K) =   160.639867   53.530191
+P(atm) = 14645.050133 2855.479718
+  
+Average over this many moves =   1000
+Etot(KJ/mol) =     6.540251    0.251801
+T(K) =   110.443061    5.415926
+P(atm) = 11692.280201  502.123531
+  
+Average over this many moves =   1000
+Etot(KJ/mol) =     6.397904    0.244114
+T(K) =   108.235616    4.865768
+P(atm) = 11440.707545  485.029192
+  
+Average over this many moves =   1000
+Etot(KJ/mol) =     6.365296    0.225301
+T(K) =   107.403628    5.224014
+P(atm) = 11391.991735  446.871806
+  
+Average over this many moves =   1000
+Etot(KJ/mol) =     6.251331    0.250408
+T(K) =   107.936808    5.390525
+P(atm) = 11134.480283  499.893682
+  
+Average over this many moves =   1000
+Etot(KJ/mol) =     7.613559    0.744627
+T(K) =   141.492381   19.265559
+P(atm) = 13163.390595 1115.822843
+  
+Average over this many moves =   1000
+Etot(KJ/mol) =     9.970778    0.555777
+T(K) =   204.622444   16.585152
+P(atm) = 16487.262032  809.845713
+  
+Average over this many moves =   1000
+Etot(KJ/mol) =    11.932610    0.609798
+T(K) =   261.606837   19.101968
+P(atm) = 19077.089912  870.324394
+  
+Average over this many moves =   1000
+Etot(KJ/mol) =    14.019644    0.594315
+T(K) =   324.365241   20.021456
+P(atm) = 21726.059673  823.649185
+  
+Average over this many moves =   1000
+Etot(KJ/mol) =    16.052455    0.624076
+T(K) =   389.724741   23.165793
+P(atm) = 24162.655043  838.747924
+Finished repeated MD trajectory. Time:      44.8590
+  
+Start cal FOM with sigma =       4.2000
+  
+FOM =       0.2974
+Finished cal FOM. Time:      45.9690
+  

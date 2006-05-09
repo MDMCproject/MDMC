@@ -127,8 +127,9 @@ contains
     call xml_AddXMLDeclaration(xf, "UTF-8")
     call xml_NewElement(xf, "rdf")
     
+    ! notice convert units of temperature from dimensionless to K  
     if (present(temperature) .and. present(density)) then
-      call xml_AddAttribute(xf, "title", "T = " // trim(str(temperature, format="(f10.5)")) // &
+      call xml_AddAttribute(xf, "title", "T = " // trim(str(temperature / 0.008314, format="(f10.5)")) // &
                                          " K: rho = " // trim(str(density, format="(f10.5)")) &
                                          // " atoms/AA-3")
     else if (present(temperature)) then 

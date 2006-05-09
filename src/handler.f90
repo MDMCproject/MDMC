@@ -205,7 +205,15 @@ contains
           
         case("adjust-temp-at-interval")       
           call get_value(attributes,"number",read_int,status)
-          setup_mdmc_control_params%adjust_temp_at_interval = string_to_int(read_int)          
+          setup_mdmc_control_params%adjust_temp_at_interval = string_to_int(read_int)     
+          
+         case("total-step-temp-cali-repeated")       
+          call get_value(attributes,"number",read_int,status)
+          setup_mdmc_control_params%total_step_temp_cali_repeated = string_to_int(read_int)
+          
+        case("adjust-temp-at-interval-repeated")       
+          call get_value(attributes,"number",read_int,status)
+          setup_mdmc_control_params%adjust_temp_at_interval_repeated = string_to_int(read_int)               
                             
         case("md-steps-repeated-equilibration")       
           call get_value(attributes,"number",read_int,status)
@@ -241,6 +249,26 @@ contains
         case("temperature-mc")       
           call get_value(attributes,"val",read_db,status)
           setup_mdmc_control_params%temperature_mc = string_to_db(read_db)
+          
+          
+        ! r-max and bin-length are here only used when wanting to save g(r) to file
+          
+        case("r-max")       
+          call get_value(attributes,"val",read_db,status)
+          
+          ! it is assumed for now that r-max should be smaller than L/2 here
+          
+          number_db = string_to_db(read_db)
+          if (number_db > minval(common_config%str%box_edges)/2.0) then
+            number_db = minval(common_config%str%box_edges)/2.0
+          end if
+          
+          setup_mdmc_control_params%r_max = number_db    
+          
+        case("bin-length")       
+          call get_value(attributes,"val",read_db,status)
+          setup_mdmc_control_params%bin_length = string_to_db(read_db)             
+          
       end select
     end if
         
@@ -388,6 +416,9 @@ contains
         if (in_md_gridsearch_control == .true.) then
           call run_md_gridsearch_control(common_config, setup_mdmc_control_params)           
         end if 
+        
+      case("fom")
+        in_fom = .false.                
         
       case("use-near-neighbour-method")
       

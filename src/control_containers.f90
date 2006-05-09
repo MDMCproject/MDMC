@@ -39,9 +39,15 @@ implicit none
     ! to equilibrium, and finally enough MD steps to calculate a reasonable histogram and FOM.                          
     integer :: md_steps_repeated_equilibration
     integer :: average_over_repeated_equilibration ! when cal MD properties: ave over this many steps    
+    integer :: total_step_temp_cali_repeated = 0    
+    integer :: adjust_temp_at_interval_repeated    
     logical :: calculate_rdf = .true.
     integer :: cal_rdf_at_interval     ! at what intervals should rdf be calculated
     integer :: average_over_this_many_rdf  ! how many rdf's do you want to average over
+    
+    ! r-max and bin-length are here only used when wanting to save g(r) to file
+    real(db) :: r_max                  ! cal rdf for interval [0:r_max]
+    real(db) :: bin_length             ! at positions 0.5*bin_length, 1.5*bin_length, etc ....    
         
     integer :: mc_steps   ! number of Monte carlo steps  
     
