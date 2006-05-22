@@ -12,6 +12,11 @@ use func_params_wrapper_class
 
   implicit none
 
+  public :: run_mdmc_control
+  
+  private :: acceptable_temperature
+  private :: acceptable_energy  
+
 contains
 
   subroutine run_mdmc_control(a_config, c)
@@ -19,27 +24,30 @@ contains
     type (mdmc_control_container) :: c
     
     real (db) :: time_now = 0.0    
-    integer :: i, i_md
+    integer :: i, i_md, j
     real(db) :: density  ! used for cal input argument to save_rdf
     
     real(db) :: sum_kin_energy = 0.0
     real(db) :: temp_adjust_factor
+    
+    real(db) :: average_energy_end_of_temp_calibration
   
-    ! md storage containers
+    real(db) :: fom_val, fom_old
 
-    type (phasespace) :: my_ps
+    type (phasespace) :: my_ps, my_ps_old
     type (md_properties) :: my_props
     real(db) :: pressure_comp = 0.0, pot_energy = 0.0
-    type (rdf) :: my_rdf, my_rdf_sum
+    type (rdf) :: my_rdf
+    type (histogram) :: my_histogram
 	
-    integer :: print_to_file = 111
+    integer :: print_to_file = 555
     integer :: print_to_screen = 0
 	  
 	  if (print_to_file /= 0) then
 	    open(print_to_file, file="output/job_summary.txt")
 	  end if
 	  		
-    write(*,*) "In run_md_control"
+    write(print_to_file,*) "In run_md_control"
 
     call tic
 
@@ -48,15 +56,17 @@ contains
     my_ps = make_phasespace(a_config%str, c%temperature)
                         
                         
-    ! Notice a design issue: fix this later
-    ! the problem is that make_phasespace does not currently properly initiate 
-    ! the histogram (not a problem to fix later)
+    ! to print out g(r) to file (otherwise neither my_histogram nor my_rdf needed)
     
-!    my_ps%neighb_list%hist = copy_histogram(target_rdf_fom%rdf_data%hist)
+    my_histogram = make_histogram(c%r_max, c%bin_length)
+                        
+    my_rdf = make_rdf(product(a_config%str%box_edges), size(a_config%str%atoms), &
+                       c%r_max, c%bin_length)                    
+                                               
                                                
                         
                
-! -------------- settling the system ---------------- !
+! -------------- initial equilibration ---------------- !
 
 
     do i = 1, c%total_steps_initial_equilibration
@@ -110,65 +120,160 @@ contains
       end if
       
       
-    end do
-    
-    
- ! ---------------  finished settling the system -------------- !               
-               
-               
-                      
-
-    do i = 1, c%mc_steps
-!      time_now = c%time_step * i * c%md_steps_per_trajectory  
+      ! Store the average energy at the point when finished the temperature calibration.
+      ! Note this must be done after md_print_properties has been called - since only this
+      ! subfunction alters the my_props.ave value.
       
-      ! do one trajectory
-      
-      do i_md = 1, c%md_steps_repeated_equilibration
-      
-        !call trajectory_in_phasespace(my_ps, common_pe_list, 1, c%time_step)
-        call trajectory_in_phasespace(my_ps, common_pe_list, 1, c%time_step, & 
-                                      pressure_comp, pot_energy)
-        
-        !call md_cal_properties(my_ps, my_props, common_pe_list)
-        call md_cal_properties(my_ps, my_props, common_pe_list, pressure_comp, pot_energy)
-
-
-        ! accumulate the calculated MD property values
-          
-        call md_accum_properties(my_props)
-      
-        sum_kin_energy = sum_kin_energy + my_props%kin_energy%val
-      end do  
-        
-      ! print out stuff
-        
-      call md_print_properties(print_to_file, my_props)
-        
-      if (sum(sum(my_ps%p,1)) > 0.0001) then
-        write(*,*) "ERROR:"
-        write(*,'(a,3f12.6)') "total momentum ", sum(my_ps%p,1)
-        write(*,*) "Serious problem - total momentum different from zero"
-        stop
+      if (i == c%total_step_temp_cali) then
+        average_energy_end_of_temp_calibration = my_props.tot_energy.ave 
       end if
-      
-      call md_reset_properties(my_props)
-      write(*, '(a,i8,a,f12.4,a)') "MD steps = ", i, " MD run-time = ", time_now, "*10e-13"
-      
-      !call nn_update_histogram(my_ps%neighb_list)
-      
-!      print *, "FOM = ", func_val_nn(my_ps%str, common_fom_list, my_ps%neighb_list)
-            
-      
-      ! adjust the temperature
-!      temp_adjust_factor = sqrt(c%md_steps_per_trajectory * 1.5 * c%temperature / &
-!              sum_kin_energy * (size(my_ps%str%atoms)-1.0) / size(my_ps%str%atoms)) 
-!      my_ps%p = my_ps%p * temp_adjust_factor
-      sum_kin_energy = 0.0
-      
-      
+
     end do
+    
+    write(print_to_file, *) " "
+    write(print_to_file, '(a,f12.4,a)') "Taken ", toc(), " seconds to execute initial equilibration."
+    write(print_to_file, *) " "
+
+
+    ! Determine if equilibrium was reached
+    !   1. is temperature within T_target +- 50% ?
+    !   2. is E_now within average_energy_end_of_temp_calibration +- 50% ?
+    
+    ! Note the (2.0/ndim) factor is to convert from dimensionless kin_energy per atom to 
+    ! dimensionless temperature
+    
+    if ( acceptable_temperature((2.0/ndim)*my_props.kin_energy.ave, &
+         c%temperature) == .false.) then
+         write(print_to_screen, *) "Initial equilibration did not reach equilibrium"
+         write(print_to_screen, *) "Temperature outside acceptable value - STOP"
+         stop
+    end if   
+    
+    if ( acceptable_energy(average_energy_end_of_temp_calibration, &
+         my_props.tot_energy.ave) == .false.) then
+         write(print_to_screen, *) "Initial equilibration did not reach equilibrium - STOP"
+         write(print_to_screen, *) "Energy outside acceptable value - STOP"
+         stop
+    end if     
+    
+ ! ---------------  finished initial equilibration -------------- !               
+    
+    do j = 1, c%average_over_this_many_rdf
+
+      call trajectory_in_phasespace(my_ps, common_pe_list, c%cal_rdf_at_interval, c%time_step)
+      
+      call func_accum_histogram(my_ps%str, common_fom_list)
+      
+      ! to print out rdf
+      
+      !call accum_histogram(my_histogram, my_ps%str)
+      
+    end do 
+    
+    !! print also out what the param values are
+    fom_val = func_val(my_ps%str, common_fom_list)
+    write(print_to_file,'(a,f12.4)') "1st FOM = ", fom_val
+    write(print_to_file, '(a,f12.4)') "Finished cal 1st FOM. Time: ", toc()
+    write(print_to_file, *) " "
+    write(print_to_screen, '(a,f12.4)') "Finished cal 1st FOM. Time: ", toc()
+
+ ! ----------- calculate first FOM ------------- !
+
+
+
+
+ ! ---------------------- mdmc part ------------------------ !              
+               
+    do i = 1, c%mc_steps
+
+      ! save state
+      
+      fom_old = fom_val
+      
+      
+
+
+        !!!! do repeated MD equilibration
+        
+        do i_md = 1, c%md_steps_repeated_equilibration
+
+          call trajectory_in_phasespace(my_ps, common_pe_list, 1, c%time_step, & 
+                                    pressure_comp, pot_energy)
+
+          call md_cal_properties(my_ps, my_props, common_pe_list, pressure_comp, pot_energy)       
+        
+        
+          if (i_md < c%total_step_temp_cali_repeated) then
+            sum_kin_energy = sum_kin_energy + my_props%kin_energy%val
+            if (mod(i_md,c%adjust_temp_at_interval_repeated) == 0) then
+              temp_adjust_factor = sqrt(c%adjust_temp_at_interval_repeated * 1.5 * c%temperature / &
+                  sum_kin_energy * (size(my_ps%str%atoms)-1.0) / size(my_ps%str%atoms))
+              my_ps%p = my_ps%p * temp_adjust_factor
+              sum_kin_energy = 0.0
+            end if
+          end if        
+        
+        
+          call md_accum_properties(my_props)
+          
+          if (mod(i_md,c%average_over_repeated_equilibration) == 0) then 
+            call md_print_properties(print_to_file, my_props)
+
+            call md_reset_properties(my_props)
+          end if
+          
+        end do
+         
+        write(print_to_file, '(a,f12.4)') "Finished repeated MD trajectory. Time: ", toc() 
+        write(print_to_file, *) " "
+        write(print_to_screen, '(a,f12.4)') "Finished repeated MD trajectory. Time: ", toc()      
+      
+
+      !!!! cal averaged rdf and FOM
+      
+      do j = 1, c%average_over_this_many_rdf
+
+        call trajectory_in_phasespace(my_ps, common_pe_list, c%cal_rdf_at_interval, c%time_step)
+
+       
+        call func_accum_histogram(my_ps%str, common_fom_list)
+        
+        ! to print out rdf
+        
+        !call accum_histogram(my_histogram, my_ps%str)
+        
+      end do 
+      
+      !! print also out what the param values are
+      write(print_to_file,'(a,f12.4)') "FOM = ", func_val(my_ps%str, common_fom_list)
+      write(print_to_file, '(a,f12.4)') "Finished cal FOM. Time: ", toc()
+      write(print_to_file, *) " "
+      write(print_to_screen, '(a,f12.4)') "Finished cal FOM. Time: ", toc()
+      
+      
+      ! print out rdf
+      
+      !call cal_rdf(my_rdf, my_histogram)
+            
+      !density = size(my_ps%str%atoms) / product(my_ps%str%box_edges)
+      !call save_rdf(my_rdf, c%temperature, density)
+      !call clear_histogram(my_histogram)
+      
+      !call func_clear_histogram(my_ps%str, common_fom_list)
+          
+    end do
+
+
+
+
+
+
+
+               
+               
+                     
    
-    call save_structure(my_ps%str, "output/argon_structure.xml")
+    !call save_structure(my_ps%str, "output/argon_structure.xml")
     
     print *, ' '
     print *, 'Job took ', toc(), ' seconds to execute.'
@@ -178,5 +283,30 @@ contains
 	  end if    
     
   end subroutine run_mdmc_control
+  
+  
+  ! check to see if temperature is within certain limits of t_target
+  function acceptable_temperature(t, t_target) result (yes_or_no)
+    real (db), intent(in) :: t, t_target
+    logical :: yes_or_no 
+    
+    yes_or_no = .true.
+    
+    if (abs((t - t_target)/t_target) > 0.5) then
+      yes_or_no = .false.
+    end if
+  end function acceptable_temperature
+  
+  ! check to see if energy is within certain limits of t_target
+  function acceptable_energy(e, e_target) result (yes_or_no)
+    real (db), intent(in) :: e, e_target
+    logical :: yes_or_no 
+    
+    yes_or_no = .true.
+    
+    if (abs((e - e_target)/e_target) > 0.5) then
+      yes_or_no = .false.
+    end if
+  end function acceptable_energy
 
 end module mdmc_control_class

@@ -59,7 +59,7 @@
     <!-- <lookup-data-potential /> -->
   </gpe>
   
-  <control-object name="md_gridsearch_control">
+  <control-object name="mdmc_control">
   
     <temperature units="Kelvin" val="85.0" />
     <time-step units="10e-13s" val="0.05" />  
@@ -77,7 +77,7 @@
     </perform-initial-temperature-calibration>
     
     
-    <mc-steps number="5" /> 
+    <mc-steps number="1" /> 
     <temperature-mc val="0.2" />    
     
     <!-- specify stuff which is repeated mc-steps times 

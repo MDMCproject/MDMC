@@ -7,6 +7,8 @@ implicit none
   public :: md_accum_properties
   public :: md_reset_properties
   public :: md_print_properties
+  
+  private :: md_convert_kin_energy_to_temperature
 
   private :: md_cal_properties_extra, md_cal_properties_not_extra
 
@@ -29,6 +31,17 @@ implicit none
   end type md_properties
 
 contains
+
+
+  ! Convert the average kin_energy value to a temperature in Kelvin
+  
+  function md_convert_kin_energy_to_temperature(kin_energy) result (val)
+    real (db), intent(in) :: kin_energy  
+    real (db) :: val
+    
+    val = (2.0/ndim)*(1000.0/8.314) * kin_energy
+  end function md_convert_kin_energy_to_temperature
+
 
   subroutine md_cal_properties(ps, props, list, pressure_comp, pot_energy)
     type (phasespace), intent(in) :: ps
@@ -73,7 +86,7 @@ contains
 
 
   subroutine md_reset_properties(props)
-    type (md_properties), intent(out) :: props
+    type (md_properties), intent(inout) :: props
     
     props%kin_energy%sum = 0.0
     props%tot_energy%sum = 0.0
@@ -106,8 +119,8 @@ contains
     write(file_pointer, *) " "
     write(file_pointer, '(a,i6)') "Average over this many moves = ", props%n_accum
     write(file_pointer,'(a,2f12.6)') "Etot(KJ/mol) = ", props%tot_energy%ave, props%tot_energy%esd    
-    write(file_pointer,'(a,2f12.6)') "T(K) = ", (2.0/ndim)*(1000.0/8.314)*props%kin_energy%ave, &
-                                  (2.0/ndim)*(1000.0/8.314)*props%kin_energy%esd
+    write(file_pointer,'(a,2f12.6)') "T(K) = ", md_convert_kin_energy_to_temperature(props%kin_energy%ave), &
+                                  md_convert_kin_energy_to_temperature(props%kin_energy%esd)
     write(file_pointer,'(a,2f12.6)') "P(atm) = ", 16387.2*props%pressure%ave, 16387.2*props%pressure%esd
 
   end subroutine md_print_properties
