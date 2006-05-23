@@ -20,6 +20,7 @@ use func_params_wrapper_class
 contains
 
   subroutine run_mdmc_control(a_config, c)
+    use flib_wxml  
     type (configuration), intent(inout) :: a_config
     type (mdmc_control_container) :: c
     
@@ -42,10 +43,35 @@ contains
 	
     integer :: print_to_file = 555
     integer :: print_to_screen = 0
+    
+    type (xmlf_t) :: xf
+
+
+    call xml_OpenFile("output/mdmc_results.xml", xf, indent=.true.)
+    
+    call xml_AddXMLDeclaration(xf, "UTF-8")
+    call xml_NewElement(xf, "mdmc-control-results")
+
+    call xml_AddAttribute(xf, "title", "rho = " // str(density, format="(f10.5)") &
+                                         // "atoms/AA-3")
+    
+    call xml_NewElement(xf, "this-file-was-created")
+    call xml_AddAttribute(xf, "when", get_current_date_and_time())
+    call xml_EndElement(xf, "this-file-was-created")
+
+
+    call add_xml_func_params_entry(xf, common_pe_list, "fiis", pot_energy)
+
+    call xml_EndElement(xf, "mdmc-control-results")
+    
+    call xml_Close(xf)
 	  
-	  if (print_to_file /= 0) then
-	    open(print_to_file, file="output/job_summary.txt")
-	  end if
+	stop  
+	  
+	  
+    if (print_to_file /= 0) then
+      open(print_to_file, file="output/job_summary.txt")
+    end if
 	  		
     write(print_to_file,*) "In run_md_control"
 
@@ -184,7 +210,7 @@ contains
 
  ! ---------------------- mdmc part ------------------------ !              
                
-    do i = 1, c%mc_steps
+    do i = 1, 0 !c%mc_steps
 
       ! save state
       
