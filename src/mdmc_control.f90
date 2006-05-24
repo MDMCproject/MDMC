@@ -28,7 +28,7 @@ contains
     integer :: i, i_md, j
     real(db) :: density  ! used for cal input argument to save_rdf
     
-    real(db) :: sum_kin_energy = 0.0
+    real(db) :: sum_kin_energy
     real(db) :: temp_adjust_factor
     
     real(db) :: average_energy_end_of_temp_calibration
@@ -94,7 +94,8 @@ contains
                
 ! -------------- initial equilibration ---------------- !
 
-
+    sum_kin_energy = 0.0
+    
     do i = 1, c%total_steps_initial_equilibration
       time_now = c%time_step * i   ! perhaps print this one out 
       
@@ -202,6 +203,7 @@ contains
     
     !! print also out what the param values are
     fom_val = func_val(my_ps%str, common_fom_list)
+    call func_clear_histogram(my_ps%str, common_fom_list)
     write(print_to_file,'(a,f12.4)') "1st FOM = ", fom_val
     write(print_to_file, '(a,f12.4)') "Finished cal 1st FOM. Time: ", toc()
     write(print_to_file, *) " "
@@ -239,6 +241,8 @@ contains
       
 
       ! do MD equilibration
+      
+      sum_kin_energy = 0.0
       
       do i_md = 1, c%md_steps_repeated_equilibration
 
@@ -322,6 +326,7 @@ contains
       
       !! print also out what the param values are
       fom_val = func_val(my_ps%str, common_fom_list)
+      call func_clear_histogram(my_ps%str, common_fom_list)
       write(print_to_file,'(a,f12.4)') "FOM = ", fom_val
       write(print_to_file, '(a,f12.4)') "Finished cal FOM. Time: ", toc()
       write(print_to_file, *) " "
@@ -346,6 +351,7 @@ contains
           accept_parameters = .true.
         end if
       end if
+ 
         
       if (accept_parameters) then
       
