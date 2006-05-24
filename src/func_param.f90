@@ -9,6 +9,8 @@ implicit none
   public :: set_func_param_val
   public :: does_func_param_exist, add_func_param
   public :: random_move_func_params
+  
+  public :: xml_add_attribute_func_params  ! used by add_xml_attribute_func_params
 
   type func_param
     private
@@ -28,6 +30,30 @@ implicit none
   end type func_params
 
 contains
+
+  ! used by add_xml_attribute_func_params()
+  
+  subroutine xml_add_attribute_func_params(xf, params)
+    use flib_wxml 
+    type (xmlf_t), intent(inout) :: xf      
+    type (func_params), intent(in) :: params
+
+
+    integer :: i
+   
+    
+    do i = 1, params%number_of_items
+!      if (params%p(i)%fixed == .false.) then
+
+
+      call xml_AddAttribute(xf, trim(params%p(i)%name), str(params%p(i)%val, format="(f10.5)")) 
+
+!      end if
+    end do 
+
+  
+  end subroutine xml_add_attribute_func_params
+
 
   subroutine write_func_param_to_file(params, xf)
     use flib_wxml
@@ -55,8 +81,6 @@ contains
     do i = 1, params%number_of_items
       if (params%p(i)%fixed == .false.) then
 	      call random_number(ran_num)  
-  	    
-  	    !params%p(i)%val = 1.0
   	    
         params%p(i)%val = params%p(i)%val + params%p(i)%max_move*(ran_num-0.5)
         

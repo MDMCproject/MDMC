@@ -5,40 +5,39 @@ use function_class
   implicit none
 
   public :: move_random_func_params
+  
+  public :: add_xml_attribute_func_params
+  
+  ! THESE TWO BELOW NEED TO BE IMPROVED
+  public :: backup_func_params
+  public :: restore_func_params
+  
+  
 !  public :: save_func_param_vals
 !  public :: open_file_func_param_vals
   
 !  type (xmlf_t), private :: xf
 !  logical, private :: is_file_open = .false. 
   
-!  type (func_params), dimension(:), allocatable, private :: param_backup
-!  logical, private :: param_backup_alloc_done = .false.
+  type (func_params), private :: param_backup
 
 contains
 
+
+  ! NEED TO IMPROVE ON THIS LATER 
   subroutine backup_func_params(list)
-    type (func_list), intent(inout) :: list
+    type (func_list), intent(in) :: list
     
-    if (param_backup_alloc_done) then
-      param_backup(1) = list%pt_lj_pe%params
-    else
-      allocate(param_backup(1))
-      param_backup(1) = list%pt_lj_pe%params
-      param_backup_alloc_done = .true.
-    end if
+    ! VERY PRIMITIVE HERE
+    param_backup = list%pt_lj_pe%params
   
   end subroutine backup_func_params
 
-
+  ! SUPER PRIMITIVE HERE
   subroutine restore_func_params(list)
     type (func_list), intent(inout) :: list
     
-    if (param_backup_alloc_done) then
-      list%pt_lj_pe%params = param_backup(1)
-    else
-      print *, "ERROR in restore_func_params"
-      stop
-    end if
+    list%pt_lj_pe%params = param_backup
   
   end subroutine restore_func_params
 
@@ -52,40 +51,22 @@ contains
   end subroutine move_random_func_params
   
   
-  ! add an element with the name entry_name to the xml file defined in xf. This element
-  ! will have attributes equal to the total number of params and one 'val' attribute.
+  ! adds an xml attribute for each param defined in list
   
-  subroutine add_xml_func_params_entry(xf, list, element_name, func_val)
+  subroutine add_xml_attribute_func_params(xf, list)
     use flib_wxml 
     type (xmlf_t), intent(inout) :: xf      
     type (func_list), intent(in) :: list
-    character(len=*), intent(in) :: element_name    
-    real (db), intent(in) :: func_val
-
-    
-    ! Determine whether a function in the list has been encounted or not in the
-    ! code below
-
-    logical :: this_is_the_first_func_in_list = .true.
 
 
-    if (this_is_the_first_func_in_list) then
-      if ( associated (list%pt_lj_pe) ) call add_xml_func_params_entry_create(list%pt_lj_pe%params)
-      if ( associated (list%pt_rdf_fom) ) call add_xml_func_params_entry_create(list%pt_rdf_fom%params)
-    else
-      if ( associated (list%pt_lj_pe) ) call add_xml_func_params_entry_append(list%pt_lj_pe%params)
-      if ( associated (list%pt_rdf_fom) ) call add_xml_func_params_entry_append(list%pt_rdf_fom%params)
-      this_is_the_first_func_in_list = .false.
-    end    
-
-
-    call xml_NewElement(xf, "g-of-r")
-    call xml_AddAttribute(xf, "r", str(12.55, format="(f10.5)"))
-    call xml_AddAttribute(xf, "g", str(155.0, format="(f10.5)"))
-    call xml_EndElement(xf, "g-of-r")    
+    if ( associated (list%pt_lj_pe) ) call xml_add_attribute_func_params(xf, list%pt_lj_pe%params)
+    if ( associated (list%pt_rdf_fom) ) call xml_add_attribute_func_params(xf, list%pt_rdf_fom%params)
 
   
-  end subroutine add_xml_func_params_entry
+  end subroutine add_xml_attribute_func_params
+    
+ 
+
     
   
 !  subroutine open_file_func_param_vals(filename)

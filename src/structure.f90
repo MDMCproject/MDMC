@@ -8,7 +8,8 @@ implicit none
   !public :: apply_boundary_condition_one_atom  (moved to structure_type_definition because used in
   !                                              structure_nn_methods)
   public :: apply_boundary_condition
-  public :: copy_structure, save_structure
+  public :: copy_structure, shallow_copy_structure
+  public :: save_structure
   public :: swap_atoms
 
 contains
@@ -77,6 +78,47 @@ contains
   
   end function copy_structure
 
+
+  ! this is a 'shallow' copy of structure, meaning that the two input
+  ! structures are assumed to have exactly the same array sizes and no memory
+  ! allocated (or deallocated)
+  
+  subroutine shallow_copy_structure(str_in, str_out)
+    type (structure), intent(in) :: str_in
+    type (structure), intent(inout) :: str_out
+    
+    integer :: i
+    real(db) :: sum_out, sum_in
+    
+    ! make some checks to see if arrays sizes are the same
+    
+    if (size(str_in%atoms) /= size(str_out%atoms)) then
+      print *, "ERROR in shallow_copy_structure"
+      print *, "atoms array sizes not the same"
+      stop
+    end if    
+    
+    if (size(str_in%r) /= size(str_out%r)) then
+      print *, "ERROR in shallow_copy_structure"
+      print *, "r array sizes not the same"
+      stop
+    end if 
+        
+    call shallow_copy_near_neighb_list(str_in%nn_list, str_out%nn_list)        
+    
+    str_out%box_edges = str_in%box_edges
+    str_out%title = str_in%title
+
+    do i = 1, size(str_in%atoms)
+      str_out%atoms(i)%mass = str_in%atoms(i)%mass
+      str_out%atoms(i)%inv_mass = str_in%atoms(i)%inv_mass
+      str_out%atoms(i)%element_type = str_in%atoms(i)%element_type
+    end do
+    
+    str_out%r = str_in%r
+  
+  end subroutine shallow_copy_structure
+  
   
   subroutine swap_atoms(a_structure, atom_number1, atom_number2)
     type (structure), intent(inout) :: a_structure

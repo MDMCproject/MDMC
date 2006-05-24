@@ -6,6 +6,7 @@ use function_class
 
   public :: trajectory_in_phasespace
   public :: make_phasespace
+  public :: copy_phasespace, shallow_copy_phasespace
   
 
   type phasespace
@@ -35,6 +36,89 @@ use function_class
 
 
 contains
+
+  function copy_phasespace(ps_in) result (ps_out)
+    type (phasespace), intent(in) :: ps_in
+    type (phasespace) :: ps_out
+      
+  
+    ps_out%str = copy_structure(ps_in%str)
+  
+    allocate(ps_out%p(size(ps_in%p, 1), size(ps_in%p, 2)))
+    allocate(ps_out%deriv(size(ps_in%deriv, 1), size(ps_in%deriv, 2)))
+    allocate(ps_out%inv_mass(size(ps_in%inv_mass, 1), size(ps_in%inv_mass, 2)))
+    allocate(ps_out%p_div_mass(size(ps_in%p_div_mass, 1), size(ps_in%p_div_mass, 2)))
+    allocate(ps_out%v2(size(ps_in%v2, 1)))
+    allocate(ps_out%mass(size(ps_in%mass, 1)))
+    
+    ps_out%p          = ps_in%p
+    ps_out%deriv      = ps_in%deriv
+    ps_out%inv_mass   = ps_in%inv_mass
+    ps_out%p_div_mass = ps_in%p_div_mass
+    ps_out%v2         = ps_in%v2
+    ps_out%mass       = ps_in%mass
+  
+  end function copy_phasespace
+
+
+
+  ! this is a 'shallow' copy of phasespace, meaning that the two input
+  ! phasespaces are assumed to have exactly the same array sizes and no memory
+  ! allocated (or deallocated)
+
+  subroutine shallow_copy_phasespace(ps_in, ps_out)
+    type (phasespace), intent(in) :: ps_in
+    type (phasespace), intent(inout) :: ps_out
+    
+    ! make some checks to see if arrays sizes are the same
+    
+    if (size(ps_in%p) /= size(ps_out%p)) then
+      print *, "ERROR in shallow_copy_phasespace"
+      print *, "p array sizes not the same"
+      stop
+    end if
+    
+    if (size(ps_in%deriv) /= size(ps_out%deriv)) then
+      print *, "ERROR in shallow_copy_phasespace"
+      print *, "deriv array sizes not the same"
+      stop
+    end if
+  
+    if (size(ps_in%inv_mass) /= size(ps_out%inv_mass)) then
+      print *, "ERROR in shallow_copy_phasespace"
+      print *, "inv_mass array sizes not the same"
+      stop
+    end if 
+    
+    if (size(ps_in%p_div_mass) /= size(ps_out%p_div_mass)) then
+      print *, "ERROR in shallow_copy_phasespace"
+      print *, "p_div_mass array sizes not the same"
+      stop
+    end if    
+    
+    if (size(ps_in%v2) /= size(ps_out%v2)) then
+      print *, "ERROR in shallow_copy_phasespace"
+      print *, "v2 array sizes not the same"
+      stop
+    end if    
+    
+    if (size(ps_in%mass) /= size(ps_out%mass)) then
+      print *, "ERROR in shallow_copy_phasespace"
+      print *, "mass array sizes not the same"
+      stop
+    end if       
+  
+    call shallow_copy_structure(ps_in%str, ps_out%str)
+  
+    ps_out%p          = ps_in%p
+    ps_out%deriv      = ps_in%deriv
+    ps_out%inv_mass   = ps_in%inv_mass
+    ps_out%p_div_mass = ps_in%p_div_mass
+    ps_out%v2         = ps_in%v2
+    ps_out%mass       = ps_in%mass
+  
+  end subroutine shallow_copy_phasespace
+
 
   subroutine trajectory_in_phasespace(ps, pe_list, n_md, delta_t, pressure_comp, pot_energy)
     type (phasespace), intent(inout) :: ps

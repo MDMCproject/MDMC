@@ -4,7 +4,7 @@ use structure_type_definition_class
 
 implicit none
 
-  public :: copy_near_neighb_list
+  public :: copy_near_neighb_list, shallow_copy_near_neighb_list
   public :: make_near_neighb_list
   public :: build_near_neighb
   public :: update_nn_list_flags
@@ -18,25 +18,10 @@ implicit none
   private :: get_num_near_neighb_without_cell  ! not using cell method
   private :: build_near_neighb_with_cell    
   private :: build_near_neighb_without_cell  
-  private :: copy_cell_list
+  private :: copy_cell_list, shallow_copy_cell_list
   private :: cal_nn_distances     ! populates the dists attribute of the near_neighb_list only  
 
 contains
-
-  function copy_cell_list(cell_in) result(cell_out)
-    type (cell_list), intent(in) :: cell_in
-    type (cell_list) :: cell_out
-    
-    integer :: i
-    
-    cell_out%ignore_cell_method = cell_in%ignore_cell_method
-    cell_out%num_cells = cell_in%num_cells
-    
-    allocate(cell_out%list(size(cell_in%list))) 
-    cell_out%list = cell_in%list
-    
-  end function copy_cell_list
-
 
   function copy_near_neighb_list(nn_list_in) result(nn_list_out)
     type (near_neighb_list), intent(in) :: nn_list_in
@@ -69,6 +54,55 @@ contains
     nn_list_out%cells = copy_cell_list(nn_list_in%cells)
     
   end function copy_near_neighb_list
+
+
+  ! this is a 'shallow' copy of nn_list, meaning that the two input
+  ! lists are assumed to have exactly the same array sizes and no memory
+  ! allocated (or deallocated)
+
+  subroutine shallow_copy_near_neighb_list(nn_list_in, nn_list_out)
+    type (near_neighb_list), intent(in) :: nn_list_in
+    type (near_neighb_list), intent(inout) :: nn_list_out
+  
+    integer :: i
+    
+    nn_list_out%ignore_list = nn_list_in%ignore_list 
+    
+    if ( nn_list_in%ignore_list == .true. ) then
+      return
+    end if 
+  
+  
+    ! make some checks to see if arrays sizes are the same
+    
+    if (size(nn_list_in%pairs) /= size(nn_list_out%pairs)) then
+      print *, "ERROR in shallow_copy_near_neighb_list"
+      print *, "pairs array sizes not the same"
+      stop
+    end if
+    
+    if (size(nn_list_in%dists) /= size(nn_list_out%dists)) then
+      print *, "ERROR in shallow_copy_near_neighb_list"
+      print *, "dists array sizes not the same"
+      stop
+    end if    
+  
+    call shallow_copy_cell_list(nn_list_in%cells, nn_list_out%cells)  
+    
+    
+    nn_list_out%pairs_allocated = nn_list_in%pairs_allocated
+    nn_list_out%n_pairs = nn_list_in%n_pairs
+    nn_list_out%needs_updating = nn_list_in%needs_updating
+    nn_list_out%delta_r = nn_list_in%delta_r
+    nn_list_out%r_cut = nn_list_in%r_cut
+    nn_list_out%max_an_atom_has_moved = nn_list_in%max_an_atom_has_moved
+    nn_list_out%what_is_stored = nn_list_in%what_is_stored
+  
+    nn_list_out%pairs = nn_list_in%pairs
+    nn_list_out%dists = nn_list_in%dists
+    
+  end subroutine shallow_copy_near_neighb_list
+
 
   
   subroutine update_nn_list_flags(max_an_atom_has_moved, nn_list)
@@ -231,7 +265,9 @@ contains
   end subroutine build_near_neighb
 
 
-!!!!!!!!!!!!!!!!!!!!!!! private functions/subroutines !!!!!!!!!!!!!!!!!!!!!!! 
+!***************************************************************************!
+!!!!!!!!!!!!!!!!!!!!!!! private functions/subroutines !!!!!!!!!!!!!!!!!!!!!!!
+!***************************************************************************! 
   
   ! build new nn-list and populate dists array with, for now, r2 values
   
@@ -668,5 +704,42 @@ contains
 
   end function get_num_near_neighb_with_cell
 
+
+  function copy_cell_list(cell_in) result(cell_out)
+    type (cell_list), intent(in) :: cell_in
+    type (cell_list) :: cell_out
+    
+    cell_out%ignore_cell_method = cell_in%ignore_cell_method
+    cell_out%num_cells = cell_in%num_cells
+    
+    allocate(cell_out%list(size(cell_in%list))) 
+    cell_out%list = cell_in%list
+    
+  end function copy_cell_list
+  
+  
+  ! this is a 'shallow' copy of cell_list, meaning that the two input
+  ! cell_lists are assumed to have exactly the same array sizes and no memory
+  ! allocated (or deallocated)
+    
+  subroutine shallow_copy_cell_list(cell_in, cell_out)
+    type (cell_list), intent(in) :: cell_in
+    type (cell_list), intent(inout) :: cell_out
+    
+    
+    ! make some checks to see if arrays sizes are the same
+    
+    if (size(cell_in%list) /= size(cell_out%list)) then
+      print *, "ERROR in shallow_copy_cell_list"
+      print *, "list array sizes not the same"
+      stop
+    end if
+    
+    cell_out%ignore_cell_method = cell_in%ignore_cell_method
+    cell_out%num_cells = cell_in%num_cells
+    
+    cell_out%list = cell_in%list
+    
+  end subroutine shallow_copy_cell_list  
 
 end module structure_nn_methods_class
