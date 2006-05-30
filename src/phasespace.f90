@@ -236,7 +236,7 @@ contains
     ! determine initial momenta
     ! momentum_scale = temperature*ndim*(n_tot-1)/sum(ps%inv_mass(:,1))
     momentum_scale = sqrt( temperature*ndim*(n_tot-1)/sum(ps%inv_mass(:,1)) ) / sqrt(3.0)
-    !write(*,'(a,f12.6)') "momentum_scale ", momentum_scale * sqrt(3.0)
+    write(*,'(a,f12.6)') "momentum_scale ", momentum_scale
     
     if (modulo(n_tot,2) == 1) then
      ps%p(n_tot,:) = 0.0
@@ -248,20 +248,20 @@ contains
     end do 
     
 
-    do i = 1, n_tot
-      call random_number(ps%p(i,:))
-      ps%p(i,:) = ps%p(i,:) * momentum_scale / sqrt(sum(ps%p(i,:)*ps%p(i,:)))
-    end do 
+  !  do i = 1, n_tot
+  !    call random_number(ps%p(i,:))
+  !    ps%p(i,:) = ps%p(i,:) * momentum_scale / sqrt(sum(ps%p(i,:)*ps%p(i,:)))
+  !  end do 
       
-    dummy_vec = sum(ps%p,1) / n_tot
+  !  dummy_vec = sum(ps%p,1) / n_tot
     
-    do i = 1, n_tot
-      ps%p(i,:) = ps%p(i,:) - dummy_vec
-    end do
+  !  do i = 1, n_tot
+  !    ps%p(i,:) = ps%p(i,:) - dummy_vec
+  !  end do
     
     ! what is the total momentum
 
-    !write(*,'(a,3f12.6)') "total momentum in make_phasespace ", sum(ps%p,1)
+    write(*,'(a,3f12.6)') "total momentum in make_phasespace ", sum(ps%p,1)
 
     !stop
     
