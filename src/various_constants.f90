@@ -10,6 +10,25 @@ implicit none
   integer, parameter :: ndim = 3
   
   
+  ! this code work does it calculations assuming:
+  !
+  !   m_unit = 1 AMU = 10^-3 KG/MOL
+  !   r_unit = 10^-10 METER
+  !   t_unit = 10^-13 SEC
+  !
+  ! which implies:
+  !
+  !   e_unit = 1 KJ/MOL
+  !   T_unit = 1000 / 8.314 K
+  !   P_unit = 16387.2 atm
+  ! 
+ 
+  real(db), parameter :: T_unit = 120.2790473899446716382_db
+  real(db), parameter :: P_unit = 16387.2_db
+  
+  
+  
+  
   ! values below are copied from Ed Akin's figure 2.1
   
   real(db), parameter:: deg_per_rad  = 57.295779513082320876798155_db

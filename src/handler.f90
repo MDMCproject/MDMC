@@ -148,8 +148,8 @@ contains
         case("temperature")       
           call get_value(attributes,"val",read_db,status)
           
-          ! to convert to dimensionless units multiply by 8.314/1000 K^-1
-          setup_md_control_params%temperature = 0.008314 * string_to_db(read_db)
+          ! to convert to dimensionless units
+          setup_md_control_params%temperature = string_to_db(read_db) / T_unit
             
         case("time-step")       
           call get_value(attributes,"val",read_db,status)
@@ -239,8 +239,8 @@ contains
         case("temperature")       
           call get_value(attributes,"val",read_db,status)
           
-          ! to convert to dimensionless units multiply by 8.314/1000 K^-1
-          setup_mdmc_control_params%temperature = 0.008314 * string_to_db(read_db)            
+          ! to convert to dimensionless units
+          setup_mdmc_control_params%temperature = string_to_db(read_db) / T_unit           
             
         case("time-step")       
           call get_value(attributes,"val",read_db,status)

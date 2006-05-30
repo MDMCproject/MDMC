@@ -39,7 +39,7 @@ contains
     real (db), intent(in) :: kin_energy  
     real (db) :: val
     
-    val = (2.0/ndim)*(1000.0/8.314) * kin_energy
+    val = (2.0/ndim) * kin_energy * T_unit
   end function md_convert_kin_energy_to_temperature
 
 
@@ -121,7 +121,7 @@ contains
     write(file_pointer,'(a,2f12.6)') "Etot(KJ/mol) = ", props%tot_energy%ave, props%tot_energy%esd    
     write(file_pointer,'(a,2f12.6)') "T(K) = ", md_convert_kin_energy_to_temperature(props%kin_energy%ave), &
                                   md_convert_kin_energy_to_temperature(props%kin_energy%esd)
-    write(file_pointer,'(a,2f12.6)') "P(atm) = ", 16387.2*props%pressure%ave, 16387.2*props%pressure%esd
+    write(file_pointer,'(a,2f12.6)') "P(atm) = ", P_unit*props%pressure%ave, P_unit*props%pressure%esd
 
   end subroutine md_print_properties
   
