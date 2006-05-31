@@ -24,8 +24,8 @@
       set r-cut = 'smallest box edge'/2 - delta-r 
       -->    
   <use-near-neighbour-method>
-    <r-cut units="AA" val="7.0" />   
-    <delta-r units="AA" val="1.2" />            
+    <r-cut units="AA" val="7.491" />   
+    <delta-r units="AA" val="1.362" />            
   </use-near-neighbour-method>   
   
   <constraints>
@@ -52,7 +52,7 @@
            but for now you can optionally specify an r-cut value here, which
            simply put the potential to zero for all r values higher than r-cut 
            -->
-      <r-cut units="AA" val="100.0" />   
+      <r-cut units="AA" val="7.491" />   
     </lj-potential>
     <!-- <lookup-data-potential /> -->
   </gpe>
@@ -60,10 +60,10 @@
   <control-object name="md_control">
 
     <temperature units="Kelvin" val="85.0" />
-    <time-step units="10e-13s" val="0.1078" />
+    <time-step units="10e-13s" val="0.1075" />
     
     
-    <step-limit number="9000" />
+    <step-limit number="8000" />
     
     <!-- when calculating MD properties average over this 
          many steps

@@ -57,8 +57,8 @@ implicit none
   
   type atom
     character(len=2)  :: element_type = "Ar"
-    real(db) :: mass = 1.0 !39.95        ! in units of amu
-    real(db) :: inv_mass = 1.0 !0.025031289111  ! to save comp time
+    real(db) :: mass = 39.95        ! in units of amu
+    real(db) :: inv_mass = 0.025031289111  ! to save comp time
   end type atom
 
 

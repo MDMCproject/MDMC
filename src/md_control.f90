@@ -127,7 +127,7 @@ contains
                             
             ! convert to atm
             
-            pressure_corr = pressure_corr * 16387.2
+            pressure_corr = pressure_corr * P_unit
             
             write(print_to_file,'(a,f12.6)') "P_corr(atm) = ", pressure_corr
           end if

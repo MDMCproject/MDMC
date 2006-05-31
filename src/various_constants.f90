@@ -23,8 +23,8 @@ implicit none
   !   P_unit = 16387.2 atm
   ! 
  
-  real(db), parameter :: T_unit = 1.0 !120.2790473899446716382_db
-  real(db), parameter :: P_unit = 1.0 !16387.2_db
+  real(db), parameter :: T_unit = 120.2790473899446716382_db
+  real(db), parameter :: P_unit = 16387.2_db
   
   
   

@@ -85,6 +85,18 @@ contains
       r_cut = sqrt(sum(str%box_edges*str%box_edges))
     end if
     
+    
+    ! when using neighest neighbour method all distances less than
+    ! nn_list%r_cut are 'guarentied' to be in the list but not 
+    ! higher distances
+    
+    if (str%nn_list%ignore_list == .false.) then
+      if (str%nn_list%r_cut < r_cut) then
+        r_cut = str%nn_list%r_cut
+      end if    
+    end if
+    
+    
     rr_cut = r_cut * r_cut
     
     n_tot = size(str%atoms)
@@ -259,9 +271,14 @@ contains
     end if
     
     
+    ! when using neighest neighbour method all distances less than
+    ! nn_list%r_cut are 'guarentied' to be in the list but not 
+    ! higher distances
+        
     if (nn_list%r_cut < r_cut) then
       r_cut = nn_list%r_cut
     end if
+    
     
     rr_cut = r_cut * r_cut
     

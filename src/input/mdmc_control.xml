@@ -11,10 +11,10 @@
        Notice the density of liquid Ar at P=1atm and T=85K is 
        rho = 1.41g/cm^3 = 0.02125 atoms/AA3        
        -->
-  <structure what-init-structure-to-build="fcc">
+  <structure what-init-structure-to-build="simple-cubic">
     <title>Liquid Ar</title>
     <density units="atom/AA3" val="0.020265" />
-    <number-of-unit-cells nx="5" ny ="5" nz="5" />
+    <number-of-unit-cells nx="8" ny ="8" nz="8" />
   </structure>
   
   <!-- To not use nearest neighbour method include element below.
@@ -65,7 +65,7 @@
   
   <control-object name="mdmc_control">
   
-    <temperature units="Kelvin" val="119.8" />
+    <temperature units="Kelvin" val="85.0" />
     <time-step units="10e-13s" val="0.1075" />  
 
     <!-- Specify stuff with is done only once
@@ -74,7 +74,7 @@
          element specifies how many steps to average over when calculating
          MD properties 
          -->
-    <total-steps-initial-equilibration number="10000" average-over="1000" />
+    <total-steps-initial-equilibration number="8000" average-over="1000" />
     <perform-initial-temperature-calibration>
       <total-step-temp-cali number="4000" />
       <adjust-temp-at-interval number="200" />

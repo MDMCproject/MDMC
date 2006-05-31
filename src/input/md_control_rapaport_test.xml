@@ -8,7 +8,10 @@
        1. CHANGE T_unit AND P_unit TO 1.0 IN VARIOUS_CONSTANTS.F90
        2. CHANGE mass AND inv_mass IN STRUCTURE_TYPE_DEFINITION.F90 TO 1.0
        3. MAKE SURE NON RANDOM INITIAL VELOCITIES
-       
+
+     REMEMBER WINDOWS VERSION OF THE RAPAPORT CODE IS NOW ALSO AVAILABLE IN
+     DIRECTORY \rapaport\artmdsim2\visual_studio, WHICH ALSO INCLUDES A 
+     README.TXT DOCUMENT
        -->
 
 
@@ -28,7 +31,7 @@
   <structure what-init-structure-to-build="simple-cubic">
     <title>Liquid Ar</title>
     <density units="atom/AA3" val="1.0" />
-    <number-of-unit-cells nx="5" ny ="5" nz="5" />
+    <number-of-unit-cells nx="6" ny ="6" nz="6" />
   </structure>
   
   <!-- To not use nearest neighbour method include element below.
@@ -37,7 +40,7 @@
       set r-cut = 'smallest box edge'/2 - delta-r 
       -->    
   <use-near-neighbour-method>
-    <r-cut units="AA" val="1.1224620483" />   
+    <r-cut units="AA" val="2.2" />   
     <delta-r units="AA" val="0.4" />            
   </use-near-neighbour-method>   
   
@@ -65,7 +68,7 @@
            but for now you can optionally specify an r-cut value here, which
            simply put the potential to zero for all r values higher than r-cut 
            -->
-      <r-cut units="AA" val="100.0" />   
+      <r-cut units="AA" val="2.2" />   
     </lj-potential>
     <!-- <lookup-data-potential /> -->
   </gpe>
@@ -76,18 +79,18 @@
     <time-step units="10e-13s" val="0.005" />
     
     
-    <step-limit number="5" />
+    <step-limit number="8000" />
     
     <!-- when calculating MD properties average over this 
          many steps
          -->
-    <average-over-this-many-step number="1" />
+    <average-over-this-many-step number="1000" />
  
     <!-- To not perform initial temperature calibration either comment
          out the element below or set total-step to zero 
          -->
     <perform-initial-temperature-calibration>
-      <total-step-temp-cali number="0" />
+      <total-step-temp-cali number="4000" />
       <adjust-temp-at-interval number="200" />
     </perform-initial-temperature-calibration>
 
