@@ -31,6 +31,22 @@ implicit none
 
 contains
 
+  subroutine print_func_params(file_pointer, params)
+    type (func_params), intent(in) :: params
+    integer, intent(in) :: file_pointer 
+    
+    integer :: i
+    
+    write(file_pointer, *) " "
+    
+    do i = 1, params%number_of_items
+      write(file_pointer,'(a,a,f12.6)') trim(params%p(i)%name), " = ", params%p(i)%val 
+    end do
+        
+  end subroutine print_func_params
+
+
+
   ! used by add_xml_attribute_func_params()
   
   subroutine xml_add_attribute_func_params(xf, params)

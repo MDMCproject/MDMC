@@ -36,33 +36,31 @@ implicit none
 
 contains
 
-  function make_rdf(volume, n_atoms, r_max, bin_length) result(a_rdf)
-    real(db), intent(in) :: volume, r_max, bin_length
-    integer, intent(in) :: n_atoms
+  function make_rdf(volume, n_atoms, n_bins, bin_length) result(a_rdf)
+    real(db), intent(in) :: volume, bin_length
+    integer, intent(in) :: n_atoms, n_bins
     type (rdf) :: a_rdf
     
     real(db) :: temp, r_i
     integer :: i, n_bin
     
-    !a_rdf%r_max = r_max
     a_rdf%bin_length = bin_length
  
  
     ! make val attribute
     
-    n_bin = floor(r_max/bin_length)
-    allocate(a_rdf%val(n_bin))
+    allocate(a_rdf%val(n_bins))
     a_rdf%val = 0.0
  
  
     ! make prefac attribute
     
-    allocate(a_rdf%prefac(n_bin))
+    allocate(a_rdf%prefac(n_bins))
     
 
     temp = volume / (2.0 * pi_value * (n_atoms**2) * bin_length**3 )
     
-    do i = 1, n_bin
+    do i = 1, n_bins
       r_i = i - 0.5_db
       a_rdf%prefac(i) = temp / (r_i**2)
     end do
@@ -145,7 +143,7 @@ contains
     
     ! Save an r_max value which is slightly too big. This is to do with the primitive way
     ! the function which reads in such a file works -> see fom_readers.f90
-    call xml_AddAttribute(xf, "r-max", str(a_rdf%bin_length*(n_bin+0.01), format="(f10.5)"))
+    ! call xml_AddAttribute(xf, "r-max", str(a_rdf%bin_length*(n_bin+0.01), format="(f10.5)"))
     
     call xml_NewElement(xf, "this-file-was-created")
     call xml_AddAttribute(xf, "when", get_current_date_and_time())

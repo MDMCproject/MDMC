@@ -50,19 +50,25 @@ program mdmc
   end if
   
   
+  ! open main input file to check if an rdf_fom present in input file
+  ! and if this is the case look for rdf data filename. Grab name of
+  ! this file and run make_rdf_fom(). This done this way because of a 
+  ! bug in the xmlf90 library (otherwise an excellent library though)  
+  
   call open_xmlfile(trim(filename),fxml,iostat)
   
   call get_node(fxml, path="//fom/rdf-fom/rdf-data",attributes=structure_attributes,status=iostat)
   
   call get_value(structure_attributes, "filename", structure_filename, iostat)
+  
+  call close_xmlfile(fxml)  
+  
   if (iostat == 0) then
     call make_rdf_fom(trim(structure_filename))
   end if
   
-  call close_xmlfile(fxml)  
   
-  !call save_rdf(target_rdf_fom%rdf_data) 
-  !stop
+  ! Now finally read in the rest of the main input file from a-to-z
   
   call startup_handler(trim(filename))
   

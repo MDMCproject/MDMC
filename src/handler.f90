@@ -72,7 +72,7 @@ contains
     
     integer :: status, n
     real(db) :: number_db
-    !integer :: number_int
+    integer :: size_of_rdf_cal_val_array  ! used in rdf-fom element
     character(len=40) :: read_db, read_int
     character(len=40) :: control_object_name, units
     character(len=120) :: filename
@@ -351,11 +351,19 @@ contains
           call get_value(attributes,"val",read_db,status)
           number_db = string_to_db(read_db) 
           
-          ! It is assumed here that a rdf-fom attribute is positioned
-          ! about the r-max attribute (i.e. this attribute)
+          ! It is assumed here that rdf-data is positioned
+          ! above r-max in rdf-fom
+          
+          size_of_rdf_cal_val_array = floor(number_db/target_rdf_fom%rdf_data%bin_length)
+          
+          ! this number cannot be larger the number of data points
+          
+          if (size_of_rdf_cal_val_array > size(target_rdf_fom%rdf_data%val)) then
+            size_of_rdf_cal_val_array = size(target_rdf_fom%rdf_data%val)
+          end if
           
           target_rdf_fom%rdf_cal = make_rdf(product(common_config%str%box_edges), &
-              size(common_config%str%atoms), number_db, &
+              size(common_config%str%atoms), size_of_rdf_cal_val_array, &
               target_rdf_fom%rdf_data%bin_length)  
           target_rdf_fom%hist = make_histogram(number_db, &
               target_rdf_fom%rdf_data%bin_length)          

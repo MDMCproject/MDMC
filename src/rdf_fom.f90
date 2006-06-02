@@ -11,6 +11,8 @@ implicit none
 
   type rdf_fom_container
     type (rdf) :: rdf_data
+    
+    ! Notice the size of rdf_cal%val <= the size of rdf_data%val 
     type (rdf) :: rdf_cal
     
     real(db) :: scale_factor = 1.0

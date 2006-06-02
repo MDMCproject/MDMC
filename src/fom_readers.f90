@@ -8,17 +8,40 @@ use converters_class
   private :: begin_element, end_element, pcdata_chunk
   private :: start_document, end_document
   
-  integer, private :: count_number_atoms
+  integer, private :: count_number_atoms    ! keeps track of how many g-of-r
+                                            ! elements have been encounted as the
+                                            ! file is read
+
+  integer, private :: number_of_g_of_r      ! used to determine at beginning 
+                                            ! # of g-of-r elements in file
 
 contains
 
   subroutine make_rdf_fom(filename)
     use flib_sax  
+    use flib_xpath    
     character(len=*), intent(in) :: filename
 
     type(xml_t) :: fxml
     integer     :: iostat
+    
+    
+    ! before reading the rdf data file from a-to-z determine
+    ! separately how many g-or-r elements it contains
+    
+    call open_xmlfile(trim(filename),fxml,iostat)
+    
+    number_of_g_of_r = 0
+    do 
+      call get_node(fxml, path="//rdf/g-of-r",status=iostat)
+      if (iostat < 0) exit
+      number_of_g_of_r = number_of_g_of_r + 1
+    end do
+  
+    call close_xmlfile(fxml)  
 
+
+    ! now begin reading rdf data file from a-to-z
 
     call open_xmlfile(filename,fxml,iostat)
     if (iostat /= 0) stop "Cannot open file."
@@ -58,16 +81,16 @@ contains
       case("rdf")
         call get_value(attributes,"title", target_rdf_fom%title, status)
         
-        call get_value(attributes,"r-max", read_db,status)
-        number_db = string_to_db(read_db) 
+        !call get_value(attributes,"r-max", read_db,status)
+        !number_db = string_to_db(read_db) 
         
         call get_value(attributes,"bin-length", read_db,status)
         number_db2 = string_to_db(read_db)
 
         
         target_rdf_fom%rdf_data = make_rdf(product(common_config%str%box_edges), &
-                                  size(common_config%str%atoms), number_db, &
-                                  number_db2)            
+                                  size(common_config%str%atoms), number_of_g_of_r, &
+                                  number_db2)
                         
         count_number_atoms = 1
 
@@ -109,17 +132,6 @@ contains
   subroutine end_element(name)
     use flib_sax  
     character(len=*), intent(in)   :: name
-
-    select case(name)
-      case("atomArray")
-        if (count_number_atoms /= size(common_config%str%atoms)+1) then
-          write (*,*) "ERROR: number of atoms read in not equal to element attribute"
-          write (*,*) count_number_atoms
-          write (*,*) size(common_config%str%atoms)+1
-          stop
-        end if
-
-    end select
 
   end subroutine end_element
 

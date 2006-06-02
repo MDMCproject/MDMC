@@ -35,6 +35,9 @@ contains
   
     real(db) :: fom_val, fom_old
 
+    real(db) :: fom_best  ! used for keeping track of best fom
+    type (phasespace) :: my_ps_best ! to store status of best phasespace
+
     type (phasespace) :: my_ps, my_ps_old
     type (md_properties) :: my_props
     real(db) :: pressure_comp = 0.0, pot_energy = 0.0
@@ -80,6 +83,8 @@ contains
     my_ps = make_phasespace(a_config%str, c%temperature)
     
     my_ps_old = copy_phasespace(my_ps)
+    
+    my_ps_best = copy_phasespace(my_ps)
                         
                         
     ! to print out g(r) to file (otherwise neither my_histogram nor my_rdf needed)
@@ -87,7 +92,7 @@ contains
     my_histogram = make_histogram(c%r_max, c%bin_length)
                         
     my_rdf = make_rdf(product(a_config%str%box_edges), size(a_config%str%atoms), &
-                       c%r_max, c%bin_length)                    
+                       floor(c%r_max/c%bin_length), c%bin_length)                    
                                                
                                                
                         
@@ -163,9 +168,7 @@ contains
 
 
     ! Determine if equilibrium was reached
-    !   1. is temperature within T_target +- 50% ?
-    !   2. is E_now within average_energy_end_of_temp_calibration +- 50% ?
-    
+    !
     ! Note the (2.0/ndim) factor is to convert from dimensionless kin_energy per atom to 
     ! dimensionless temperature
     
@@ -197,7 +200,7 @@ contains
       
       ! to print out rdf
       
-      !call accum_histogram(my_histogram, my_ps%str)
+      call accum_histogram(my_histogram, my_ps%str)
       
     end do 
     
@@ -214,6 +217,24 @@ contains
     call add_xml_attribute_func_params(xf, common_pe_list)
     call xml_AddAttribute(xf, "val", str(fom_val, format="(f10.5)"))
     call xml_EndElement(xf, "accept")    
+
+
+    ! to print out rdf 
+      
+    call cal_rdf(my_rdf, my_histogram)
+            
+    density = size(my_ps%str%atoms) / product(my_ps%str%box_edges)
+    call save_rdf(my_rdf, c%temperature, density)
+    call clear_histogram(my_histogram)
+
+
+    ! store best solution so far
+    
+    fom_best = fom_val
+    call backup_best_func_params(common_pe_list)
+    call shallow_copy_phasespace(my_ps, my_ps_best)
+
+
 
  ! ----------- finished calculating first FOM ------------- !
 
@@ -287,9 +308,7 @@ contains
       
 
       ! Determine if equilibrium was reached
-      !   1. is temperature within T_target +- 50% ?
-      !   2. is E_now within average_energy_end_of_temp_calibration +- 50% ?
-      
+      !
       ! Note the (2.0/ndim) factor is to convert from dimensionless kin_energy per atom to 
       ! dimensionless temperature
       
@@ -320,7 +339,7 @@ contains
         
         ! to print out rdf
         
-        !call accum_histogram(my_histogram, my_ps%str)
+        !if (i == c%mc_steps) call accum_histogram(my_histogram, my_ps%str)
         
       end do 
       
@@ -333,7 +352,14 @@ contains
       write(print_to_screen, '(a,f12.4)') "Finished cal FOM. Time: ", toc()
       
       
+      ! check if new best fom
       
+      if (fom_val < fom_best) then
+        fom_best = fom_val
+        call backup_best_func_params(common_pe_list)
+        call shallow_copy_phasespace(my_ps, my_ps_best)      
+      end if
+     
       
       ! Metropolis check
 
@@ -384,8 +410,45 @@ contains
       
     end do
      
-                     
-   
+ ! ---------------- finished mdmc part ------------------------ !      
+     
+    
+     
+    ! print out rdf for best fom
+    
+    call restore_best_func_params(common_pe_list)
+    call shallow_copy_phasespace(my_ps_best, my_ps)
+        
+    do i = 1, 5    
+        
+    do j = 1, c%average_over_this_many_rdf
+
+      call trajectory_in_phasespace(my_ps, common_pe_list, c%cal_rdf_at_interval, c%time_step)
+       
+      call func_accum_histogram(my_ps%str, common_fom_list)
+        
+      ! to print out rdf
+        
+      call accum_histogram(my_histogram, my_ps%str)
+        
+    end do 
+      
+    fom_val = func_val(my_ps%str, common_fom_list)
+    call func_clear_histogram(my_ps%str, common_fom_list)
+    write(print_to_file,'(a,f12.4)') "BEST FOM = ", fom_val
+    write(print_to_file,'(a)') "WITH: "
+    call print_all_func_params(print_to_file, common_pe_list)
+    write(print_to_file, '(a,f12.4)') "Finished cal FOM. Time: ", toc()
+    write(print_to_file, *) " "
+      
+    call cal_rdf(my_rdf, my_histogram)
+            
+    density = size(my_ps%str%atoms) / product(my_ps%str%box_edges)
+    call save_rdf(my_rdf, c%temperature, density)
+    call clear_histogram(my_histogram)
+    
+    end do   
+                      
     !call save_structure(my_ps%str, "output/argon_structure.xml")
     
     print *, ' '
@@ -409,7 +472,7 @@ contains
     
     yes_or_no = .true.
     
-    if (abs((t - t_target)/t_target) > 0.5) then
+    if (abs((t - t_target)/t_target) > 0.2) then
       yes_or_no = .false.
     end if
   end function acceptable_temperature
@@ -421,7 +484,7 @@ contains
     
     yes_or_no = .true.
     
-    if (abs((e - e_target)/e_target) > 0.5) then
+    if (abs((e - e_target)/e_target) > 0.1) then
       yes_or_no = .false.
     end if
   end function acceptable_energy

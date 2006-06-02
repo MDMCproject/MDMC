@@ -21,8 +21,30 @@ use function_class
   
   type (func_params), private :: param_backup
 
+
+  ! REALLY BAD HERE
+  type (func_params), private :: best_param_backup
+
+
 contains
 
+  ! REALLY BAD HERE
+  subroutine backup_best_func_params(list)
+    type (func_list), intent(in) :: list
+    
+    ! VERY PRIMITIVE HERE
+    best_param_backup = list%pt_lj_pe%params
+  
+  end subroutine backup_best_func_params
+  
+  ! REALLY BAD HERE
+  subroutine restore_best_func_params(list)
+    type (func_list), intent(inout) :: list
+    
+    list%pt_lj_pe%params = best_param_backup
+  
+  end subroutine restore_best_func_params
+       
 
   ! NEED TO IMPROVE ON THIS LATER 
   subroutine backup_func_params(list)
@@ -58,14 +80,20 @@ contains
     type (xmlf_t), intent(inout) :: xf      
     type (func_list), intent(in) :: list
 
-
     if ( associated (list%pt_lj_pe) ) call xml_add_attribute_func_params(xf, list%pt_lj_pe%params)
     if ( associated (list%pt_rdf_fom) ) call xml_add_attribute_func_params(xf, list%pt_rdf_fom%params)
 
-  
   end subroutine add_xml_attribute_func_params
     
  
+  subroutine print_all_func_params(file_pointer, list)
+    type (func_list), intent(in) :: list
+    integer, intent(in) :: file_pointer   
+        
+    if ( associated (list%pt_lj_pe) ) call print_func_params(file_pointer, list%pt_lj_pe%params)
+    if ( associated (list%pt_rdf_fom) ) call print_func_params(file_pointer, list%pt_rdf_fom%params)
+
+  end subroutine print_all_func_params
 
     
   

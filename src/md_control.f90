@@ -59,7 +59,7 @@ contains
     my_histogram = make_histogram(c%r_max, c%bin_length)
                         
     my_rdf = make_rdf(product(a_config%str%box_edges), size(a_config%str%atoms), &
-                      c%r_max, c%bin_length)
+                      floor(c%r_max/c%bin_length), c%bin_length)
  
                           
     
