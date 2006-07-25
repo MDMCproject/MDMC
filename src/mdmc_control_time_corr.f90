@@ -251,8 +251,6 @@ contains
     
       call do_time_correlation(my_ps%str, c%n_buffer_average_over, &
         c%n_delta_t*c%time_step, c%temperature, density)
-        
-      print *, i
       
     end do
  
