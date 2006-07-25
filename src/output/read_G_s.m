@@ -40,7 +40,7 @@ for j = 1 : n_time
   time_index = time_index + 1;
 end
 
-surf(r(1:10), t, G_s(1:10,:)')
+surf(r), t, G_s')
 xlabel('r [AA]')
 ylabel('t [10\^-13 s]')
 zlabel('G\_s (r,t)')
