@@ -54,6 +54,12 @@ implicit none
     real(db) :: temperature   ! stored internally in units of 120.279K (=1000/8.314K)
     real(db) :: time_step     ! stored internally in units of 10e-13seconds
     real(db) :: temperature_mc   ! used in metropolis
+    
+    ! parameters for time correlation run
+    integer :: n_time_buffers  ! must be less than n_time_evals
+    integer :: n_time_evals    ! number of times time-correlation is calculated
+    integer :: n_buffer_average_over ! number of buffers to average over to improve stats
+    integer :: n_delta_t       ! n_delta_t * n_time_evals = total number of MD the corr is run for
   end type mdmc_control_container
 
 

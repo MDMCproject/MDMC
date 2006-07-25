@@ -89,6 +89,7 @@ contains
 
   ! Notice the a_rdf%val array are assumed to represent g(r) at the center
   ! of each. That means at: 0.5*bin_length, 1.5*bin_length etc......
+  ! The temperature is required to passed in dimensional units here.
   
   subroutine save_rdf(a_rdf, temperature, density)
     use flib_wxml
@@ -126,8 +127,9 @@ contains
     call xml_NewElement(xf, "rdf")
     
     ! notice convert units of temperature from dimensionless to K  
+    
     if (present(temperature) .and. present(density)) then
-      call xml_AddAttribute(xf, "title", "T = " // trim(str(temperature / 0.008314, format="(f10.5)")) // &
+      call xml_AddAttribute(xf, "title", "T = " // trim(str(temperature * T_unit, format="(f10.5)")) // &
                                          " K: rho = " // trim(str(density, format="(f10.5)")) &
                                          // " atoms/AA-3")
     else if (present(temperature)) then 

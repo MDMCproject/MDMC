@@ -36,7 +36,7 @@ contains
 
 
   ! Same as cal_histogram but in additional this function also adds the
-  ! calculated histogram to the hist%sum attribute 
+  ! calculated histogram to the hist%sum attribute and increase hist%n_accum
 
   subroutine accum_histogram(hist, str)
     type (histogram), intent(inout) :: hist
@@ -133,8 +133,8 @@ contains
     
     if (str%nn_list%ignore_list == .true. .or. str%nn_list%r_cut < r_max) then
     
-		  do i1 = 1, n_tot
-		    do i2 = i1+1, n_tot
+      do i1 = 1, n_tot
+        do i2 = i1+1, n_tot
           diff_vec = str%r(i1,:) - str%r(i2,:)
           
           do i = 1, ndim
@@ -153,11 +153,11 @@ contains
             hist%val(which_bin) = hist%val(which_bin) + 1
           end if
   			
-			  end do
-		  end do    
+        end do
+      end do    
 		
-		else
-		  ! for now also assumes that distances are stored as r2
+    else
+      ! for now also assumes that distances are stored as r2
       ! and I have put this if statement in so that I don't forget to
       ! change the code in this function when I no longer assume this
     
