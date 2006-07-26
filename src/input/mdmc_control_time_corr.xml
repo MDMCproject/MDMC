@@ -47,8 +47,8 @@
   
   <gpe>
     <lj-potential>
-      <sigma units="AA" val="3.7"             fixed="no" min="1.0" max="6.0" max-move="0.1" />
-      <epsilon units="KJ/mole" val="2.0"  fixed="no" min="0.2" max="5.0" max-move="0.1" />
+      <sigma units="AA" val="3.405"             fixed="no" min="1.0" max="6.0" max-move="0.1" />
+      <epsilon units="KJ/mole" val="0.9960172"  fixed="no" min="0.2" max="5.0" max-move="0.1" />
 
       <!-- Ag values are: sigma units="AA" val="3.405"
                           epsilon units="KJ/mole" val="0.9960172"
