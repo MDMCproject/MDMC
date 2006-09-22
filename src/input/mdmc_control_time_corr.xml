@@ -87,7 +87,7 @@
            -->
       <n-time-buffers number="10" />
       <n-time-evals number="250" />
-      <n-buffer-average-over number="200" />
+      <n-buffer-average-over number="10" />
       <n-delta-t number="4" />
     </time-correlation>
     

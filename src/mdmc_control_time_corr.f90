@@ -243,7 +243,7 @@ contains
     call init_time_correlation(c%n_time_buffers, c%n_time_evals, size(my_ps%str%atoms) &
       , c%r_max, c%bin_length) 
     
-    do i = 1, (c%n_time_evals/c%n_time_buffers)*(c%n_buffer_average_over-1)+c%n_time_evals
+    do i = 1, 3*((c%n_time_evals/c%n_time_buffers)*(c%n_buffer_average_over-1)+c%n_time_evals)
       
       ! move n-delta-t
       

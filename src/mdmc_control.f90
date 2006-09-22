@@ -78,19 +78,17 @@ contains
 
     call tic
 
-    ! initiate phasespace
+
+    ! allocate phase-spaces
     
-    my_ps = make_phasespace(a_config%str, c%temperature)
-    
+    my_ps = make_phasespace(a_config%str, c%temperature)    
     my_ps_old = copy_phasespace(my_ps)
-    
     my_ps_best = copy_phasespace(my_ps)
                         
                         
-    ! to print out g(r) to file (otherwise neither my_histogram nor my_rdf needed)
+    ! to print out g(r) to file (otherwise neither my_histogram nor my_rdf are needed)
     
     my_histogram = make_histogram(c%r_max, c%bin_length)
-                        
     my_rdf = make_rdf(product(a_config%str%box_edges), size(a_config%str%atoms), &
                        floor(c%r_max/c%bin_length), c%bin_length)                    
                                                

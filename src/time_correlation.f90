@@ -10,7 +10,7 @@ implicit none
   private :: cal_g_s_histogram, cal_g_d_histogram
   private :: clear_time_correlation
   private :: update_act_r
-  private :: print_g_s, print_einstein_diffuse_exp
+  private :: print_g_s, print_g_d, print_einstein_diffuse_exp
 
   private :: make_histogram_cutdown
 
