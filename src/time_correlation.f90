@@ -7,7 +7,7 @@ implicit none
 
   public :: init_time_correlation, do_time_correlation
 
-  private :: cal_g_s_histogram
+  private :: cal_g_s_histogram, cal_g_d_histogram
   private :: clear_time_correlation
   private :: update_act_r
   private :: print_g_s, print_einstein_diffuse_exp
@@ -19,6 +19,8 @@ implicit none
     real(db) :: bin_length   
     integer, dimension(:), allocatable :: val
   end type histogram_cutdown
+  
+  private histogram_cutdown
 
 
   type buffer
@@ -29,6 +31,8 @@ implicit none
     type (histogram_cutdown), dimension(:), allocatable :: g_s_hists
     type (histogram_cutdown), dimension(:), allocatable :: g_d_hists
   end type buffer
+  
+  private buffer
 
 
   ! bufs holds all the buffers
