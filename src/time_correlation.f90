@@ -6,11 +6,13 @@ use tic_toc_class
 implicit none
 
   public :: init_time_correlation, do_time_correlation
+  public :: set_n_buffer_average_over, set_n_time_buffers
+  public :: print_g_d, print_g_s, print_einstein_diffuse_exp
+  public :: clear_time_correlation
+  public :: allocate_g_d_data_array
 
   private :: cal_g_s_histogram, cal_g_d_histogram
-  private :: clear_time_correlation
-  private :: update_act_r
-  private :: print_g_s, print_g_d, print_einstein_diffuse_exp
+  private :: update_act_r 
 
   private :: make_histogram_cutdown
 
@@ -50,6 +52,12 @@ implicit none
   type (histogram_cutdown), dimension(:), allocatable, private :: g_d_hists_sum
   !real(db), dimension(:,:,:), allocatable, private :: g_s_pair_func
   real(db), dimension(:), allocatable, private :: g_prefac 
+  
+  
+  ! Temporary container for reading in G_d dataset from file
+  
+  real(db), dimension(:,:), allocatable, private :: g_d_data
+    
     
   integer, private :: num_buffs_cal_thus_far
 
@@ -63,8 +71,23 @@ implicit none
   character(len=10), parameter, private :: filename_prefix3 = "output/g_d"  
   integer, private :: filname_number3 = 1    
 
+  integer, private :: n_buffer_average_over
+  integer, private :: n_time_buffers
 
 contains
+
+  subroutine set_n_time_buffers(n)
+    integer, intent(in) :: n
+    
+    n_time_buffers = n
+  end subroutine set_n_time_buffers
+
+  subroutine set_n_buffer_average_over(n)
+    integer, intent(in) :: n
+    
+    n_buffer_average_over = n
+  end subroutine set_n_buffer_average_over
+
 
   ! The temperature is required to passed in dimensional units here.
 
@@ -139,10 +162,9 @@ contains
 
   ! The temperature is required to passed in dimensional units here.
 
-  subroutine print_g_s(temperature, density, time_step, n_buffer_average_over)
+  subroutine print_g_s(temperature, density, time_step)
     use flib_wxml
     real(db), optional, intent(in) :: temperature, density, time_step
-    integer, intent(in) :: n_buffer_average_over
     
     type (xmlf_t) :: xf
     integer :: i, n_eval_times, n_bin, i_bin
@@ -225,10 +247,9 @@ contains
 
   ! The temperature is required to passed in dimensional units here.
 
-  subroutine print_g_d(temperature, density, time_step, n_buffer_average_over)
+  subroutine print_g_d(temperature, density, time_step)
     use flib_wxml
     real(db), optional, intent(in) :: temperature, density, time_step
-    integer, intent(in) :: n_buffer_average_over
     
     type (xmlf_t) :: xf
     integer :: i, n_eval_times, n_bin, i_bin
@@ -328,51 +349,77 @@ contains
   end subroutine update_act_r
 
 
+
   ! time_step is here equal to real MD delta_t times n_delta_t
 
-  subroutine do_time_correlation(str, n_buffer_average_over, time_step, temperature, density)
+  function do_time_correlation(str, time_step) result(job_done)
     type (structure), intent(in) :: str
-    integer, intent(in) :: n_buffer_average_over
-    real(db), intent(in) :: time_step
-    real(db), optional, intent(in) :: temperature, density    
+    real(db), intent(in) :: time_step   
+    
+    logical :: job_done
+  
   
     integer :: i_buf, i_time
     integer :: tc    ! shorthand for time_count
     integer :: n_time_evals
     real(db) :: fac
+   
+    
+    ! bufs holds all the buffers
     
     n_time_evals = size(bufs(1)%sum_square_diffs)
   
+  
+    ! sum over all the buffers
+    
     do i_buf = 1, size(bufs)
       tc = bufs(i_buf)%time_count
       
       if (tc == 0) then
         bufs(i_buf)%org_r = str%r
         bufs(i_buf)%act_r = str%r
+
+
+        ! calculate g_d(r,t=0) = g(r)
         
         call cal_g_d_histogram(bufs(i_buf)%g_d_hists(tc+1), & 
-          bufs(i_buf)%org_r, bufs(i_buf)%act_r )         
-      elseif (tc > 0) then      
+          bufs(i_buf)%org_r, bufs(i_buf)%act_r )
+                   
+      elseif (tc > 0) then   
+      
+        ! update actual act_r positions relative to org_r 
+           
         call update_act_r(bufs(i_buf)%act_r, str)
+        
+        
+        ! calculate g_s(r,t) and the sum of square differences
         
         bufs(i_buf)%sum_square_diffs(tc+1) = cal_g_s_histogram( & 
           bufs(i_buf)%g_s_hists(tc+1), bufs(i_buf)%org_r, bufs(i_buf)%act_r )
+        
+        
+        ! calculate g_d(r,t)
           
         call cal_g_d_histogram(bufs(i_buf)%g_d_hists(tc+1), bufs(i_buf)%org_r, bufs(i_buf)%act_r )  
       end if
       
+      
       ! check if this buffer reached time series end point
       
       if (tc + 1 == n_time_evals) then
-        bufs(i_buf)%time_count = 0
+      
+        ! reset time_count
         
-        ! notice at this point einstein_diffuse_exp holds just the sum of sums
-        ! of square differences 
+        bufs(i_buf)%time_count = 0
+      
+        
+        ! notice at this point einstein_diffuse_exp holds the sum of 'sum
+        ! of square differences' 
         
         einstein_diffuse_exp = einstein_diffuse_exp + bufs(i_buf)%sum_square_diffs
         
         
-        ! sum up histograms for the calculation of G_s(r,t)
+        ! sum up G_s(r,t) and G_d(r,t) histograms for each n_time_evals
         
         do i_time = 2, n_time_evals
           g_s_hists_sum(i_time)%val = g_s_hists_sum(i_time)%val + bufs(i_buf)%g_s_hists(i_time)%val
@@ -383,27 +430,29 @@ contains
         end do
         
         
+        ! number of buffers calculated thus far
+        
         num_buffs_cal_thus_far = num_buffs_cal_thus_far + 1
         
         print *, "num_buffs_cal_thus_far ", num_buffs_cal_thus_far
         
         
-        ! check if enough buffers have been completed to calculate averages
+        ! check if enough buffers have been completed to calculate average
         
         if (num_buffs_cal_thus_far == n_buffer_average_over) then
+        
+          ! calculate einstein diff. expression according to (5.2.4) Rapaport book
+        
           fac = 1 / (ndim*2*time_step*n_buffer_average_over)
-          do i_time = 2, n_time_evals
-          
-            ! expression (5.2.4) Rapaport book 
-             
+          do i_time = 2, n_time_evals             
             einstein_diffuse_exp(i_time) = einstein_diffuse_exp(i_time) * fac / (i_time-1)
-          end do 
-          call print_einstein_diffuse_exp(temperature, density, time_step)
+          end do           
           
-          call print_g_s(temperature, density, time_step, n_buffer_average_over)
-          call print_g_d(temperature, density, time_step, n_buffer_average_over)
           
-          call clear_time_correlation()
+          ! finish what needs to be calculated
+          
+          job_done = .true.
+          return
         end if
       
       else
@@ -413,12 +462,24 @@ contains
     end do ! end i_buf
     
     
+    ! have not completed enough buffers yet
+    
+    job_done = .false.
+    
+  end function do_time_correlation
+
+
+  subroutine allocate_g_d_data_array(n_time_evals, r_max, bin_length)
+    integer, intent(in) :: n_time_evals
+    real(db), intent(in) :: r_max, bin_length
+
+    allocate(g_d_data(n_time_evals, floor(r_max/bin_length)))
   
-  end subroutine do_time_correlation
+  end subroutine allocate_g_d_data_array
+  
 
-
-  subroutine init_time_correlation(n_time_buffers, n_time_evals, n_atoms, r_max, bin_length)
-    integer, intent(in) :: n_time_buffers, n_time_evals, n_atoms
+  subroutine init_time_correlation(n_time_evals, n_atoms, r_max, bin_length)
+    integer, intent(in) :: n_time_evals, n_atoms
     real(db), intent(in) :: r_max, bin_length
  
     integer :: i, j, n_bin
@@ -429,7 +490,6 @@ contains
     allocate(einstein_diffuse_exp(n_time_evals))
 
     do i = 0, n_time_buffers-1
-      bufs(i+1)%time_count = - i * n_time_evals / n_time_buffers
       
       allocate(bufs(i+1)%org_r(n_atoms, ndim)) 
       allocate(bufs(i+1)%act_r(n_atoms, ndim))
@@ -456,8 +516,6 @@ contains
     
     n_bin = size(g_s_hists_sum(1)%val)
     
-    !allocate(g_s_pair_func(n_bin, n_time_evals))
-    
     
     allocate(g_prefac(n_bin))
     
@@ -469,13 +527,20 @@ contains
     end do    
     
     
-    call clear_time_correlation()
+    call clear_time_correlation(n_time_evals)
     
   end subroutine init_time_correlation
    
   
-  subroutine clear_time_correlation()
+  subroutine clear_time_correlation(n_time_evals)
+    integer, intent(in) :: n_time_evals
+  
     integer :: i
+  
+  
+    do i = 0, n_time_buffers-1
+      bufs(i+1)%time_count = - i * n_time_evals / n_time_buffers
+    end do  
   
     num_buffs_cal_thus_far = 0
     einstein_diffuse_exp = 0.0

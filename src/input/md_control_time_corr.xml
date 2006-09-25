@@ -45,10 +45,6 @@
     </rdf-fom>
   </fom>
   
-  
-  <fix-this-later-g-d-data filename="C:\Backup\Backup_folder1\work\code\RMC++\mdmc\trunk\src\output\g_d1.xml" />
-  
-  
   <gpe>
     <lj-potential>
       <sigma units="AA" val="3.405"             fixed="no" min="1.0" max="6.0" max-move="0.1" />
@@ -67,7 +63,7 @@
     <!-- <lookup-data-potential /> -->
   </gpe>
   
-  <control-object name="mdmc_control_time_corr">
+  <control-object name="md_control_time_corr">
   
     <temperature units="Kelvin" val="85.0" />
     <time-step units="10e-13s" val="0.1075" />  
@@ -90,11 +86,9 @@
            set n-time-evals = n-time-buffers * floor(n-time-evals/n-time-buffers)
            -->
       <n-time-buffers number="10" />
-      <n-buffer-average-over number="200" />
-   <!--   
       <n-time-evals number="250" />
+      <n-buffer-average-over number="10" />
       <n-delta-t number="4" />
-      -->
     </time-correlation>
     
     

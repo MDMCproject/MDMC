@@ -5,6 +5,7 @@ use md_control_class
 use mdmc_control_class
 use md_gridsearch_control_class
 use mdmc_control_time_corr_class
+use md_control_time_corr_class
 use structure_reader_class
 use control_containers_class
 use converters_class
@@ -25,7 +26,8 @@ use converters_class
   ! Notice use the same setup param container for md_gridsearch_control as is used for
   ! mdmc_control - see code below
   logical, private :: in_md_gridsearch_control = .false.
-  logical, private  :: in_mdmc_control_time_corr = .false.  
+  logical, private  :: in_mdmc_control_time_corr = .false. 
+  logical, private  :: in_md_control_time_corr = .false.  
   
   ! nn_list_r_cut and nn_list_delta_r are the two attributes that are needed to setup
   ! a nearest neighbour list. 
@@ -109,6 +111,9 @@ contains
             
           case("mdmc_control_time_corr")
             in_mdmc_control_time_corr = .true.  
+            
+          case("md_control_time_corr")
+            in_md_control_time_corr = .true.            
         end select
 	
     end select
@@ -194,7 +199,8 @@ contains
 
     ! if in mdmc_control
     
-    if (in_mdmc_control .or. in_md_gridsearch_control .or. in_mdmc_control_time_corr) then
+    if (in_mdmc_control .or. in_md_gridsearch_control .or. in_mdmc_control_time_corr &
+        .or. in_md_control_time_corr) then
       select case(name)
  
         case("total-steps-initial-equilibration")       
@@ -449,6 +455,31 @@ contains
         if (in_md_gridsearch_control == .true.) then
           call run_md_gridsearch_control(common_config, setup_mdmc_control_params)           
         end if 
+        if (in_md_control_time_corr == .true.) then
+          ! check if time correlation parameters are ok
+          
+          if (setup_mdmc_control_params%n_time_buffers > &
+              setup_mdmc_control_params%n_time_evals) then
+            write(*,*) " "
+            write(*,*) "ERROR in handler.f90"
+            write(*,*) "n_time_buffers > n_time_evals"
+            stop
+          end if
+          
+          
+          ! force n_time_evals/n_time_buffers to have no remainder since this make
+          ! the buffer algorithm better work better
+          
+          if (mod(setup_mdmc_control_params%n_time_evals, &
+                  setup_mdmc_control_params%n_time_buffers)) then
+            setup_mdmc_control_params%n_time_evals = setup_mdmc_control_params%n_time_buffers &
+              * (setup_mdmc_control_params%n_time_evals/setup_mdmc_control_params%n_time_buffers)
+            print *, "n-time-evals adjusted reduced to ", setup_mdmc_control_params%n_time_evals
+          end if
+          
+          
+          call run_md_control_time_corr(common_config, setup_mdmc_control_params)           
+        end if 
         if (in_mdmc_control_time_corr == .true.) then
           ! check if time correlation parameters are ok
           
@@ -473,7 +504,7 @@ contains
           
           
           call run_mdmc_control_time_corr(common_config, setup_mdmc_control_params)           
-        end if 
+        end if        
         
       case("fom")
         in_fom = .false.                

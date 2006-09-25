@@ -1,4 +1,4 @@
-module mdmc_control_time_corr_class
+module md_control_time_corr_class
 use configuration_class
 use function_class
 use common_block_class, only : common_config, common_pe_list, common_fom_list, target_rdf_fom
@@ -13,7 +13,7 @@ use time_correlation_class
 
   implicit none
 
-  public :: run_mdmc_control_time_corr
+  public :: run_md_control_time_corr
   
   private :: acceptable_temperature
   private :: acceptable_energy  
@@ -23,7 +23,7 @@ use time_correlation_class
 
 contains
 
-  subroutine run_mdmc_control_time_corr(a_config, c)
+  subroutine run_md_control_time_corr(a_config, c)
     use flib_wxml  
     type (configuration), intent(inout) :: a_config
     type (mdmc_control_container) :: c
@@ -270,7 +270,7 @@ contains
     call xml_EndElement(xf, "mdmc-control-results")
     call xml_Close(xf)
     
-  end subroutine run_mdmc_control_time_corr
+  end subroutine run_md_control_time_corr
   
   
   ! this subroutine needs to be moved somewhere else at some point
@@ -312,4 +312,4 @@ contains
     end if
   end function acceptable_energy
 
-end module mdmc_control_time_corr_class
+end module md_control_time_corr_class
