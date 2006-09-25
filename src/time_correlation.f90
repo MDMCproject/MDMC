@@ -9,7 +9,6 @@ implicit none
   public :: set_n_buffer_average_over, set_n_time_buffers
   public :: print_g_d, print_g_s, print_einstein_diffuse_exp
   public :: clear_time_correlation
-  public :: allocate_g_d_data_array
 
   private :: cal_g_s_histogram, cal_g_d_histogram
   private :: update_act_r 
@@ -56,7 +55,7 @@ implicit none
   
   ! Temporary container for reading in G_d dataset from file
   
-  real(db), dimension(:,:), allocatable, private :: g_d_data
+  real(db), dimension(:,:), allocatable :: g_d_data
     
     
   integer, private :: num_buffs_cal_thus_far
@@ -75,6 +74,31 @@ implicit none
   integer, private :: n_time_buffers
 
 contains
+
+  function time_correlation_fom() result(val)
+    real(db) :: val
+    
+    integer :: i, i_bin
+    
+    integer n_eval_times, n_bin
+    
+    n_eval_times = size(g_d_data, 2)
+    n_bin = size(g_d_data, 1)
+  
+    val = 0.0
+    
+    g_prefac = g_prefac / n_buffer_average_over
+
+    do i = 1, n_eval_times    
+      do i_bin = 10, n_bin
+         val = val + (g_d_data(i_bin, i) - g_d_hists_sum(i)%val(i_bin)*g_prefac(i_bin))**2
+      end do 
+    end do
+    
+    g_prefac = g_prefac * n_buffer_average_over  
+  
+  end function time_correlation_fom
+
 
   subroutine set_n_time_buffers(n)
     integer, intent(in) :: n
@@ -467,15 +491,6 @@ contains
     job_done = .false.
     
   end function do_time_correlation
-
-
-  subroutine allocate_g_d_data_array(n_time_evals, r_max, bin_length)
-    integer, intent(in) :: n_time_evals
-    real(db), intent(in) :: r_max, bin_length
-
-    allocate(g_d_data(n_time_evals, floor(r_max/bin_length)))
-  
-  end subroutine allocate_g_d_data_array
   
 
   subroutine init_time_correlation(n_time_evals, n_atoms, r_max, bin_length)

@@ -74,7 +74,7 @@ contains
       open(print_to_file, file="output/job_summary.txt")
     end if
 	  		
-    write(print_to_file,*) "In run_md_control"
+    write(print_to_file,*) "In run_mdmc_control"
 
     call tic
 

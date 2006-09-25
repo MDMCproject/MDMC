@@ -76,7 +76,7 @@ contains
     end if
 
 	  		
-    write(print_to_file,*) "In run_md_control"
+    write(print_to_file,*) "In run_mdmc_control_time_corr"
 
     call tic
 
@@ -189,59 +189,9 @@ contains
     end if     
     
  ! ---------------  finished initial equilibration -------------- !      
- 
- 
- 
- ! ----------- calculate first FOM ------------- !        
-    
-    do j = 1, c%average_over_this_many_rdf
-
-      call trajectory_in_phasespace(my_ps, common_pe_list, c%cal_rdf_at_interval, c%time_step)
-      
-      call func_accum_histogram(my_ps%str, common_fom_list)
-      
-      ! to print out rdf
-      
-      call accum_histogram(my_histogram, my_ps%str)
-      
-    end do 
-    
-    !! print also out what the param values are
-    fom_val = func_val(my_ps%str, common_fom_list)
-    call func_clear_histogram(my_ps%str, common_fom_list)
-    write(print_to_file,'(a,f12.4)') "1st FOM = ", fom_val
-    write(print_to_file, '(a,f12.4)') "Finished cal 1st FOM. Time: ", toc()
-    write(print_to_file, *) " "
-    write(print_to_screen, '(a,f12.4)') "Finished cal 1st FOM. Time: ", toc()
-    
-    
-    call xml_NewElement(xf, "accept")
-    call add_xml_attribute_func_params(xf, common_pe_list)
-    call xml_AddAttribute(xf, "val", str(fom_val, format="(f10.5)"))
-    call xml_EndElement(xf, "accept")    
-
-
-    ! to print out rdf 
-      
-    call cal_rdf(my_rdf, my_histogram)
-            
-    density = size(my_ps%str%atoms) / product(my_ps%str%box_edges)
-    call save_rdf(my_rdf, c%temperature, density)
-    call clear_histogram(my_histogram)
-
-
-    ! store best solution so far
-    
-    fom_best = fom_val
-    call backup_best_func_params(common_pe_list)
-    call shallow_copy_phasespace(my_ps, my_ps_best)
-
-
- ! ----------- finished calculating first FOM ------------- !
-
 
  
- ! -------- time correlation part ------------------------- !
+ ! -------- calculate first FOM ------------------------- !
 
     call set_n_buffer_average_over(c%n_buffer_average_over)
     call set_n_time_buffers(c%n_time_buffers)
@@ -249,16 +199,216 @@ contains
     call init_time_correlation(c%n_time_evals, size(my_ps%str%atoms) &
       , c%r_max, c%bin_length) 
     
-    do i = 1, 1
-      call cal_full_time_correlation(my_ps, c)   
-      call print_g_d(c%temperature, density, c%time_step)
-      call print_einstein_diffuse_exp(c%temperature, density, c%time_step)
-      call clear_time_correlation(c%n_time_evals)
-    end do
+
+    ! cal 1st FOM and print 1st G_d
+    
+    call cal_full_time_correlation(my_ps, c)   
+    call print_g_d(c%temperature, density, c%n_delta_t*c%time_step) 
+    fom_val = time_correlation_fom()
+    call clear_time_correlation(c%n_time_evals)    
+    
+    write(print_to_file,'(a,f12.4)') "1st FOM = ", fom_val
+    write(print_to_file, '(a,f12.4)') "Finished cal 1st FOM. Time: ", toc()
+    write(print_to_file, *) " "
+    write(print_to_screen, '(a,f12.4)') "Finished cal 1st FOM. Time: ", toc()
+
+    
+    ! print FOM to xml file
+    
+    call xml_NewElement(xf, "accept")
+    call add_xml_attribute_func_params(xf, common_pe_list)
+    call xml_AddAttribute(xf, "val", str(fom_val, format="(f10.5)"))
+    call xml_EndElement(xf, "accept")    
+
+
+    ! store best solution so far
+    
+    fom_best = fom_val
+    call backup_best_func_params(common_pe_list)
+    call shallow_copy_phasespace(my_ps, my_ps_best)      
  
- ! -------- end time correlation -------------------------- !
+ ! -------- finished calculating first FOM -------------------------- !
 
 
+
+
+ ! ---------------------- mdmc part ------------------------ !              
+               
+  
+    ! save state
+    
+    fom_old = fom_val
+    call backup_func_params(common_pe_list)
+    call shallow_copy_phasespace(my_ps, my_ps_old)       
+      
+              
+    do i = 1, c%mc_steps
+
+      write (print_to_screen, *) "Begin MC step number ", i
+      
+      write (print_to_file, *) "Begin MC step number ", i
+      write (print_to_file, *) " "
+
+      call move_random_func_params(common_pe_list)
+      
+
+      ! do MD equilibration
+      
+      sum_kin_energy = 0.0
+      
+      do i_md = 1, c%md_steps_repeated_equilibration
+
+        call trajectory_in_phasespace(my_ps, common_pe_list, 1, c%time_step, & 
+                                  pressure_comp, pot_energy)
+
+        call md_cal_properties(my_ps, my_props, common_pe_list, pressure_comp, pot_energy)       
+      
+      
+        if (i_md < c%total_step_temp_cali_repeated) then
+          sum_kin_energy = sum_kin_energy + my_props%kin_energy%val
+          if (mod(i_md,c%adjust_temp_at_interval_repeated) == 0) then
+            temp_adjust_factor = sqrt(c%adjust_temp_at_interval_repeated * 1.5 * c%temperature / &
+                sum_kin_energy * (size(my_ps%str%atoms)-1.0) / size(my_ps%str%atoms))
+            my_ps%p = my_ps%p * temp_adjust_factor
+            sum_kin_energy = 0.0
+          end if
+        end if        
+      
+      
+        call md_accum_properties(my_props)
+        
+        if (mod(i_md,c%average_over_repeated_equilibration) == 0) then 
+          call md_print_properties(print_to_file, my_props)
+
+          call md_reset_properties(my_props)
+        end if
+        
+        ! Store the average energy at the point when finished the temperature calibration.
+        ! Note this must be done after md_print_properties has been called - since only this
+        ! subfunction alters the my_props.ave value.
+      
+        if (i_md == c%total_step_temp_cali_repeated) then
+          average_energy_end_of_temp_calibration = my_props.tot_energy.ave 
+        end if
+              
+      end do
+         
+      write(print_to_file, '(a,f12.4)') "Finished repeated MD trajectory. Time: ", toc() 
+      write(print_to_file, *) " "
+      write(print_to_screen, '(a,f12.4)') "Finished repeated MD trajectory. Time: ", toc()      
+      
+
+      ! Determine if equilibrium was reached
+      !
+      ! Note the (2.0/ndim) factor is to convert from dimensionless kin_energy per atom to 
+      ! dimensionless temperature
+      
+      if ( acceptable_temperature((2.0/ndim)*my_props.kin_energy.ave, &
+          c%temperature) == .false. .or. acceptable_energy(average_energy_end_of_temp_calibration, &
+          my_props.tot_energy.ave) == .false.) then
+        write(print_to_screen, *) "Did not reach equilibrium in MD run"
+        write(print_to_file, *) "Did not reach equilibrium in MD run"
+
+        call xml_NewElement(xf, "failed-md-run")
+        call add_xml_attribute_func_params(xf, common_pe_list)
+        call xml_EndElement(xf, "failed-md-run")   
+
+        call restore_func_params(common_pe_list)
+        call shallow_copy_phasespace(my_ps_old, my_ps)         
+
+        cycle
+      end if   
+
+
+      ! cal FOM
+    
+      call cal_full_time_correlation(my_ps, c)   
+      fom_val = time_correlation_fom()
+      call clear_time_correlation(c%n_time_evals) 
+
+      write(print_to_file,'(a,f12.4)') "FOM = ", fom_val
+      write(print_to_file, '(a,f12.4)') "Finished cal FOM. Time: ", toc()
+      write(print_to_file, *) " "
+      write(print_to_screen, '(a,f12.4)') "Finished cal FOM. Time: ", toc()
+      
+      
+      ! check if new best fom
+      
+      if (fom_val < fom_best) then
+        fom_best = fom_val
+        call backup_best_func_params(common_pe_list)
+        call shallow_copy_phasespace(my_ps, my_ps_best)      
+      end if
+     
+      
+      ! Metropolis check
+
+      delta_fom = fom_val - fom_old
+
+      accept_parameters = .false.
+
+      if(delta_fom <= 0.0) then
+          ! new parameters accepted
+        accept_parameters = .true.    
+      else
+        call random_number(ran_num)
+          
+        if(exp(- delta_fom / c%temperature_mc) > ran_num) then
+          accept_parameters = .true.
+        end if
+      end if
+ 
+        
+      if (accept_parameters) then
+      
+        call xml_NewElement(xf, "accept")
+        call add_xml_attribute_func_params(xf, common_pe_list)
+        call xml_AddAttribute(xf, "val", str(fom_val, format="(f10.5)"))
+        call xml_EndElement(xf, "accept")       
+     
+      
+        ! save state
+    
+        fom_old = fom_val
+        call backup_func_params(common_pe_list)
+        call shallow_copy_phasespace(my_ps, my_ps_old) 
+        
+      else
+      
+        call xml_NewElement(xf, "rejected")
+        call add_xml_attribute_func_params(xf, common_pe_list)
+        call xml_AddAttribute(xf, "val", str(fom_val, format="(f10.5)"))
+        call xml_EndElement(xf, "rejected")
+        
+        
+        ! restore state
+    
+        call restore_func_params(common_pe_list)
+        call shallow_copy_phasespace(my_ps_old, my_ps)          
+              
+      end if  
+      
+    end do
+     
+ ! ---------------- finished mdmc part ------------------------ !    
+
+
+    ! print out best fom
+    
+    call restore_best_func_params(common_pe_list)
+    call shallow_copy_phasespace(my_ps_best, my_ps)  
+        
+    call cal_full_time_correlation(my_ps, c)   
+    fom_val = time_correlation_fom()
+    call print_g_d(c%temperature, density, c%n_delta_t*c%time_step)    
+    call clear_time_correlation(c%n_time_evals) 
+      
+    write(print_to_file,'(a,f12.4)') "BEST FOM = ", fom_val
+    write(print_to_file,'(a)') "WITH: "
+    call print_all_func_params(print_to_file, common_pe_list)
+    write(print_to_file, '(a,f12.4)') "Finished cal FOM. Time: ", toc()
+    write(print_to_file, *) " "
+ 
     
     print *, ' '
     print *, 'Job took ', toc(), ' seconds to execute.'

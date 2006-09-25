@@ -8,15 +8,8 @@ use time_correlation_class
   implicit none
   
   private :: begin_element, end_element, pcdata_chunk
-  private :: start_document, end_document
-  
-  integer, private :: time_index = 1 ! keeps track of time-index when
-                                     ! reading in data
-                                    
-  integer, private :: bin_index                                  
+  private :: start_document, end_document                               
 
-  integer, private :: number_of_g_d      ! used to determine at beginning 
-                                            ! # of g-d elements in file
 
 contains
 
@@ -39,6 +32,9 @@ contains
     real(db) :: bin_length, delta_t
     
     integer :: n_bin, n_time_evals
+    integer :: i, j
+    
+    integer :: number_of_g_d  ! counts # of G-d elements
     
     ! before reading the rdf data file from a-to-z determine
     ! separately how many g-d elements it contains
@@ -78,32 +74,40 @@ contains
       
       number_of_g_d = number_of_g_d + 1
     end do
-  
-    print *, number_of_g_d
+
 
     r_max = r_last+r_first
     n_bin = nint( (r_last+r_first) / bin_length )
     n_time_evals = number_of_g_d / n_bin
     delta_t = t_last / (n_time_evals-1)
     
-    call allocate_g_d_data_array(n_time_evals, r_max, bin_length)
+    
+    ! VERY BAD WHAT I AM DOING HERE
+    
+    setup_mdmc_control_params%r_max = r_max
+    setup_mdmc_control_params%bin_length = bin_length
+    setup_mdmc_control_params%n_time_evals = n_time_evals
+    setup_mdmc_control_params%g_d_data_time_step = delta_t
+
+
+    allocate(g_d_data(floor(r_max/bin_length), n_time_evals))
+  
   
     call close_xmlfile(fxml)  
 
 
     call open_xmlfile(trim(filename),fxml,iostat)
     
+    
     do j = 1, n_time_evals
-      bin_index = 1
       do i = 1, n_bin
+      
         call get_node(fxml, path="//G_d-space-time-pair-correlation-function/G-d", &
           attributes=structure_attributes, status=iostat) 
-
         call get_value(structure_attributes,"G",read_db,status=iostat)
-        g_d_data(bin_index, time_index) = string_to_db(read_db)              
+        g_d_data(i, j) = string_to_db(read_db)             
+        
       end do
-    
-    
     end do
 
 
@@ -165,11 +169,11 @@ contains
       case("G-d")
 
         
-
-        call get_value(attributes,"g", read_db,status)
-        target_rdf_fom%rdf_data%val(count_number_atoms) = string_to_db(read_db)
-   
-        count_number_atoms = count_number_atoms + 1        
+!
+!        call get_value(attributes,"g", read_db,status)
+!        target_rdf_fom%rdf_data%val(count_number_atoms) = string_to_db(read_db)
+!   
+!        count_number_atoms = count_number_atoms + 1        
 
 
 !      case("scale-factor")

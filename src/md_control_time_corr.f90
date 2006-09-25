@@ -251,8 +251,8 @@ contains
     
     do i = 1, 1
       call cal_full_time_correlation(my_ps, c)   
-      call print_g_d(c%temperature, density, c%time_step)
-      call print_einstein_diffuse_exp(c%temperature, density, c%time_step)
+      call print_g_d(c%temperature, density, c%n_delta_t*c%time_step)
+      call print_einstein_diffuse_exp(c%temperature, density, c%n_delta_t*c%time_step)
       call clear_time_correlation(c%n_time_evals)
     end do
  

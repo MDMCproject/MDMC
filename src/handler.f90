@@ -256,6 +256,20 @@ contains
         case("time-step")       
           call get_value(attributes,"val",read_db,status)
           setup_mdmc_control_params%time_step = string_to_db(read_db)
+          
+          if (setup_mdmc_control_params%g_d_data_time_step /= 0.0) then
+            setup_mdmc_control_params%n_delta_t = &
+              nint(setup_mdmc_control_params%g_d_data_time_step / &
+                   setup_mdmc_control_params%time_step)
+            
+            if (setup_mdmc_control_params%n_delta_t == 0) then
+              setup_mdmc_control_params%n_delta_t = 1
+            end if
+            
+            setup_mdmc_control_params%time_step =  &
+              setup_mdmc_control_params%g_d_data_time_step / &
+              setup_mdmc_control_params%n_delta_t
+          end if
 
         case("temperature-mc")       
           call get_value(attributes,"val",read_db,status)

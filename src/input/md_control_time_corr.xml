@@ -87,7 +87,7 @@
            -->
       <n-time-buffers number="10" />
       <n-time-evals number="250" />
-      <n-buffer-average-over number="10" />
+      <n-buffer-average-over number="200" />
       <n-delta-t number="4" />
     </time-correlation>
     
@@ -107,8 +107,7 @@
       <cal-rdf-at-interval number="50" />
       <average-over-this-many-rdf number="20" />  
       
-      <!-- These are only used here when wanting to save g(r) to file -->
-      <r-max units="AA" val="20.0" />
+      <r-max units="AA" val="10.0" />
       <bin-length units="AA" val="0.1" /> 
     </calculate-rdf>    
         

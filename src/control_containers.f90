@@ -60,6 +60,10 @@ implicit none
     integer :: n_time_evals    ! number of times time-correlation is calculated
     integer :: n_buffer_average_over ! number of buffers to average over to improve stats
     integer :: n_delta_t       ! n_delta_t * n_time_evals = total number of MD the corr is run for
+    
+    
+    real(db) :: g_d_data_time_step = 0.0 ! VERY BAD WHAT I AM DOING HERE
+    
   end type mdmc_control_container
 
 
