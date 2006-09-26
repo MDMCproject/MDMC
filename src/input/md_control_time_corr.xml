@@ -74,9 +74,9 @@
          element specifies how many steps to average over when calculating
          MD properties 
          -->
-    <total-steps-initial-equilibration number="8000" average-over="1000" />
+    <total-steps-initial-equilibration number="50000" average-over="1000" />
     <perform-initial-temperature-calibration>
-      <total-step-temp-cali number="4000" />
+      <total-step-temp-cali number="20000" />
       <adjust-temp-at-interval number="200" />
     </perform-initial-temperature-calibration>
     
