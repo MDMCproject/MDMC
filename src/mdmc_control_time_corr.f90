@@ -324,6 +324,7 @@ contains
     
       call cal_full_time_correlation(my_ps, c)   
       fom_val = time_correlation_fom()
+    !call print_g_d(c%temperature, density, c%n_delta_t*c%time_step)       
       call clear_time_correlation(c%n_time_evals) 
 
       write(print_to_file,'(a,f12.4)') "FOM = ", fom_val

@@ -46,7 +46,7 @@
   </fom>
 -->  
   
-  <fix-this-later-g-d-data filename="C:\Backup\Backup_folder1\work\code\RMC++\mdmc\trunk\src\output\g_d1_temp.xml" />
+  <fix-this-later-g-d-data filename="C:\Backup\Backup_folder1\work\code\RMC++\mdmc\trunk\src\output\g_d1_data.xml" />
   
   
   <gpe>
@@ -78,9 +78,9 @@
          element specifies how many steps to average over when calculating
          MD properties 
          -->
-    <total-steps-initial-equilibration number="8000" average-over="1000" />
+    <total-steps-initial-equilibration number="50000" average-over="1000" />
     <perform-initial-temperature-calibration>
-      <total-step-temp-cali number="4000" />
+      <total-step-temp-cali number="20000" />
       <adjust-temp-at-interval number="200" />
     </perform-initial-temperature-calibration>
     
@@ -100,18 +100,18 @@
     
     
     <mc-steps number="50" /> 
-    <temperature-mc val="0.1" />    
+    <temperature-mc val="0.02" />    
     
     <!-- specify stuff which is repeated mc-steps times 
          -->
-    <md-steps-repeated-equilibration number="8000" average-over="1000" />
+    <md-steps-repeated-equilibration number="20000" average-over="1000" />
     <perform-repeated-temperature-calibration>
-      <total-step-temp-cali-repeated number="4000" />
+      <total-step-temp-cali-repeated number="10000" />
       <adjust-temp-at-interval-repeated number="200" />
     </perform-repeated-temperature-calibration>
     <calculate-rdf>
       <cal-rdf-at-interval number="50" />
-      <average-over-this-many-rdf number="20" />  
+      <average-over-this-many-rdf number="200" />  
       
     </calculate-rdf>    
         

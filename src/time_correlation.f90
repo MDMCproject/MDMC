@@ -90,7 +90,7 @@ contains
     g_prefac = g_prefac / n_buffer_average_over
 
     do i = 1, n_eval_times    
-      do i_bin = 10, n_bin
+      do i_bin = 20, n_bin
          val = val + (g_d_data(i_bin, i) - g_d_hists_sum(i)%val(i_bin)*g_prefac(i_bin))**2
       end do 
     end do
