@@ -47,8 +47,8 @@
   
   <gpe>
     <lj-potential>
-      <sigma units="AA" val="3.405"             fixed="no" min="1.0" max="6.0" max-move="0.1" />
-      <epsilon units="KJ/mole" val="0.9960172"  fixed="no" min="0.2" max="5.0" max-move="0.1" />
+      <sigma units="AA" val="3.2677"             fixed="no" min="1.0" max="6.0" max-move="0.1" />
+      <epsilon units="KJ/mole" val="20.0"  fixed="no" min="0.2" max="5.0" max-move="0.1" />
 
       <!-- Ag values are: sigma units="AA" val="3.405"
                           epsilon units="KJ/mole" val="0.9960172"
@@ -91,10 +91,7 @@
       <n-delta-t number="4" />
     </time-correlation>
     
-    
-    
-    <mc-steps number="1000" /> 
-    <temperature-mc val="0.005" />    
+
     
     <!-- specify stuff which is repeated mc-steps times 
          -->
@@ -107,7 +104,7 @@
       <cal-rdf-at-interval number="50" />
       <average-over-this-many-rdf number="20" />  
       
-      <r-max units="AA" val="10.0" />
+      <r-max units="AA" val="50.0" />
       <bin-length units="AA" val="0.1" /> 
     </calculate-rdf>    
         

@@ -187,74 +187,25 @@ contains
          write(print_to_screen, *) "Energy outside acceptable value - STOP"
          stop
     end if     
-    
- ! ---------------  finished initial equilibration -------------- !      
- 
- 
- 
- ! ----------- calculate first FOM ------------- !        
-    
-    do j = 1, c%average_over_this_many_rdf
-
-      call trajectory_in_phasespace(my_ps, common_pe_list, c%cal_rdf_at_interval, c%time_step)
-      
-      call func_accum_histogram(my_ps%str, common_fom_list)
-      
-      ! to print out rdf
-      
-      call accum_histogram(my_histogram, my_ps%str)
-      
-    end do 
-    
-    !! print also out what the param values are
-    fom_val = func_val(my_ps%str, common_fom_list)
-    call func_clear_histogram(my_ps%str, common_fom_list)
-    write(print_to_file,'(a,f12.4)') "1st FOM = ", fom_val
-    write(print_to_file, '(a,f12.4)') "Finished cal 1st FOM. Time: ", toc()
-    write(print_to_file, *) " "
-    write(print_to_screen, '(a,f12.4)') "Finished cal 1st FOM. Time: ", toc()
-    
-    
-    call xml_NewElement(xf, "accept")
-    call add_xml_attribute_func_params(xf, common_pe_list)
-    call xml_AddAttribute(xf, "val", str(fom_val, format="(f10.5)"))
-    call xml_EndElement(xf, "accept")    
-
-
-    ! to print out rdf 
-      
-    call cal_rdf(my_rdf, my_histogram)
-            
-    density = size(my_ps%str%atoms) / product(my_ps%str%box_edges)
-    call save_rdf(my_rdf, c%temperature, density)
-    call clear_histogram(my_histogram)
-
-
-    ! store best solution so far
-    
-    fom_best = fom_val
-    call backup_best_func_params(common_pe_list)
-    call shallow_copy_phasespace(my_ps, my_ps_best)
-
-
- ! ----------- finished calculating first FOM ------------- !
 
 
  
  ! -------- time correlation part ------------------------- !
 
-    call set_n_buffer_average_over(c%n_buffer_average_over)
-    call set_n_time_buffers(c%n_time_buffers)
+  density = size(my_ps%str%atoms) / product(my_ps%str%box_edges) ! for printing
 
-    call init_time_correlation(c%n_time_evals, size(my_ps%str%atoms) &
+  call set_n_buffer_average_over(c%n_buffer_average_over)
+  call set_n_time_buffers(c%n_time_buffers)
+
+  call init_time_correlation(c%n_time_evals, size(my_ps%str%atoms) &
       , c%r_max, c%bin_length) 
     
-    do i = 1, 1
-      call cal_full_time_correlation(my_ps, c)   
-      call print_g_d(c%temperature, density, c%n_delta_t*c%time_step)
-      call print_einstein_diffuse_exp(c%temperature, density, c%n_delta_t*c%time_step)
-      call clear_time_correlation(c%n_time_evals)
-    end do
+  !do i = 1, 4
+    call cal_full_time_correlation(my_ps, c)   
+    call print_g_d(c%temperature, density, c%n_delta_t*c%time_step)
+    call print_einstein_diffuse_exp(c%temperature, density, c%n_delta_t*c%time_step)
+    call clear_time_correlation(c%n_time_evals)
+  !end do
  
  ! -------- end time correlation -------------------------- !
 

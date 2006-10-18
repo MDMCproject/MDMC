@@ -193,39 +193,41 @@ contains
  
  ! -------- calculate first FOM ------------------------- !
 
-    call set_n_buffer_average_over(c%n_buffer_average_over)
-    call set_n_time_buffers(c%n_time_buffers)
+  density = size(my_ps%str%atoms) / product(my_ps%str%box_edges) ! for printing
 
-    call init_time_correlation(c%n_time_evals, size(my_ps%str%atoms) &
-      , c%r_max, c%bin_length) 
-    
+  call set_n_buffer_average_over(c%n_buffer_average_over)
+  call set_n_time_buffers(c%n_time_buffers)
 
-    ! cal 1st FOM and print 1st G_d
-    
-    call cal_full_time_correlation(my_ps, c)   
-    call print_g_d(c%temperature, density, c%n_delta_t*c%time_step) 
-    fom_val = time_correlation_fom()
-    call clear_time_correlation(c%n_time_evals)    
-    
-    write(print_to_file,'(a,f12.4)') "1st FOM = ", fom_val
-    write(print_to_file, '(a,f12.4)') "Finished cal 1st FOM. Time: ", toc()
-    write(print_to_file, *) " "
-    write(print_to_screen, '(a,f12.4)') "Finished cal 1st FOM. Time: ", toc()
+  call init_time_correlation(c%n_time_evals, size(my_ps%str%atoms) &
+    , c%r_max, c%bin_length) 
+  
 
-    
-    ! print FOM to xml file
-    
-    call xml_NewElement(xf, "accept")
-    call add_xml_attribute_func_params(xf, common_pe_list)
-    call xml_AddAttribute(xf, "val", str(fom_val, format="(f10.5)"))
-    call xml_EndElement(xf, "accept")    
+  ! cal 1st FOM and print 1st G_d
+  
+  call cal_full_time_correlation(my_ps, c)   
+  call print_g_d(c%temperature, density, c%n_delta_t*c%time_step) 
+  fom_val = time_correlation_fom()
+  call clear_time_correlation(c%n_time_evals)    
+  
+  write(print_to_file,'(a,f12.4)') "1st FOM = ", fom_val
+  write(print_to_file, '(a,f12.4)') "Finished cal 1st FOM. Time: ", toc()
+  write(print_to_file, *) " "
+  write(print_to_screen, '(a,f12.4)') "Finished cal 1st FOM. Time: ", toc()
+
+  
+  ! print FOM to xml file
+  
+  call xml_NewElement(xf, "accept")
+  call add_xml_attribute_func_params(xf, common_pe_list)
+  call xml_AddAttribute(xf, "val", str(fom_val, format="(f10.5)"))
+  call xml_EndElement(xf, "accept")    
 
 
-    ! store best solution so far
-    
-    fom_best = fom_val
-    call backup_best_func_params(common_pe_list)
-    call shallow_copy_phasespace(my_ps, my_ps_best)      
+  ! store best solution so far
+  
+  fom_best = fom_val
+  call backup_best_func_params(common_pe_list)
+  call shallow_copy_phasespace(my_ps, my_ps_best)      
  
  ! -------- finished calculating first FOM -------------------------- !
 
