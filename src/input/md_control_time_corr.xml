@@ -11,7 +11,7 @@
        Notice the density of liquid Ar at P=1atm and T=85K is 
        rho = 1.41g/cm^3 = 0.02125 atoms/AA3        
        -->
-  <structure what-init-structure-to-build="simple-cubic">
+  <structure what-init-structure-to-build="fcc">
     <title>Liquid Ar</title>
     <density units="atom/AA3" val="0.020265" />
     <number-of-unit-cells nx="6" ny ="6" nz="6" />
@@ -47,8 +47,8 @@
   
   <gpe>
     <lj-potential>
-      <sigma units="AA" val="3.2677"             fixed="no" min="1.0" max="6.0" max-move="0.1" />
-      <epsilon units="KJ/mole" val="20.0"  fixed="no" min="0.2" max="5.0" max-move="0.1" />
+      <sigma units="AA" val="3.405"             fixed="no" min="1.0" max="6.0" max-move="0.1" />
+      <epsilon units="KJ/mole" val="0.9960172"  fixed="no" min="0.2" max="5.0" max-move="0.1" />
 
       <!-- Ag values are: sigma units="AA" val="3.405"
                           epsilon units="KJ/mole" val="0.9960172"
@@ -77,7 +77,7 @@
     <total-steps-initial-equilibration number="50000" average-over="1000" />
     <perform-initial-temperature-calibration>
       <total-step-temp-cali number="20000" />
-      <adjust-temp-at-interval number="200" />
+      <adjust-temp-at-interval number="2000" />
     </perform-initial-temperature-calibration>
     
     

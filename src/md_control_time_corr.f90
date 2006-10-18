@@ -20,6 +20,9 @@ use time_correlation_class
   
   ! this function needs to be moved somewhere else at some point
   private :: cal_full_time_correlation
+  
+  character(len=31), parameter, private :: md_prefix = "output/movie/md_time_corr_movie"  
+  integer, private :: filename_number = 1  ! so first saved rdf file will be called rdf1.xml
 
 contains
 
@@ -96,7 +99,10 @@ contains
     my_rdf = make_rdf(product(a_config%str%box_edges), size(a_config%str%atoms), &
                        floor(c%r_max/c%bin_length), c%bin_length)                    
                                                
-                                               
+    
+    ! save raw structure
+    
+    call save_structure(my_ps%str, "output/movie/raw_structure.xml")                                           
                         
                
 ! -------------- initial equilibration ---------------- !
@@ -228,11 +234,36 @@ contains
   subroutine cal_full_time_correlation(ps, c)
     type (phasespace), intent(inout) :: ps
     type (mdmc_control_container), intent(in) :: c
+
+    character(len=80) :: filename
     
     ! here keep on calling do_time_correlation until enough buffers have 
     ! been calculated
     
     do while (do_time_correlation(ps%str, c%n_delta_t*c%time_step) == .false.)
+    
+      if (filename_number < 500) then
+      
+        filename = ""
+        if (filename_number < 10) then
+          write(filename, '(i1)') filename_number
+        else if (filename_number < 100) then
+          write(filename, '(i2)') filename_number
+        else if (filename_number < 1000) then
+          write(filename, '(i3)') filename_number
+        else
+          write(*,*) "ERROR: in cal_full_time_correlation"
+          stop
+        end if
+        
+        filename = md_prefix // trim(filename) // ".xml"
+        filename_number = filename_number + 1
+    
+        call save_structure(ps%str, filename)
+      
+      end if
+    
+    
       call trajectory_in_phasespace(ps, common_pe_list, c%n_delta_t, c%time_step)
     end do
      

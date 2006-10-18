@@ -32,7 +32,7 @@ implicit none
   
   
   character(len=10), parameter, private :: rdf_filename_prefix = "output/rdf"  
-  integer, private :: filname_number = 1  ! so first saved rdf file will be called rdf1.xml
+  integer, private :: filename_number = 1  ! so first saved rdf file will be called rdf1.xml
 
 contains
 
@@ -100,12 +100,12 @@ contains
     integer :: i, n_bin
     character(len=50) :: filename
     
-    if (filname_number < 10) then
-      write(filename, '(i1)') filname_number
-    else if (filname_number < 100) then
-      write(filename, '(i2)') filname_number
-    else if (filname_number < 1000) then
-      write(filename, '(i3)') filname_number
+    if (filename_number < 10) then
+      write(filename, '(i1)') filename_number
+    else if (filename_number < 100) then
+      write(filename, '(i2)') filename_number
+    else if (filename_number < 1000) then
+      write(filename, '(i3)') filename_number
     else
       write(*,*) "ERROR: in save_rdf"
       write(*,*) "It is assumed that you did not intend to write"
@@ -113,7 +113,7 @@ contains
       stop
     end if
     
-    filname_number = filname_number + 1
+    filename_number = filename_number + 1
     
     filename = rdf_filename_prefix // trim(filename) // ".xml"
     
