@@ -17,13 +17,13 @@ else:
 # caused by an issue with forcing scons to put .mod file in a certain 
 # directory......
 env_lib = env.Copy()
-#SConscript('xmlf90-1.2/sax/SConscript', exports='env_lib')
-#SConscript('xmlf90-1.2/xpath/SConscript', exports='env_lib')
-#SConscript('xmlf90-1.2/wxml/SConscript', exports='env_lib')
+SConscript('xmlf90-1.2/sax/SConscript', exports='env_lib')
+SConscript('xmlf90-1.2/xpath/SConscript', exports='env_lib')
+SConscript('xmlf90-1.2/wxml/SConscript', exports='env_lib')
 
 # building executable
 env_exe = env.Copy()
-SConscript('SConscript', exports='env_exe')
+#SConscript('SConscript', exports='env_exe')
 
 
 
