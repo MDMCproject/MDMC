@@ -41,8 +41,15 @@ contains
     type (phasespace) :: my_ps, my_ps_old
     type (md_properties) :: my_props
     real(db) :: pressure_comp = 0.0, pot_energy = 0.0
-    type (rdf) :: my_rdf
-    type (histogram) :: my_histogram
+    
+    
+    ! For printing out calculated rdf. Notice that the binning of 
+    ! the rdf_printout_histogram is controlled by sub XML elements 
+    ! of <control-object> and independent of the binning of any data
+    
+    type (rdf) :: rdf_printout
+    type (histogram) :: rdf_printout_histogram 
+
 	
     integer :: print_to_file = 555
     integer :: print_to_screen = 0
@@ -86,10 +93,11 @@ contains
     my_ps_best = copy_phasespace(my_ps)
                         
                         
-    ! to print out g(r) to file (otherwise neither my_histogram nor my_rdf are needed)
+    ! to print out g(r) to file (notice this printing out is not part
+    ! of the MDMC algorithm and may be removed later)
     
-    my_histogram = make_histogram(c%r_max, c%bin_length)
-    my_rdf = make_rdf(product(a_config%str%box_edges), size(a_config%str%atoms), &
+    rdf_printout_histogram = make_histogram(c%r_max, c%bin_length)
+    rdf_printout = make_rdf(product(a_config%str%box_edges), size(a_config%str%atoms), &
                        floor(c%r_max/c%bin_length), c%bin_length)                    
                                                
                                                
@@ -198,7 +206,7 @@ contains
       
       ! to print out rdf
       
-      call accum_histogram(my_histogram, my_ps%str)
+      call accum_histogram(rdf_printout_histogram, my_ps%str)
       
     end do 
     
@@ -219,11 +227,11 @@ contains
 
     ! to print out rdf 
       
-    call cal_rdf(my_rdf, my_histogram)
+    call cal_rdf(rdf_printout, rdf_printout_histogram)
             
     density = size(my_ps%str%atoms) / product(my_ps%str%box_edges)
-    call save_rdf(my_rdf, c%temperature, density)
-    call clear_histogram(my_histogram)
+    call save_rdf(rdf_printout, c%temperature, density)
+    call clear_histogram(rdf_printout_histogram)
 
 
     ! store best solution so far
@@ -337,7 +345,7 @@ contains
         
         ! to print out rdf
         
-        !if (i == c%mc_steps) call accum_histogram(my_histogram, my_ps%str)
+        !if (i == c%mc_steps) call accum_histogram(rdf_printout_histogram, my_ps%str)
         
       end do 
       
@@ -427,7 +435,7 @@ contains
         
       ! to print out rdf
         
-      call accum_histogram(my_histogram, my_ps%str)
+      call accum_histogram(rdf_printout_histogram, my_ps%str)
         
     end do 
       
@@ -439,11 +447,11 @@ contains
     write(print_to_file, '(a,f12.4)') "Finished cal FOM. Time: ", toc()
     write(print_to_file, *) " "
       
-    call cal_rdf(my_rdf, my_histogram)
+    call cal_rdf(rdf_printout, rdf_printout_histogram)
             
     density = size(my_ps%str%atoms) / product(my_ps%str%box_edges)
-    call save_rdf(my_rdf, c%temperature, density)
-    call clear_histogram(my_histogram)
+    call save_rdf(rdf_printout, c%temperature, density)
+    call clear_histogram(rdf_printout_histogram)
     
     end do   
                       

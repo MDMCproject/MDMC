@@ -25,9 +25,27 @@ implicit none
 
 
   type buffer
+    ! time_count = 0,1,2,...,N-1, where N equals the XML 
+    ! element <n-time-evals> 
+    
     integer :: time_count
+ 
+ 
+    ! org_r holds the atomic coordinates at time_count=0 and
+    ! act_r at any later time. 
+    ! Both have dimension n_atoms x ndim
+    
     real(db), dimension(:,:), allocatable :: org_r, act_r
+    
+    
+    ! sum of square differences between org_r and act_r for
+    ! all the atoms. This array has dimension <n-time-evals>
+    
     real(db), dimension(:), allocatable :: sum_square_diffs
+   
+    
+    ! histograms for g_s and g_d for various values of time_count.
+    ! These arrayes have dimension <n-time-evals>
     
     type (histogram_cutdown), dimension(:), allocatable :: g_s_hists
     type (histogram_cutdown), dimension(:), allocatable :: g_d_hists
@@ -75,7 +93,7 @@ implicit none
 
 contains
 
-  function time_correlation_fom() result(val)
+  function g_d_fom_val() result(val)
     real(db) :: val
     
     integer :: i, i_bin
@@ -97,7 +115,7 @@ contains
     
     g_prefac = g_prefac * n_buffer_average_over  
   
-  end function time_correlation_fom
+  end function g_d_fom_val
 
 
   subroutine set_n_time_buffers(n)

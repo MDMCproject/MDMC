@@ -43,8 +43,14 @@ contains
     type (phasespace) :: my_ps
     type (md_properties) :: my_props
     real(db) :: pressure_comp = 0.0, pot_energy = 0.0
-    type (rdf) :: my_rdf
-    type (histogram) :: my_histogram
+    
+    
+    ! For printing out calculated rdf. Notice that the binning of 
+    ! the rdf_printout_histogram is controlled by sub XML elements 
+    ! of <control-object> and independent of the binning of any data
+    
+    type (rdf) :: rdf_printout
+    type (histogram) :: rdf_printout_histogram 
     
     
     !**************** Setup what to perform a gridsearch over **************! 
@@ -72,11 +78,11 @@ contains
     my_ps = make_phasespace(a_config%str, c%temperature)
                         
     
-    ! to print out g(r) to file (otherwise neither my_histogram nor my_rdf needed)
+    ! to print out g(r) to file 
     
-    my_histogram = make_histogram(c%r_max, c%bin_length)
+    rdf_printout_histogram = make_histogram(c%r_max, c%bin_length)
                         
-    my_rdf = make_rdf(product(a_config%str%box_edges), size(a_config%str%atoms), &
+    rdf_printout = make_rdf(product(a_config%str%box_edges), size(a_config%str%atoms), &
                        floor(c%r_max/c%bin_length), c%bin_length)                    
                                                
                         
@@ -227,7 +233,7 @@ contains
         
         ! to print out rdf
         
-        call accum_histogram(my_histogram, my_ps%str)
+        call accum_histogram(rdf_printout_histogram, my_ps%str)
         
       end do 
       
@@ -239,11 +245,11 @@ contains
       
       ! print out rdf
       
-      call cal_rdf(my_rdf, my_histogram)
+      call cal_rdf(rdf_printout, rdf_printout_histogram)
             
       density = size(my_ps%str%atoms) / product(my_ps%str%box_edges)
-      call save_rdf(my_rdf, c%temperature, density)
-      call clear_histogram(my_histogram)
+      call save_rdf(rdf_printout, c%temperature, density)
+      call clear_histogram(rdf_printout_histogram)
       
       call func_clear_histogram(my_ps%str, common_fom_list)
           

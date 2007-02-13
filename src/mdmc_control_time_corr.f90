@@ -45,8 +45,7 @@ contains
     type (phasespace) :: my_ps, my_ps_old
     type (md_properties) :: my_props
     real(db) :: pressure_comp = 0.0, pot_energy = 0.0
-    type (rdf) :: my_rdf
-    type (histogram) :: my_histogram
+
 	
     integer :: print_to_file = 555
     integer :: print_to_screen = 0
@@ -88,17 +87,8 @@ contains
     
     my_ps_best = copy_phasespace(my_ps)
                         
-                        
-    ! to print out g(r) to file (otherwise neither my_histogram nor my_rdf needed)
-    
-    my_histogram = make_histogram(c%r_max, c%bin_length)
-                        
-    my_rdf = make_rdf(product(a_config%str%box_edges), size(a_config%str%atoms), &
-                       floor(c%r_max/c%bin_length), c%bin_length)                    
-                                               
-                                               
-                        
-               
+                 
+                                         
 ! -------------- initial equilibration ---------------- !
 
     sum_kin_energy = 0.0
@@ -206,7 +196,7 @@ contains
   
   call cal_full_time_correlation(my_ps, c)   
   call print_g_d(c%temperature, density, c%n_delta_t*c%time_step) 
-  fom_val = time_correlation_fom()
+  fom_val = g_d_fom_val()
   call clear_time_correlation(c%n_time_evals)    
   
   write(print_to_file,'(a,f12.4)') "1st FOM = ", fom_val
@@ -325,7 +315,7 @@ contains
       ! cal FOM
     
       call cal_full_time_correlation(my_ps, c)   
-      fom_val = time_correlation_fom()
+      fom_val = g_d_fom_val()
     !call print_g_d(c%temperature, density, c%n_delta_t*c%time_step)       
       call clear_time_correlation(c%n_time_evals) 
 
@@ -402,7 +392,7 @@ contains
     call shallow_copy_phasespace(my_ps_best, my_ps)  
         
     call cal_full_time_correlation(my_ps, c)   
-    fom_val = time_correlation_fom()
+    fom_val = g_d_fom_val()
     call print_g_d(c%temperature, density, c%n_delta_t*c%time_step)    
     call clear_time_correlation(c%n_time_evals) 
       

@@ -19,17 +19,18 @@ implicit none
   type histogram
     real(db) :: bin_length   
     
+    ! used when calculating a single histogram
     integer, dimension(:), allocatable :: val
     
-    ! used when using accum_histogram
+    ! used when using accumulating histograms
     integer, dimension(:), allocatable :: sum 
-    
-    ! you may want to add a number of histograms before e.g.
-    ! calculating a rdf
-    !
-    ! Notice if n_accum = 0 the array sum is assumed to be equal to an
-    ! array of zeros
     integer :: n_accum  
+    
+    ! Notice in the current design %val and %sum are not
+    ! in sync. 
+    
+    ! ....
+    
   end type histogram
 
 contains
@@ -61,6 +62,7 @@ contains
   subroutine clear_histogram(hist)
     type (histogram), intent(inout) :: hist  
   
+    hist%val = 0
     hist%n_accum = 0
     hist%sum = 0
   
@@ -73,24 +75,24 @@ contains
     
     
     hist%bin_length = bin_length 
-    !hist%r_max = r_max
     
     allocate(hist%val(floor(r_max/bin_length)))
     allocate(hist%sum(floor(r_max/bin_length)))
     
     ! initialise
     
-    !hist%val = 0
+    hist%val = 0
     hist%sum = 0
     hist%n_accum = 0
   
   end function make_histogram
   
+  
   function copy_histogram(hist_in) result(hist_out)
     type (histogram), intent(in) :: hist_in
     type (histogram) :: hist_out
     
-    integer :: n_bin
+    integer :: n_bin 
     
     n_bin = size(hist_in%val)
     
@@ -100,14 +102,19 @@ contains
       stop
     end if
     
-    !hist_out%r_max = hist_in%r_max
     hist_out%bin_length = hist_in%bin_length
     
     allocate(hist_out%val(n_bin))
+    allocate(hist_out%sum(n_bin))
+    
     hist_out%val = hist_in%val
+    hist_out%sum = hist_in%sum
+    hist_out%n_accum = hist_in%n_accum
   
   end function copy_histogram  
   
+  
+  ! Populate the histogram%val array (but doesn't alter %sum and %n_accum)
   
   subroutine cal_histogram(hist, str)
     type (histogram), intent(inout) :: hist
