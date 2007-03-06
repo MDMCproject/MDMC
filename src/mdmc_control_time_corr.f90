@@ -195,7 +195,7 @@ contains
   ! cal 1st FOM and print 1st G_d
   
   call cal_full_time_correlation(my_ps, c)   
-  call print_g_d(c%temperature, density, c%n_delta_t*c%time_step) 
+  call print_g_d(c%temperature, product(my_ps%str%box_edges), size(my_ps%str%atoms), c%n_delta_t*c%time_step) 
   fom_val = g_d_fom_val()
   call clear_time_correlation(c%n_time_evals)    
   
@@ -393,7 +393,7 @@ contains
         
     call cal_full_time_correlation(my_ps, c)   
     fom_val = g_d_fom_val()
-    call print_g_d(c%temperature, density, c%n_delta_t*c%time_step)    
+    call print_g_d(c%temperature, product(my_ps%str%box_edges), size(my_ps%str%atoms), c%n_delta_t*c%time_step)    
     call clear_time_correlation(c%n_time_evals) 
       
     write(print_to_file,'(a,f12.4)') "BEST FOM = ", fom_val

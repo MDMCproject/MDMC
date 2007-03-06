@@ -36,6 +36,13 @@ implicit none
 
 contains
 
+  ! this function 
+  
+  subroutine binning_conversion()
+  
+  end subroutine binning_conversion
+
+
   function make_rdf(volume, n_atoms, n_bins, bin_length) result(a_rdf)
     real(db), intent(in) :: volume, bin_length
     integer, intent(in) :: n_atoms, n_bins
@@ -57,8 +64,11 @@ contains
     
     allocate(a_rdf%prefac(n_bins))
     
+    
+    ! 4*pi*r^2*dr = 4*pi*(n-1/2)^2*dr^3 is the volume of spherical shell
+    ! with width dr and center position dr*(n-1/2).
 
-    temp = volume / (2.0 * pi_value * (n_atoms**2) * bin_length**3 )
+    temp = volume / (4.0 * pi_value * (n_atoms**2) * bin_length**3 )
     
     do i = 1, n_bins
       r_i = i - 0.5_db

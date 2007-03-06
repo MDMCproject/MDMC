@@ -5,7 +5,7 @@ use structure_nn_methods_class
 
 implicit none
 
-  !public :: apply_boundary_condition_one_atom  (moved to structure_type_definition because used in
+  !public :: apply_boundary_condition_to_vector  (moved to structure_type_definition because used in
   !                                              structure_nn_methods)
   public :: apply_boundary_condition
   public :: copy_structure, shallow_copy_structure
@@ -27,7 +27,7 @@ contains
     
     do i_a = 1, size(str%atoms)
       
-      call apply_boundary_condition_one_atom(str%r(i_a,:), str%box_edges)
+      call apply_boundary_condition_to_vector(str%r(i_a,:), str%box_edges)
       
       
       ! check that atoms have not moved further than one box length!!

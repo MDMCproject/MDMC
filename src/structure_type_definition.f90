@@ -4,7 +4,7 @@ use various_constants_class
 implicit none
 
   ! moved here because used in structure_nn_methods 
-  public :: apply_boundary_condition_one_atom
+  public :: apply_boundary_condition_to_vector
 
 
   ! the below is the fastest and most compressed collection of single link
@@ -95,7 +95,12 @@ implicit none
   
 contains
 
-  subroutine apply_boundary_condition_one_atom(vec, box_edges)
+
+  ! fast way of applying boundary conditions. However, only valid 
+  ! when atoms haven't moved further than box_edges outside the
+  ! center box.
+
+  subroutine apply_boundary_condition_to_vector(vec, box_edges)
     real (db), dimension(ndim), intent(inout) :: vec
     real (db), dimension(ndim), intent(in) :: box_edges
     
@@ -110,6 +115,31 @@ contains
       end if       
     end do
     
-  end subroutine apply_boundary_condition_one_atom  
+  end subroutine apply_boundary_condition_to_vector  
+  
+  
+  ! correct version of apply_boundary_condition_to_vector(). From a simply
+  ! test it seems that in fact this 'expension' version is only a little
+  ! slower than apply_boundary_condition_to_vector(). Thus, in the future
+  ! perhaps on use this one!?
+  
+  subroutine apply_boundary_condition_to_vector_expensive(vec, box_edges)
+    real (db), dimension(ndim), intent(inout) :: vec
+    real (db), dimension(ndim), intent(in) :: box_edges
+    
+    integer :: i
+    
+    ! below correspond to mod(vec+edge/2, edge) - edge/2
+    
+    do i = 1, ndim
+      if (vec(i) >= 0.5 * box_edges(i)) then
+        vec(i) = vec(i) - floor(vec(i)/box_edges(i)+0.5)*box_edges(i)
+      end if
+      if (vec(i) < -0.5 * box_edges(i)) then
+        vec(i) = vec(i) + floor(-vec(i)/box_edges(i)+0.5)*box_edges(i)
+      end if       
+    end do
+    
+  end subroutine apply_boundary_condition_to_vector_expensive    
   
 end module structure_type_definition_class

@@ -14,7 +14,7 @@
        -->
   <structure what-init-structure-to-build="fcc">
     <title>Liquid Ar</title>
-    <density units="atom/AA3" val="0.02125" />
+    <density units="atom/AA3" val="0.020265" />
     <number-of-unit-cells nx="6" ny ="6" nz="6" />
   </structure>
   
@@ -45,8 +45,8 @@
   
   <gpe>
     <lj-potential>
-      <sigma units="AA" val="4.0" />
-      <epsilon units="KJ/mole" val="1.5" />
+      <sigma units="AA" val="3.405"  />
+      <epsilon units="KJ/mole" val="0.9960172" />
       
       <!-- you can argue whether r-cut here is a property of this potentially,
            but for now you can optionally specify an r-cut value here, which
@@ -63,7 +63,7 @@
     <time-step units="10e-13s" val="0.1075" />
     
     
-    <step-limit number="1" />
+    <step-limit number="6000" />
     
     <!-- when calculating MD properties average over this 
          many steps
@@ -84,10 +84,10 @@
          that value. 
          -->
     <calculate-rdf>
-      <r-max units="AA" val="20.0" />
-      <bin-length units="AA" val="0.05" /> 
+      <r-max units="AA" val="50.0" />
+      <bin-length units="AA" val="0.1" /> 
       <cal-rdf-at-interval number="50" />
-      <average-over-this-many-rdf number="1" />
+      <average-over-this-many-rdf number="5" />
     </calculate-rdf> 
 
         

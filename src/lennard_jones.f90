@@ -115,7 +115,7 @@ contains
         do i2 = i1+1, n_tot
           diff_vec = str%r(i1,:) - str%r(i2,:)
           
-          call apply_boundary_condition_one_atom(diff_vec, str%box_edges)
+          call apply_boundary_condition_to_vector(diff_vec, str%box_edges)
           
           rr = sum(diff_vec*diff_vec)
           
@@ -156,7 +156,7 @@ contains
         
         diff_vec = str%r(i1,:) - str%r(i2,:)
           
-        call apply_boundary_condition_one_atom(diff_vec, str%box_edges)
+        call apply_boundary_condition_to_vector(diff_vec, str%box_edges)
         
         rr = str%nn_list%dists(j)
           
@@ -227,7 +227,7 @@ contains
       do i2 = i1+1, n_tot
         diff_vec = str%r(i1,:) - str%r(i2,:)
         
-        call apply_boundary_condition_one_atom(diff_vec, str%box_edges)
+        call apply_boundary_condition_to_vector(diff_vec, str%box_edges)
         
         rr = sum(diff_vec*diff_vec)
         

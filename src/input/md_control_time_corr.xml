@@ -74,10 +74,10 @@
          element specifies how many steps to average over when calculating
          MD properties 
          -->
-    <total-steps-initial-equilibration number="50000" average-over="1000" />
+    <total-steps-initial-equilibration number="8000" average-over="1000" />
     <perform-initial-temperature-calibration>
-      <total-step-temp-cali number="20000" />
-      <adjust-temp-at-interval number="2000" />
+      <total-step-temp-cali number="4000" />
+      <adjust-temp-at-interval number="1000" />
     </perform-initial-temperature-calibration>
     
     
@@ -87,7 +87,7 @@
            -->
       <n-time-buffers number="10" />
       <n-time-evals number="250" />
-      <n-buffer-average-over number="200" />
+      <n-buffer-average-over number="5" />
       <n-delta-t number="4" />
     </time-correlation>
     

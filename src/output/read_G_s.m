@@ -1,4 +1,4 @@
-function read_g_s(filename)
+function read_G_s(filename)
 
 s = xmlread(filename);
 
@@ -40,8 +40,18 @@ for j = 1 : n_time
   time_index = time_index + 1;
 end
 
+
+subplot(2,1,1)
 surf(r, t, G_s')
 xlabel('r [AA]')
 ylabel('t [10\^-13 s]')
 zlabel('G\_s (r,t)')
 title(char(top_element.item(0).getAttribute('title')))
+subplot(2,1,2)
+t_lower_cut = floor(length(t)/5)*4;
+t_new = t(t_lower_cut:end);
+G_s_new = G_s(:,t_lower_cut:end);
+surf(r, t_new, G_s_new')
+xlabel('r [AA]')
+ylabel('t [10\^-13 s]')
+zlabel('G\_s (r,t)')

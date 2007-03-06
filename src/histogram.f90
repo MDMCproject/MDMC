@@ -144,20 +144,14 @@ contains
         do i2 = i1+1, n_tot
           diff_vec = str%r(i1,:) - str%r(i2,:)
           
-          do i = 1, ndim
-            if (diff_vec(i) >= 0.5_db * str%box_edges(i)) then
-              diff_vec(i) = diff_vec(i) - str%box_edges(i)
-            end if
-            if (diff_vec(i) < -0.5_db * str%box_edges(i)) then
-              diff_vec(i) = diff_vec(i) + str%box_edges(i)
-            end if       
-          end do
+          call apply_boundary_condition_to_vector_expensive(diff_vec, str%box_edges)
+          
           
           rr = sum(diff_vec*diff_vec)
           
           if (rr < rr_max) then
             which_bin = ceiling(sqrt(rr)/hist%bin_length) 
-            hist%val(which_bin) = hist%val(which_bin) + 1
+            hist%val(which_bin) = hist%val(which_bin) + 2 ! two to count both i1<i2 and i1>i2
           end if
   			
         end do
@@ -178,7 +172,7 @@ contains
         rr = str%nn_list%dists(i) 
         if (rr < rr_max) then
           which_bin = ceiling(sqrt(rr)/hist%bin_length) 
-          hist%val(which_bin) = hist%val(which_bin) + 1
+          hist%val(which_bin) = hist%val(which_bin) + 2 ! two to count both i1<i2 and i1>i2
         end if
       end do
 

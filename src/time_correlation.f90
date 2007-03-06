@@ -25,7 +25,8 @@ implicit none
 
 
   type buffer
-    ! time_count = 0,1,2,...,N-1, where N equals the XML 
+    ! time_count may be negative, but buffers are only calculated
+    ! for time_count values: 0,1,2,...,N-1, where N equals the XML 
     ! element <n-time-evals> 
     
     integer :: time_count
@@ -266,7 +267,7 @@ contains
     call xml_EndElement(xf, "this-file-was-created")
     
     
-    g_prefac = g_prefac / n_buffer_average_over
+    g_prefac = g_prefac / (n_buffer_average_over*density)
 
     do i = 1, n_eval_times    
       do i_bin = 1, n_bin
@@ -278,7 +279,7 @@ contains
       end do 
     end do
     
-    g_prefac = g_prefac * n_buffer_average_over
+    g_prefac = g_prefac * (n_buffer_average_over*density)
     
     call xml_EndElement(xf, "G_s-space-time-pair-correlation-function")
     
@@ -289,14 +290,18 @@ contains
 
   ! The temperature is required to passed in dimensional units here.
 
-  subroutine print_g_d(temperature, density, time_step)
+  subroutine print_g_d(temperature, volume, n_atom, time_step)
     use flib_wxml
-    real(db), optional, intent(in) :: temperature, density, time_step
+    real(db), optional, intent(in) :: temperature, volume, time_step
+    integer, optional, intent(in) :: n_atom
     
     type (xmlf_t) :: xf
     integer :: i, n_eval_times, n_bin, i_bin
     real(db) :: bin_length
     character(len=50) :: filename
+    real(db) :: density
+    
+    density = n_atom / volume
     
     if (filname_number3 < 10) then
       write(filename, '(i1)') filname_number3
@@ -328,15 +333,15 @@ contains
     call xml_NewElement(xf, "G_d-space-time-pair-correlation-function")
     
     ! notice convert units of temperature from dimensionless to K  
-    if (present(temperature) .and. present(density)) then
+    if (present(temperature) .and. present(volume) .and. present(n_atom)) then
       call xml_AddAttribute(xf, "title", "T = " // trim(str(temperature * T_unit, format="(f10.5)")) // &
-                                         " K: rho = " // trim(str(density, format="(f10.5)")) &
+                                         " K: rho = " // trim(str(volume, format="(f10.5)")) &
                                          // " atoms/AA-3")
     else if (present(temperature)) then 
       call xml_AddAttribute(xf, "title", "T = " // str(temperature, format="(f10.5)") // &
                                          "K")
-    else  if (present(density)) then 
-      call xml_AddAttribute(xf, "title", "rho = " // str(density, format="(f10.5)") &
+    else  if (present(volume) .and. present(n_atom)) then 
+      call xml_AddAttribute(xf, "title", "rho = " // str(volume, format="(f10.5)") &
                                          // "atoms/AA-3")
     end if
     
@@ -351,7 +356,7 @@ contains
     call xml_EndElement(xf, "this-file-was-created")
     
     
-    g_prefac = g_prefac / n_buffer_average_over
+    g_prefac = g_prefac / (n_buffer_average_over*density*(n_atom-1))
 
     do i = 1, n_eval_times    
       do i_bin = 1, n_bin
@@ -363,7 +368,7 @@ contains
       end do 
     end do
     
-    g_prefac = g_prefac * n_buffer_average_over
+    g_prefac = g_prefac * (n_buffer_average_over*density*(n_atom-1))
     
     call xml_EndElement(xf, "G_d-space-time-pair-correlation-function")
     
@@ -425,7 +430,7 @@ contains
         ! calculate g_d(r,t=0) = g(r)
         
         call cal_g_d_histogram(bufs(i_buf)%g_d_hists(tc+1), & 
-          bufs(i_buf)%org_r, bufs(i_buf)%act_r )
+          bufs(i_buf)%org_r, bufs(i_buf)%act_r, str%box_edges)
                    
       elseif (tc > 0) then   
       
@@ -437,12 +442,12 @@ contains
         ! calculate g_s(r,t) and the sum of square differences
         
         bufs(i_buf)%sum_square_diffs(tc+1) = cal_g_s_histogram( & 
-          bufs(i_buf)%g_s_hists(tc+1), bufs(i_buf)%org_r, bufs(i_buf)%act_r )
+          bufs(i_buf)%g_s_hists(tc+1), bufs(i_buf)%org_r, bufs(i_buf)%act_r, str%box_edges)
         
         
         ! calculate g_d(r,t)
           
-        call cal_g_d_histogram(bufs(i_buf)%g_d_hists(tc+1), bufs(i_buf)%org_r, bufs(i_buf)%act_r )  
+        call cal_g_d_histogram(bufs(i_buf)%g_d_hists(tc+1), bufs(i_buf)%org_r, bufs(i_buf)%act_r, str%box_edges)  
       end if
       
       
@@ -552,13 +557,15 @@ contains
     
     allocate(g_prefac(n_bin))
     
-    temp = 1.0 / ( 4.0 * pi_value * n_atoms * bin_length**3 )
+    temp = 1.0 / ( 4.0 * pi_value * bin_length**3 )
     
     do i = 1, n_bin
       r_i = i - 0.5
       g_prefac(i) = temp / (r_i**2)
+      
+      !write (*,*) i, g_prefac(i)
     end do    
-    
+    !stop
     
     call clear_time_correlation(n_time_evals)
     
@@ -595,9 +602,10 @@ contains
   end function make_histogram_cutdown
   
 
-  function cal_g_s_histogram(g_s_hist, org_r, act_r) result(rr_sum)
+  function cal_g_s_histogram(g_s_hist, org_r, act_r, box_edges) result(rr_sum)
     type (histogram_cutdown), intent(inout) :: g_s_hist
     real(db), dimension(:,:), intent(in) :: org_r, act_r
+    real (db), dimension(ndim), intent(in) :: box_edges    
     real(db) :: rr_sum
   
     real(db) :: rr_max, r_max
@@ -618,7 +626,13 @@ contains
   
     do i1 = 1, n_tot
       diff_vec = act_r(i1,:) - org_r(i1,:)
+ 
+      ! The command below does not actually seem to make that much difference
+      ! to the execution speed 
+          
+      call apply_boundary_condition_to_vector_expensive(diff_vec, box_edges)
       
+                
       rr = sum(diff_vec*diff_vec)
       
       if (rr < rr_max) then
@@ -633,9 +647,10 @@ contains
   end function cal_g_s_histogram
     
 
-  subroutine cal_g_d_histogram(g_d_hist, org_r, act_r)
+  subroutine cal_g_d_histogram(g_d_hist, org_r, act_r, box_edges)
     type (histogram_cutdown), intent(inout) :: g_d_hist
     real(db), dimension(:,:), intent(in) :: org_r, act_r
+    real (db), dimension(ndim), intent(in) :: box_edges
     real(db) :: rr_sum
   
     real(db) :: rr_max, r_max
@@ -658,6 +673,12 @@ contains
       do i2 = 1, n_tot
         if (i1 /= i2) then
           diff_vec = act_r(i1,:) - org_r(i2,:)
+      
+          ! The command below does not actually seem to make that much difference
+          ! to the execution speed 
+          
+          call apply_boundary_condition_to_vector_expensive(diff_vec, box_edges)
+          
       
           rr = sum(diff_vec*diff_vec)
       
