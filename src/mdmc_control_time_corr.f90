@@ -10,6 +10,7 @@ use rdf_class
 use structure_reader_class
 use func_params_wrapper_class
 use time_correlation_class
+use time_corr_hist_container_class
 
   implicit none
 
@@ -19,7 +20,7 @@ use time_correlation_class
   private :: acceptable_energy  
   
   ! this function needs to be moved somewhere else at some point
-  private :: cal_full_time_correlation
+!  private :: cal_full_time_correlation
 
 contains
 
@@ -46,6 +47,7 @@ contains
     type (md_properties) :: my_props
     real(db) :: pressure_comp = 0.0, pot_energy = 0.0
 
+    type(time_corr_hist_container) :: my_time_corr_container
 	
     integer :: print_to_file = 555
     integer :: print_to_screen = 0
@@ -185,19 +187,19 @@ contains
 
   density = size(my_ps%str%atoms) / product(my_ps%str%box_edges) ! for printing
 
-  call set_n_buffer_average_over(c%n_buffer_average_over)
-  call set_n_time_buffers(c%n_time_buffers)
+!  call set_n_buffer_average_over(c%n_buffer_average_over)
+!  call set_n_time_buffers(c%n_time_buffers)
 
-  call init_time_correlation(c%n_time_evals, size(my_ps%str%atoms) &
-    , c%r_max, c%bin_length) 
+!  call init_time_correlation(c%n_time_evals, size(my_ps%str%atoms) &
+!    , c%r_max, c%bin_length) 
   
 
   ! cal 1st FOM and print 1st G_d
   
-  call cal_full_time_correlation(my_ps, c)   
-  call print_g_d(c%temperature, product(my_ps%str%box_edges), size(my_ps%str%atoms), c%n_delta_t*c%time_step) 
+  call cal_time_corr_container(my_time_corr_container, my_ps, common_pe_list, c%n_delta_t, c%time_step)   
+  call print_g_d(my_time_corr_container, product(my_ps%str%box_edges), size(my_ps%str%atoms), c%temperature) 
   fom_val = g_d_fom_val()
-  call clear_time_correlation(c%n_time_evals)    
+  !call clear_time_correlation(c%n_time_evals)    
   
   write(print_to_file,'(a,f12.4)') "1st FOM = ", fom_val
   write(print_to_file, '(a,f12.4)') "Finished cal 1st FOM. Time: ", toc()
@@ -314,10 +316,10 @@ contains
 
       ! cal FOM
     
-      call cal_full_time_correlation(my_ps, c)   
+      call cal_time_corr_container(my_time_corr_container, my_ps, common_pe_list, c%n_delta_t, c%time_step)   
       fom_val = g_d_fom_val()
     !call print_g_d(c%temperature, density, c%n_delta_t*c%time_step)       
-      call clear_time_correlation(c%n_time_evals) 
+      !call clear_time_correlation(c%n_time_evals) 
 
       write(print_to_file,'(a,f12.4)') "FOM = ", fom_val
       write(print_to_file, '(a,f12.4)') "Finished cal FOM. Time: ", toc()
@@ -391,10 +393,10 @@ contains
     call restore_best_func_params(common_pe_list)
     call shallow_copy_phasespace(my_ps_best, my_ps)  
         
-    call cal_full_time_correlation(my_ps, c)   
+    call cal_time_corr_container(my_time_corr_container, my_ps, common_pe_list, c%n_delta_t, c%time_step)   
     fom_val = g_d_fom_val()
-    call print_g_d(c%temperature, product(my_ps%str%box_edges), size(my_ps%str%atoms), c%n_delta_t*c%time_step)    
-    call clear_time_correlation(c%n_time_evals) 
+    call print_g_d(my_time_corr_container, product(my_ps%str%box_edges), size(my_ps%str%atoms), c%temperature)   
+    !call clear_time_correlation(c%n_time_evals) 
       
     write(print_to_file,'(a,f12.4)') "BEST FOM = ", fom_val
     write(print_to_file,'(a)') "WITH: "
@@ -417,18 +419,18 @@ contains
   
   
   ! this subroutine needs to be moved somewhere else at some point
-  subroutine cal_full_time_correlation(ps, c)
-    type (phasespace), intent(inout) :: ps
-    type (mdmc_control_container), intent(in) :: c
+  !subroutine cal_full_time_correlation(ps, c)
+  !  type (phasespace), intent(inout) :: ps
+  !  type (mdmc_control_container), intent(in) :: c
     
     ! here keep on calling do_time_correlation until enough buffers have 
     ! been calculated
     
-    do while (do_time_correlation(ps%str, c%n_delta_t*c%time_step) == .false.)
-      call trajectory_in_phasespace(ps, common_pe_list, c%n_delta_t, c%time_step)
-    end do
+  !  do while (do_time_correlation(ps%str, c%n_delta_t*c%time_step) == .false.)
+  !    call trajectory_in_phasespace(ps, common_pe_list, c%n_delta_t, c%time_step)
+  !  end do
      
-  end subroutine cal_full_time_correlation
+  !end subroutine cal_full_time_correlation
   
   
   ! check to see if temperature is within certain limits of t_target

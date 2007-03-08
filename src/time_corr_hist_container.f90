@@ -2,6 +2,7 @@ module time_corr_hist_container_class
 use various_constants_class
 use structure_class
 use histogram_cutdown_class
+use tic_toc_class
 
 implicit none
 
@@ -9,9 +10,20 @@ implicit none
   public :: clear_time_corr_hist_container
   public :: make_time_corr_hist_container 
 
+  public :: print_g_d, print_g_s, print_einstein_diffuse_exp
+  
+  public :: check_if_time_corr_hist_container_is_allocated
+  
+  public :: get_time_corr_hist_r_max, get_time_corr_hist_bin_length, &
+            get_time_corr_hist_n_time_evals
+            
 
   type time_corr_hist_container
     integer :: n_accum
+
+    real(db) :: time_step  ! otherwise time-binning not fully defined.
+                           ! time between different cals of g_s and g_d etc.
+                           !(r-binning stuff is in histogram_cutdown) 
 
     ! dimensions are n_bin x n_time
     type (histogram_cutdown), dimension(:), allocatable :: g_s_hists_sum
@@ -37,17 +49,26 @@ implicit none
 
 contains
 
-  subroutine clear_time_corr_hist_container(container)
-    type(time_corr_hist_container), intent(inout) :: container
-    
-    integer :: i
-    
+  subroutine check_if_time_corr_hist_container_is_allocated(container)
+    type(time_corr_hist_container), intent(in) :: container
+  
     if (allocated(container%einstein_diffuse_exp) == .false.) then
       write(*,*) " "
       write(*,*) "ERROR in time_corr_hist_container.f90"
       write(*,*) "Forgot to allocate time_corr_hist_container"
       stop
-    end if
+    end if  
+  end subroutine check_if_time_corr_hist_container_is_allocated
+
+
+
+
+  subroutine clear_time_corr_hist_container(container)
+    type(time_corr_hist_container), intent(inout) :: container
+    
+    integer :: i
+    
+    call check_if_time_corr_hist_container_is_allocated(container)
      
     container%n_accum = 0
     container%einstein_diffuse_exp = 0.0
@@ -59,6 +80,8 @@ contains
     
   end subroutine clear_time_corr_hist_container
   
+  
+  ! notice delta_time here is the time between to time calculations of g_d, g_s etc.
 
   function make_time_corr_hist_container(r_max, bin_length, n_time_evals, delta_time) result(container)
     real(db), intent(in) :: r_max, bin_length, delta_time
@@ -69,6 +92,8 @@ contains
     real(db) :: temp, r_i
     
     container%n_accum = 0
+    
+    container%time_step = delta_time 
     
     allocate(container%einstein_diffuse_exp(n_time_evals))
     
@@ -94,6 +119,44 @@ contains
     end do    
     
   end function make_time_corr_hist_container
+
+
+  function get_time_corr_hist_n_time_evals(container) result(n_time_evals)
+    type(time_corr_hist_container), intent(inout) :: container
+    integer :: n_time_evals
+      
+     call check_if_time_corr_hist_container_is_allocated(container) 
+     
+     n_time_evals = size(container%einstein_diffuse_exp)
+  end function get_time_corr_hist_n_time_evals
+  
+  
+  function get_time_corr_hist_bin_length(container) result(bin_length)
+    type(time_corr_hist_container), intent(inout) :: container
+    real(db) :: bin_length  
+    
+    call check_if_time_corr_hist_container_is_allocated(container)     
+    
+    bin_length = container%g_s_hists_sum(1)%bin_length
+  
+  end function get_time_corr_hist_bin_length
+
+
+  function get_time_corr_hist_r_max(container) result(r_max)
+    type(time_corr_hist_container), intent(inout) :: container
+    real(db) :: r_max  
+    
+    integer n_bin
+    real(db) :: bin_length
+    
+    call check_if_time_corr_hist_container_is_allocated(container)     
+    
+    bin_length = container%g_s_hists_sum(1)%bin_length
+    n_bin = size(container%g_s_hists_sum(1)%val)
+    
+    r_max = bin_length * n_bin
+  
+  end function get_time_corr_hist_r_max
 
 
  ! The temperature is required to passed in dimensional units here.
@@ -126,7 +189,7 @@ contains
     
     write(*,'(3a)') "Write ", trim(filename), " to disk"
     
-    n_eval_times = size(einstein_diffuse_exp)    
+    n_eval_times = size(container%einstein_diffuse_exp)    
     
     call xml_OpenFile(filename, xf, indent=.true.)
     
@@ -156,8 +219,8 @@ contains
     
     do i = 1, n_eval_times
       call xml_NewElement(xf, "D-of-t")
-      call xml_AddAttribute(xf, "t", str((i-1)*time_step, format="(f10.5)"))
-      call xml_AddAttribute(xf, "D", str(einstein_diffuse_exp(i), format="(f10.5)"))
+      call xml_AddAttribute(xf, "t", str((i-1)*container%time_step, format="(f10.5)"))
+      call xml_AddAttribute(xf, "D", str(container%einstein_diffuse_exp(i), format="(f10.5)"))
       call xml_EndElement(xf, "D-of-t")
     end do 
     
@@ -170,9 +233,11 @@ contains
 
   ! The temperature is required to passed in dimensional units here.
 
-  subroutine print_g_s(temperature, density, time_step)
+  subroutine print_g_s(container, density, temperature)
     use flib_wxml
-    real(db), optional, intent(in) :: temperature, density, time_step
+    type(time_corr_hist_container), intent(inout) :: container  ! inout because volume_prefac modified
+    real(db), intent(in) :: density    
+    real(db), optional, intent(in) :: temperature
     
     type (xmlf_t) :: xf
     integer :: i, n_eval_times, n_bin, i_bin
@@ -199,9 +264,9 @@ contains
     write(*,'(3a)') "Write ", trim(filename), " to disk"
     
     
-    n_eval_times = size(einstein_diffuse_exp)    
-    n_bin = size(g_s_hists_sum(1)%val)
-    bin_length = g_s_hists_sum(1)%bin_length
+    n_eval_times = size(container%einstein_diffuse_exp)    
+    n_bin = size(container%g_s_hists_sum(1)%val)
+    bin_length = container%g_s_hists_sum(1)%bin_length
     
     call xml_OpenFile(filename, xf, indent=.true.)
     
@@ -209,14 +274,11 @@ contains
     call xml_NewElement(xf, "G_s-space-time-pair-correlation-function")
     
     ! notice convert units of temperature from dimensionless to K  
-    if (present(temperature) .and. present(density)) then
+    if (present(temperature)) then
       call xml_AddAttribute(xf, "title", "T = " // trim(str(temperature * T_unit, format="(f10.5)")) // &
                                          " K: rho = " // trim(str(density, format="(f10.5)")) &
                                          // " atoms/AA-3")
-    else if (present(temperature)) then 
-      call xml_AddAttribute(xf, "title", "T = " // str(temperature, format="(f10.5)") // &
-                                         "K")
-    else  if (present(density)) then 
+    else 
       call xml_AddAttribute(xf, "title", "rho = " // str(density, format="(f10.5)") &
                                          // "atoms/AA-3")
     end if
@@ -232,19 +294,20 @@ contains
     call xml_EndElement(xf, "this-file-was-created")
     
     
-    g_prefac = g_prefac / (n_buffer_average_over*density)
+    container%volume_prefac = container%volume_prefac / (container%n_accum*density)
 
     do i = 1, n_eval_times    
       do i_bin = 1, n_bin
         call xml_NewElement(xf, "G-s")
         call xml_AddAttribute(xf, "r", str((i_bin-0.5)*bin_length, format="(f10.5)"))
-        call xml_AddAttribute(xf, "t", str((i-1)*time_step, format="(f10.5)"))
-        call xml_AddAttribute(xf, "G", str(g_s_hists_sum(i)%val(i_bin)*g_prefac(i_bin), format="(f15.5)"))
+        call xml_AddAttribute(xf, "t", str((i-1)*container%time_step, format="(f10.5)"))
+        call xml_AddAttribute(xf, "G", str(container%g_s_hists_sum(i)%val(i_bin) * &
+                              container%volume_prefac(i_bin), format="(f15.5)"))
         call xml_EndElement(xf, "G-s")
       end do 
     end do
     
-    g_prefac = g_prefac * (n_buffer_average_over*density)
+    container%volume_prefac = container%volume_prefac * (container%n_accum*density)
     
     call xml_EndElement(xf, "G_s-space-time-pair-correlation-function")
     
@@ -255,9 +318,11 @@ contains
 
   ! The temperature is required to passed in dimensional units here.
 
-  subroutine print_g_d(temperature, volume, n_atom, time_step)
+  subroutine print_g_d(container, volume, n_atom, temperature)
     use flib_wxml
-    real(db), optional, intent(in) :: temperature, volume, time_step
+    type(time_corr_hist_container), intent(inout) :: container  ! inout because volume_prefac modified  
+    real(db), intent(in) :: volume 
+    real(db), optional, intent(in) :: temperature
     integer, optional, intent(in) :: n_atom
     
     type (xmlf_t) :: xf
@@ -288,9 +353,9 @@ contains
     write(*,'(3a)') "Write ", trim(filename), " to disk"
     
     
-    n_eval_times = size(einstein_diffuse_exp)    
-    n_bin = size(g_s_hists_sum(1)%val)
-    bin_length = g_s_hists_sum(1)%bin_length
+    n_eval_times = size(container%einstein_diffuse_exp)    
+    n_bin = size(container%g_s_hists_sum(1)%val)
+    bin_length = container%g_s_hists_sum(1)%bin_length
     
     call xml_OpenFile(filename, xf, indent=.true.)
     
@@ -298,15 +363,12 @@ contains
     call xml_NewElement(xf, "G_d-space-time-pair-correlation-function")
     
     ! notice convert units of temperature from dimensionless to K  
-    if (present(temperature) .and. present(volume) .and. present(n_atom)) then
+    if (present(temperature)) then
       call xml_AddAttribute(xf, "title", "T = " // trim(str(temperature * T_unit, format="(f10.5)")) // &
-                                         " K: rho = " // trim(str(volume, format="(f10.5)")) &
+                                         " K: rho = " // trim(str(density, format="(f10.5)")) &
                                          // " atoms/AA-3")
-    else if (present(temperature)) then 
-      call xml_AddAttribute(xf, "title", "T = " // str(temperature, format="(f10.5)") // &
-                                         "K")
-    else  if (present(volume) .and. present(n_atom)) then 
-      call xml_AddAttribute(xf, "title", "rho = " // str(volume, format="(f10.5)") &
+    else 
+      call xml_AddAttribute(xf, "title", "rho = " // str(density, format="(f10.5)") &
                                          // "atoms/AA-3")
     end if
     
@@ -321,19 +383,20 @@ contains
     call xml_EndElement(xf, "this-file-was-created")
     
     
-    g_prefac = g_prefac / (n_buffer_average_over*density*(n_atom-1))
+    container%volume_prefac = container%volume_prefac / (container%n_accum*density*(n_atom-1))
 
     do i = 1, n_eval_times    
       do i_bin = 1, n_bin
         call xml_NewElement(xf, "G-d")
         call xml_AddAttribute(xf, "r", str((i_bin-0.5)*bin_length, format="(f10.5)"))
-        call xml_AddAttribute(xf, "t", str((i-1)*time_step, format="(f10.5)"))
-        call xml_AddAttribute(xf, "G", str(g_d_hists_sum(i)%val(i_bin)*g_prefac(i_bin), format="(f15.5)"))
+        call xml_AddAttribute(xf, "t", str((i-1)*container%time_step, format="(f10.5)"))
+        call xml_AddAttribute(xf, "G", str(container%g_d_hists_sum(i)%val(i_bin) * &
+                                           container%volume_prefac(i_bin), format="(f15.5)"))
         call xml_EndElement(xf, "G-d")
       end do 
     end do
     
-    g_prefac = g_prefac * (n_buffer_average_over*density*(n_atom-1))
+    container%volume_prefac = container%volume_prefac * (container%n_accum*density*(n_atom-1))
     
     call xml_EndElement(xf, "G_d-space-time-pair-correlation-function")
     

@@ -1,4 +1,4 @@
-module time_correlation_class
+module time_corr_algorithm_class
 use various_constants_class         
 use structure_class
 use tic_toc_class
@@ -370,4 +370,4 @@ contains
 
 
     
-end module time_correlation_class
+end module time_corr_algorithm_class

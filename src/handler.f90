@@ -9,6 +9,7 @@ use md_control_time_corr_class
 use structure_reader_class
 use control_containers_class
 use converters_class
+use time_correlation_class
 
   implicit none
   
@@ -299,7 +300,10 @@ contains
           
         case("n-time-buffers")       
           call get_value(attributes,"number",read_int,status)
-          setup_mdmc_control_params%n_time_buffers = string_to_int(read_int)    
+          setup_mdmc_control_params%n_time_buffers = string_to_int(read_int) ! used only in this file
+          
+          ! set this parameter directly
+          call set_n_time_buffers(string_to_int(read_int))                    
            
         case("n-time-evals")       
           call get_value(attributes,"number",read_int,status)
@@ -307,7 +311,10 @@ contains
           
         case("n-buffer-average-over")       
           call get_value(attributes,"number",read_int,status)
-          setup_mdmc_control_params%n_buffer_average_over = string_to_int(read_int)
+          setup_mdmc_control_params%n_buffer_average_over = string_to_int(read_int) ! used only in this file
+          
+          ! set this parameter directly
+          call set_n_buffer_average_over(string_to_int(read_int))
           
         case("n-delta-t")       
           call get_value(attributes,"number",read_int,status)

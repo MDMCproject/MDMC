@@ -10,6 +10,7 @@ use rdf_class
 use structure_reader_class
 use func_params_wrapper_class
 use time_correlation_class
+use time_corr_hist_container_class
 
   implicit none
 
@@ -19,7 +20,7 @@ use time_correlation_class
   private :: acceptable_energy  
   
   ! this function needs to be moved somewhere else at some point
-  private :: cal_full_time_correlation
+!  private :: cal_full_time_correlation
   
   character(len=31), parameter, private :: md_prefix = "output/movie/md_time_corr_movie"  
   integer, private :: filename_number = 1  ! so first saved rdf file will be called rdf1.xml
@@ -49,6 +50,7 @@ contains
     type (md_properties) :: my_props
     real(db) :: pressure_comp = 0.0, pot_energy = 0.0
 
+    type(time_corr_hist_container) :: my_time_corr_container
 	
     integer :: print_to_file = 555
     integer :: print_to_screen = 0
@@ -90,6 +92,14 @@ contains
     
     my_ps_best = copy_phasespace(my_ps)
                                                                    
+    
+    ! initiate time correlation histogram container
+    
+    my_time_corr_container = make_time_corr_hist_container(c%r_max, c%bin_length, c%n_time_evals, &
+                             c%n_delta_t * c%time_step)
+    call clear_time_corr_hist_container(my_time_corr_container)                         
+    
+    
     
     ! save raw structure
     
@@ -191,18 +201,18 @@ contains
 
   density = size(my_ps%str%atoms) / product(my_ps%str%box_edges) ! for printing
 
-  call set_n_buffer_average_over(c%n_buffer_average_over)
-  call set_n_time_buffers(c%n_time_buffers)
+!  call set_n_buffer_average_over(c%n_buffer_average_over)
+!  call set_n_time_buffers(c%n_time_buffers)
 
-  call init_time_correlation(c%n_time_evals, size(my_ps%str%atoms) &
-      , c%r_max, c%bin_length) 
+!  call init_time_correlation(c%n_time_evals, size(my_ps%str%atoms) &
+!      , c%r_max, c%bin_length) 
     
 
-  call cal_full_time_correlation(my_ps, c)   
-  call print_g_d(c%temperature, product(my_ps%str%box_edges), size(my_ps%str%atoms), c%n_delta_t*c%time_step)
-  call print_g_s(c%temperature, density, c%n_delta_t*c%time_step)
-  call print_einstein_diffuse_exp(c%temperature, density, c%n_delta_t*c%time_step)
-  call clear_time_correlation(c%n_time_evals)
+  call cal_time_corr_container(my_time_corr_container, my_ps, common_pe_list, c%n_delta_t, c%time_step)   
+  call print_g_d(my_time_corr_container, product(my_ps%str%box_edges), size(my_ps%str%atoms), c%temperature)
+  call print_g_s(my_time_corr_container, density, c%temperature)
+  call print_einstein_diffuse_exp(my_time_corr_container, density, c%temperature)
+!  call clear_time_correlation(c%n_time_evals)
 
  
  ! -------- end time correlation -------------------------- !
@@ -225,46 +235,6 @@ contains
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   !!!!!!!!!!!!!!!  private functions/subroutines !!!!!!!!!!!!!!
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-  
-  ! this subroutine needs to be moved somewhere else at some point
-  subroutine cal_full_time_correlation(ps, c)
-    type (phasespace), intent(inout) :: ps
-    type (mdmc_control_container), intent(in) :: c
-
-    character(len=80) :: filename
-    
-    ! here keep on calling do_time_correlation until enough buffers have 
-    ! been calculated
-    
-    do while (do_time_correlation(ps%str, c%n_delta_t*c%time_step) == .false.)
-    
-! TO PRINT OUT FOR MOVIE - UNCOMMENT STUFF BELOW    
-!      if (filename_number < 500) then
-!      
-!        filename = ""
-!        if (filename_number < 10) then
-!          write(filename, '(i1)') filename_number
-!        else if (filename_number < 100) then
-!          write(filename, '(i2)') filename_number
-!        else if (filename_number < 1000) then
-!          write(filename, '(i3)') filename_number
-!        else
-!          write(*,*) "ERROR: in cal_full_time_correlation"
-!          stop
-!        end if
-!        
-!        filename = md_prefix // trim(filename) // ".xml"
-!        filename_number = filename_number + 1
-!    
-!        call save_structure(ps%str, filename)
-!      
-!      end if
-    
-    
-      call trajectory_in_phasespace(ps, common_pe_list, c%n_delta_t, c%time_step)
-    end do
-     
-  end subroutine cal_full_time_correlation
   
   
   ! check to see if temperature is within certain limits of t_target

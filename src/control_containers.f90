@@ -61,6 +61,7 @@ implicit none
     integer :: n_buffer_average_over ! number of buffers to average over to improve stats
     integer :: n_delta_t       ! n_delta_t * n_time_evals = total number of MD the corr is run for
     
+    ! (perhaps uncomment n_time_buffers and n_buffer_average_over later since only used in handler for check)
     
     real(db) :: g_d_data_time_step = 0.0 ! VERY BAD WHAT I AM DOING HERE
     
