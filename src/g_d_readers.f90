@@ -1,14 +1,25 @@
+! Please read Umbrello for how this code perhaps should be 
+! changed in the future
+
 module g_d_readers_class
 use common_block_class
 use various_constants_class
 use converters_class
 use control_containers_class
-use time_correlation_class
+use time_corr_algorithm_class
 
   implicit none
   
   private :: begin_element, end_element, pcdata_chunk
   private :: start_document, end_document                               
+
+
+  ! Temporary container for reading in G_d 'dataset'. 
+  ! Please read Umbrello documentation for how this be perhaps 
+  ! changed in the future (notice have left some commented out
+  ! code for g_d_fom_val() in time_corr_algorithm.f90
+  
+  real(db), dimension(:,:), allocatable :: g_d_data
 
 
 contains

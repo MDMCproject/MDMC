@@ -9,7 +9,7 @@ use tic_toc_class
 use rdf_class
 use structure_reader_class
 use func_params_wrapper_class
-use time_correlation_class
+use time_corr_algorithm_class
 use time_corr_hist_container_class
 
   implicit none

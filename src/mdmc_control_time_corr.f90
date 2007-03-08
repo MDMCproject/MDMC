@@ -9,7 +9,7 @@ use tic_toc_class
 use rdf_class
 use structure_reader_class
 use func_params_wrapper_class
-use time_correlation_class
+use time_corr_algorithm_class
 use time_corr_hist_container_class
 
   implicit none
@@ -198,7 +198,7 @@ contains
   
   call cal_time_corr_container(my_time_corr_container, my_ps, common_pe_list, c%n_delta_t, c%time_step)   
   call print_g_d(my_time_corr_container, product(my_ps%str%box_edges), size(my_ps%str%atoms), c%temperature) 
-  fom_val = g_d_fom_val()
+!  fom_val = g_d_fom_val()
   !call clear_time_correlation(c%n_time_evals)    
   
   write(print_to_file,'(a,f12.4)') "1st FOM = ", fom_val
@@ -317,7 +317,7 @@ contains
       ! cal FOM
     
       call cal_time_corr_container(my_time_corr_container, my_ps, common_pe_list, c%n_delta_t, c%time_step)   
-      fom_val = g_d_fom_val()
+      !fom_val = g_d_fom_val()
     !call print_g_d(c%temperature, density, c%n_delta_t*c%time_step)       
       !call clear_time_correlation(c%n_time_evals) 
 
@@ -394,7 +394,7 @@ contains
     call shallow_copy_phasespace(my_ps_best, my_ps)  
         
     call cal_time_corr_container(my_time_corr_container, my_ps, common_pe_list, c%n_delta_t, c%time_step)   
-    fom_val = g_d_fom_val()
+    !fom_val = g_d_fom_val()
     call print_g_d(my_time_corr_container, product(my_ps%str%box_edges), size(my_ps%str%atoms), c%temperature)   
     !call clear_time_correlation(c%n_time_evals) 
       

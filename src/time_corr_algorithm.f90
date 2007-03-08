@@ -16,8 +16,6 @@ implicit none
   private :: do_time_correlation
 
 
-
-
   type buffer
     ! time_count may be negative, but buffers are only calculated
     ! for time_count values: 0,1,2,...,N-1, where N equals the XML 
@@ -53,28 +51,8 @@ implicit none
 
   type (buffer), dimension(:), allocatable, private :: bufs  
     
-  real(db), dimension(:), allocatable, private :: einstein_diffuse_exp
-  
-  
-  ! g_s_hists_sum used to hold the sum of histograms and g_s_pair_func to hold
-  ! the G_s(r,t) space-time pair correlation function. g_s_pair_func has dimensions
-  ! n_bin x n_time_evals. g_prefac is to convert from histogram values to g values.
-  
-  type (histogram_cutdown), dimension(:), allocatable, private :: g_s_hists_sum
-  type (histogram_cutdown), dimension(:), allocatable, private :: g_d_hists_sum
-  !real(db), dimension(:,:,:), allocatable, private :: g_s_pair_func
-  real(db), dimension(:), allocatable, private :: g_prefac 
-  
-  
-  ! Temporary container for reading in G_d dataset from file
-  
-  real(db), dimension(:,:), allocatable :: g_d_data
-    
     
   integer, private :: num_buffs_cal_thus_far
-
-
-
 
   integer, private :: n_buffer_average_over
   integer, private :: n_time_buffers
@@ -141,31 +119,7 @@ contains
     end do
      
   end subroutine cal_time_corr_container
-  
-  
-  function g_d_fom_val() result(val)
-    real(db) :: val
-    
-    integer :: i, i_bin
-    
-    integer n_eval_times, n_bin
-    
-    n_eval_times = size(g_d_data, 2)
-    n_bin = size(g_d_data, 1)
-  
-    val = 0.0
-    
-    g_prefac = g_prefac / n_buffer_average_over
 
-    do i = 1, n_eval_times    
-      do i_bin = 20, n_bin
-         val = val + (g_d_data(i_bin, i) - g_d_hists_sum(i)%val(i_bin)*g_prefac(i_bin))**2
-      end do 
-    end do
-    
-    g_prefac = g_prefac * n_buffer_average_over  
-  
-  end function g_d_fom_val
 
 
   subroutine set_n_time_buffers(n)
@@ -174,14 +128,14 @@ contains
     n_time_buffers = n
   end subroutine set_n_time_buffers
 
+
+
   subroutine set_n_buffer_average_over(n)
     integer, intent(in) :: n
     
     n_buffer_average_over = n
   end subroutine set_n_buffer_average_over
 
-
- 
   
   
   ! update act_r to str%r but without wrap-around
@@ -323,6 +277,7 @@ contains
     job_done = .false.
     
   end function do_time_correlation
+
   
 
   subroutine allocate_buffer(n_time_evals, n_atoms, r_max, bin_length)
@@ -353,6 +308,7 @@ contains
     
   end subroutine allocate_buffer
    
+
   
   subroutine reset_buffer(n_time_evals)
     integer, intent(in) :: n_time_evals
@@ -369,5 +325,28 @@ contains
   
 
 
+!  function g_d_fom_val() result(val)
+!    real(db) :: val
+!    
+!    integer :: i, i_bin
+!    
+!    integer n_eval_times, n_bin
+!    
+!    n_eval_times = size(g_d_data, 2)
+!    n_bin = size(g_d_data, 1)
+!  
+!    val = 0.0
+!    
+!    g_prefac = g_prefac / n_buffer_average_over
+!
+!    do i = 1, n_eval_times    
+!      do i_bin = 20, n_bin
+!         val = val + (g_d_data(i_bin, i) - g_d_hists_sum(i)%val(i_bin)*g_prefac(i_bin))**2
+!      end do 
+!    end do
+!    
+!    g_prefac = g_prefac * n_buffer_average_over  
+!  
+!  end function g_d_fom_val
     
 end module time_corr_algorithm_class

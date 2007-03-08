@@ -9,7 +9,7 @@ use md_control_time_corr_class
 use structure_reader_class
 use control_containers_class
 use converters_class
-use time_correlation_class
+use time_corr_algorithm_class
 
   implicit none
   
