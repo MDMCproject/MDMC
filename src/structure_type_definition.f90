@@ -5,6 +5,7 @@ implicit none
 
   ! moved here because used in structure_nn_methods 
   public :: apply_boundary_condition_to_vector
+  public :: apply_boundary_condition_to_vector_expensive
 
 
   ! the below is the fastest and most compressed collection of single link
