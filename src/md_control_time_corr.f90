@@ -11,6 +11,7 @@ use structure_reader_class
 use func_params_wrapper_class
 use time_corr_algorithm_class
 use time_corr_hist_container_class
+use s_q_time_class
 
   implicit none
 
@@ -51,6 +52,10 @@ contains
     real(db) :: pressure_comp = 0.0, pot_energy = 0.0
 
     type(time_corr_hist_container) :: my_time_corr_container
+    
+    type (s_q_time) :: my_s_q_time
+    
+    real(db), dimension(41) :: q_values = (/ (0.2+0.2*float(i), i = 0, 40) /)	
 	
     integer :: print_to_file = 555
     integer :: print_to_screen = 0
@@ -99,6 +104,10 @@ contains
                              c%n_delta_t * c%time_step)
     call clear_time_corr_hist_container(my_time_corr_container)                         
     
+    
+    ! to cal and print out s_q_time
+    
+    my_s_q_time = make_s_q_time(q_values, c%n_delta_t * c%time_step, c%n_time_evals)
     
     
     ! save raw structure
@@ -212,8 +221,12 @@ contains
   call print_g_d(my_time_corr_container, product(my_ps%str%box_edges), size(my_ps%str%atoms), c%temperature)
   call print_g_s(my_time_corr_container, density, c%temperature)
   call print_einstein_diffuse_exp(my_time_corr_container, density, c%temperature)
-!  call clear_time_correlation(c%n_time_evals)
 
+  call cal_s_q_time(my_time_corr_container, my_ps%str, my_s_q_time)
+  call print_s_q_time(my_s_q_time, density, c%temperature)
+  
+  call print_h_s_hist(my_time_corr_container, density, c%temperature)  ! for debugging
+  call print_h_d_hist(my_time_corr_container, density, c%temperature)  ! for debugging
  
  ! -------- end time correlation -------------------------- !
 

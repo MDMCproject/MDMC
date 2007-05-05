@@ -11,11 +11,27 @@ implicit none
   public :: copy_structure, shallow_copy_structure
   public :: save_structure
   public :: swap_atoms
+  
+  public :: get_n_atom
+  public :: get_density
 
 contains
 
+  function get_n_atom(str) result (n_atom)
+    type (structure), intent(in) :: str
+    integer :: n_atom
+    
+    n_atom = size(str%atoms)
+  end function get_n_atom
 
-  
+
+  function get_density(str) result (density)
+    type (structure), intent(in) :: str
+    real(db) :: density
+    
+    density = size(str%atoms) / product(str%box_edges)  
+  end function get_density
+    
 
   ! apply periodic boundary conditions, however assume here that atoms have
   ! not moved out more that box_edge length away from the region

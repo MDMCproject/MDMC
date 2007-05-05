@@ -65,6 +65,9 @@ contains
     allocate(a_rdf%prefac(n_bins))
     
     
+    ! notice less accurate method of calculating volume elements is used
+    ! see my notes page 19aa
+    
     ! 4*pi*r^2*dr = 4*pi*(n-1/2)^2*dr^3 is the volume of spherical shell
     ! with width dr and center position dr*(n-1/2).
 
