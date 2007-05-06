@@ -43,6 +43,18 @@ implicit none
   
 contains
 
+  function get_s_q_time_n_time(container) result(n_time)
+    type(s_q_time), intent(in) :: container
+    integer :: n_time 
+    
+    call check_if_s_q_time_allocated(container)     
+
+    n_time = size(container%self, 2)
+  
+  end function get_s_q_time_n_time 
+
+
+
   subroutine cal_s_q_time(g_r_t, str, s_q_t)
     type(time_corr_hist_container), intent(in) :: g_r_t
     type(structure), intent(in) :: str

@@ -12,6 +12,7 @@ use func_params_wrapper_class
 use time_corr_algorithm_class
 use time_corr_hist_container_class
 use s_q_time_class
+use s_q_omega_class
 
   implicit none
 
@@ -54,8 +55,10 @@ contains
     type(time_corr_hist_container) :: my_time_corr_container
     
     type (s_q_time) :: my_s_q_time
+    type (s_q_omega) :: my_s_q_omega
     
     real(db), dimension(41) :: q_values = (/ (0.2+0.2*float(i), i = 0, 40) /)	
+    real(db), dimension(21) :: omega_values = (/ (0.05+0.05*float(i), i = 0, 20) /)	
 	
     integer :: print_to_file = 555
     integer :: print_to_screen = 0
@@ -105,10 +108,10 @@ contains
     call clear_time_corr_hist_container(my_time_corr_container)                         
     
     
-    ! to cal and print out s_q_time
+    ! to cal and print out s_q_time and s_q_omega
     
     my_s_q_time = make_s_q_time(q_values, c%n_delta_t * c%time_step, c%n_time_evals)
-    
+    my_s_q_omega = make_s_q_omega(q_values, omega_values)
     
     ! save raw structure
     
@@ -225,8 +228,11 @@ contains
   call cal_s_q_time(my_time_corr_container, my_ps%str, my_s_q_time)
   call print_s_q_time(my_s_q_time, density, c%temperature)
   
-  call print_h_s_hist(my_time_corr_container, density, c%temperature)  ! for debugging
-  call print_h_d_hist(my_time_corr_container, density, c%temperature)  ! for debugging
+  call cal_s_q_omega(my_s_q_time, my_ps%str, my_s_q_omega)
+  call print_s_q_omega(my_s_q_omega, density, c%temperature)  
+  
+!  call print_h_s_hist(my_time_corr_container, density, c%temperature)  ! for debugging
+!  call print_h_d_hist(my_time_corr_container, density, c%temperature)  ! for debugging
  
  ! -------- end time correlation -------------------------- !
 
