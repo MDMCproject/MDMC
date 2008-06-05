@@ -31,6 +31,13 @@
 		<File RelativePath="input\mdmc_control_time_corr.xml"/>
 		<File RelativePath="input\test.xml"/></Filter>
 		<Filter Name="Source Files" Filter="f90;for;f;fpp;ftn;def;odl;idl">
+		<Filter Name="algorithms">
+		<File RelativePath=".\algorithms\mc_control.f90"/>
+		<File RelativePath=".\algorithms\md_control.f90"/>
+		<File RelativePath=".\algorithms\md_control_time_corr.f90"/>
+		<File RelativePath=".\algorithms\md_gridsearch_control.f90"/>
+		<File RelativePath=".\algorithms\mdmc_control.f90"/>
+		<File RelativePath=".\algorithms\mdmc_control_time_corr.f90"/></Filter>
 		<Filter Name="xmlf90">
 		<Filter Name="sax">
 		<File RelativePath="xmlf90-1.2\sax\flib_sax.f90"/>
@@ -72,14 +79,8 @@
 		<File RelativePath="histogram.f90"/>
 		<File RelativePath="histogram_cutdown.f90"/>
 		<File RelativePath="lennard_jones.f90"/>
-		<File RelativePath="mc_control.f90"/>
-		<File RelativePath="md_control.f90"/>
-		<File RelativePath="md_control_time_corr.f90"/>
-		<File RelativePath="md_gridsearch_control.f90"/>
 		<File RelativePath="md_properties.f90"/>
 		<File RelativePath="mdmc.f90"/>
-		<File RelativePath="mdmc_control.f90"/>
-		<File RelativePath="mdmc_control_time_corr.f90"/>
 		<File RelativePath="phasespace.f90"/>
 		<File RelativePath="rdf.f90"/>
 		<File RelativePath="rdf_fom.f90"/>
