@@ -21,11 +21,6 @@ use s_q_omega_class
   private :: acceptable_temperature
   private :: acceptable_energy  
   
-  ! this function needs to be moved somewhere else at some point
-!  private :: cal_full_time_correlation
-  
-  character(len=31), parameter, private :: md_prefix = "output/movie/md_time_corr_movie"  
-  integer, private :: filename_number = 1  ! so first saved rdf file will be called rdf1.xml
 
 contains
 
@@ -142,6 +137,8 @@ contains
       if (i < c%total_step_temp_cali) then
         sum_kin_energy = sum_kin_energy + my_props%kin_energy%val
         if (mod(i,c%adjust_temp_at_interval) == 0) then
+          ! see md_gridsearch_control.doc for explanation of the expression below
+          !        
           temp_adjust_factor = sqrt(c%adjust_temp_at_interval * 1.5 * c%temperature / &
               sum_kin_energy * (size(my_ps%str%atoms)-1.0) / size(my_ps%str%atoms))
           my_ps%p = my_ps%p * temp_adjust_factor
@@ -213,13 +210,6 @@ contains
 
   density = size(my_ps%str%atoms) / product(my_ps%str%box_edges) ! for printing
 
-!  call set_n_buffer_average_over(c%n_buffer_average_over)
-!  call set_n_time_buffers(c%n_time_buffers)
-
-!  call init_time_correlation(c%n_time_evals, size(my_ps%str%atoms) &
-!      , c%r_max, c%bin_length) 
-    
-
   call cal_time_corr_container(my_time_corr_container, my_ps, common_pe_list, c%n_delta_t, c%time_step)   
   call print_g_d(my_time_corr_container, product(my_ps%str%box_edges), size(my_ps%str%atoms), c%temperature)
   call print_g_s(my_time_corr_container, density, c%temperature)
@@ -230,9 +220,6 @@ contains
   
   call cal_s_q_omega(my_s_q_time, my_ps%str, my_s_q_omega)
   call print_s_q_omega(my_s_q_omega, density, c%temperature)  
-  
-!  call print_h_s_hist(my_time_corr_container, density, c%temperature)  ! for debugging
-!  call print_h_d_hist(my_time_corr_container, density, c%temperature)  ! for debugging
  
  ! -------- end time correlation -------------------------- !
 

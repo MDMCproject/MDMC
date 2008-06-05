@@ -19,8 +19,6 @@ use time_corr_hist_container_class
   private :: acceptable_temperature
   private :: acceptable_energy  
   
-  ! this function needs to be moved somewhere else at some point
-!  private :: cal_full_time_correlation
 
 contains
 
@@ -115,6 +113,8 @@ contains
       if (i < c%total_step_temp_cali) then
         sum_kin_energy = sum_kin_energy + my_props%kin_energy%val
         if (mod(i,c%adjust_temp_at_interval) == 0) then
+          ! see md_gridsearch_control.doc for explanation of the expression below
+          !        
           temp_adjust_factor = sqrt(c%adjust_temp_at_interval * 1.5 * c%temperature / &
               sum_kin_energy * (size(my_ps%str%atoms)-1.0) / size(my_ps%str%atoms))
           my_ps%p = my_ps%p * temp_adjust_factor
@@ -122,8 +122,7 @@ contains
         end if
       end if
      
-      
-
+     
       ! accumulate the calculated MD property values
         
       call md_accum_properties(my_props)
@@ -185,14 +184,7 @@ contains
  
  ! -------- calculate first FOM ------------------------- !
 
-  density = size(my_ps%str%atoms) / product(my_ps%str%box_edges) ! for printing
-
-!  call set_n_buffer_average_over(c%n_buffer_average_over)
-!  call set_n_time_buffers(c%n_time_buffers)
-
-!  call init_time_correlation(c%n_time_evals, size(my_ps%str%atoms) &
-!    , c%r_max, c%bin_length) 
-  
+  density = size(my_ps%str%atoms) / product(my_ps%str%box_edges) ! for printing 
 
   ! cal 1st FOM and print 1st G_d
   
@@ -416,21 +408,6 @@ contains
     call xml_Close(xf)
     
   end subroutine run_mdmc_control_time_corr
-  
-  
-  ! this subroutine needs to be moved somewhere else at some point
-  !subroutine cal_full_time_correlation(ps, c)
-  !  type (phasespace), intent(inout) :: ps
-  !  type (mdmc_control_container), intent(in) :: c
-    
-    ! here keep on calling do_time_correlation until enough buffers have 
-    ! been calculated
-    
-  !  do while (do_time_correlation(ps%str, c%n_delta_t*c%time_step) == .false.)
-  !    call trajectory_in_phasespace(ps, common_pe_list, c%n_delta_t, c%time_step)
-  !  end do
-     
-  !end subroutine cal_full_time_correlation
   
   
   ! check to see if temperature is within certain limits of t_target

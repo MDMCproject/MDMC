@@ -38,6 +38,9 @@
 		<File RelativePath=".\algorithms\md_gridsearch_control.f90"/>
 		<File RelativePath=".\algorithms\mdmc_control.f90"/>
 		<File RelativePath=".\algorithms\mdmc_control_time_corr.f90"/></Filter>
+		<Filter Name="functions">
+		<File RelativePath=".\functions\lennard_jones.f90"/>
+		<File RelativePath=".\functions\rdf_fom.f90"/></Filter>
 		<Filter Name="xmlf90">
 		<Filter Name="sax">
 		<File RelativePath="xmlf90-1.2\sax\flib_sax.f90"/>
@@ -78,12 +81,10 @@
 		<File RelativePath="handler_structure_part.f90"/>
 		<File RelativePath="histogram.f90"/>
 		<File RelativePath="histogram_cutdown.f90"/>
-		<File RelativePath="lennard_jones.f90"/>
 		<File RelativePath="md_properties.f90"/>
 		<File RelativePath="mdmc.f90"/>
 		<File RelativePath="phasespace.f90"/>
 		<File RelativePath="rdf.f90"/>
-		<File RelativePath="rdf_fom.f90"/>
 		<File RelativePath="s_q_omega.f90"/>
 		<File RelativePath="s_q_time.f90"/>
 		<File RelativePath="structure.f90"/>
