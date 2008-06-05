@@ -52,20 +52,18 @@ contains
     type (rdf) :: rdf_printout
     type (histogram) :: rdf_printout_histogram 
     
-    
-    !**************** Setup what to perform a gridsearch over **************! 
-   
-    real (db), dimension(6) :: sigma_search
-    !real (db) :: start_val = 2.2, step_val = 0.4, end_val = 4.6
-    !real (db) :: sigma
+    real (db), dimension(6) :: sigma_search  ! to hold what sigmas
+                                             ! loop over
 	
-    integer :: print_to_file = 222
+    integer :: print_to_file = 222  ! if set to zero then always
+                                    ! print to screen only
     integer :: print_to_screen = 0
 	  
 	  if (print_to_file /= 0) then
 	    open(print_to_file, file="output/job_summary.txt")
 	  end if
 	  		
+	  ! specify sigmas to loop over		
 	  sigma_search = (/ (2.2+0.4*float(i), i = 0, 5) /)				
 	  		
 	  		
@@ -114,21 +112,23 @@ contains
       !call md_cal_properties(my_ps, my_props, common_pe_list)
       call md_cal_properties(my_ps, my_props, common_pe_list, pressure_comp, pot_energy)
       
-      ! case you want to adject the temperature in the initial stages of the MD simulation
-      ! (notice c%total_step_temp_cali = 0 if <perform-initial-temperature-calibration> 
+      
+      ! Adjust the temperature in the initial stages of the MD simulation.
+      ! Note that c%total_step_temp_cali = 0 if <perform-initial-temperature-calibration> 
       ! element not specified in input file)
 
       if (i < c%total_step_temp_cali) then
         sum_kin_energy = sum_kin_energy + my_props%kin_energy%val
         if (mod(i,c%adjust_temp_at_interval) == 0) then
-          temp_adjust_factor = sqrt(c%adjust_temp_at_interval * 1.5 * c%temperature / &
-              sum_kin_energy * (size(my_ps%str%atoms)-1.0) / size(my_ps%str%atoms))
+          ! see md_gridsearch_control.doc for explanation of the expression below
+          !
+          temp_adjust_factor = sqrt( real(c%adjust_temp_at_interval,db) * 1.5 * c%temperature / &
+              sum_kin_energy * (size(my_ps%str%atoms)-1.0) / real(size(my_ps%str%atoms),db))
           my_ps%p = my_ps%p * temp_adjust_factor
           sum_kin_energy = 0.0
         end if
       end if
-     
-      
+   
 
       ! accumulate the calculated MD property values
         
@@ -253,7 +253,7 @@ contains
       
       call func_clear_histogram(my_ps%str, common_fom_list)
           
-    end do
+    end do ! end of sigma search
                              
  
    

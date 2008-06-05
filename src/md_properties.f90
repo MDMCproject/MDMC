@@ -19,7 +19,7 @@ implicit none
   end type property
 
   type md_properties
-    type (property) :: kin_energy
+    type (property) :: kin_energy  ! unit of energy is KJ per mol per atom
     type (property) :: tot_energy
     type (property) :: pressure
     
