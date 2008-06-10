@@ -41,6 +41,10 @@
 		<Filter Name="functions">
 		<File RelativePath=".\functions\lennard_jones.f90"/>
 		<File RelativePath=".\functions\rdf_fom.f90"/></Filter>
+		<Filter Name="readers">
+		<File RelativePath=".\readers\fnc_constraint_reader.f90"/>
+		<File RelativePath=".\readers\g_d_readers.f90"/>
+		<File RelativePath=".\readers\structure_reader.f90"/></Filter>
 		<Filter Name="xmlf90">
 		<Filter Name="sax">
 		<File RelativePath="xmlf90-1.2\sax\flib_sax.f90"/>
@@ -71,12 +75,10 @@
 		<File RelativePath="control_containers.f90"/>
 		<File RelativePath="converters.f90"/>
 		<File RelativePath="fnc_constraint.f90"/>
-		<File RelativePath="fnc_constraint_reader.f90"/>
 		<File RelativePath="fom_readers.f90"/>
 		<File RelativePath="func_param.f90"/>
 		<File RelativePath="func_params_wrapper.f90"/>
 		<File RelativePath="function.f90"/>
-		<File RelativePath="g_d_readers.f90"/>
 		<File RelativePath="handler.f90"/>
 		<File RelativePath="handler_structure_part.f90"/>
 		<File RelativePath="histogram.f90"/>
@@ -89,7 +91,6 @@
 		<File RelativePath="s_q_time.f90"/>
 		<File RelativePath="structure.f90"/>
 		<File RelativePath="structure_nn_methods.f90"/>
-		<File RelativePath="structure_reader.f90"/>
 		<File RelativePath="structure_type_definition.f90"/>
 		<File RelativePath="tic_toc.f90"/>
 		<File RelativePath="time_corr_algorithm.f90"/>
