@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<XMI xmlns:UML="http://schema.omg.org/spec/UML/1.3" verified="false" timestamp="2008-06-09T21:12:03" xmi.version="1.2" >
+<XMI xmlns:UML="http://schema.omg.org/spec/UML/1.3" verified="false" timestamp="2008-06-11T09:39:25" xmi.version="1.2" >
  <XMI.header>
   <XMI.documentation>
    <XMI.exporter>umbrello uml modeller http://uml.sf.net</XMI.exporter>
@@ -85,7 +85,7 @@
       </UML:Operation>
       <UML:Operation isSpecification="false" isLeaf="false" visibility="public" xmi.id="14854" isRoot="false" isAbstract="false" isQuery="false" name="copy_structure" >
        <UML:BehavioralFeature.parameter>
-        <UML:Parameter kind="return" xmi.id="72429" type="1882" />
+        <UML:Parameter kind="return" xmi.id="73455" type="1882" />
         <UML:Parameter isSpecification="false" visibility="private" xmi.id="14855" value="" type="1882" name="s_in" />
        </UML:BehavioralFeature.parameter>
       </UML:Operation>
@@ -108,7 +108,7 @@
      <UML:Classifier.feature>
       <UML:Operation isSpecification="false" isLeaf="false" visibility="protected" xmi.id="33" isRoot="false" isAbstract="false" isQuery="false" name="validate_fnc_constraint" >
        <UML:BehavioralFeature.parameter>
-        <UML:Parameter kind="return" xmi.id="72430" type="32" />
+        <UML:Parameter kind="return" xmi.id="73456" type="32" />
         <UML:Parameter isSpecification="false" visibility="public" xmi.id="1" value="" type="1882" name="s" />
         <UML:Parameter isSpecification="false" visibility="private" xmi.id="4379" value="" type="1460" name="t" />
        </UML:BehavioralFeature.parameter>
@@ -119,7 +119,7 @@
      <UML:Classifier.feature>
       <UML:Operation isSpecification="false" isLeaf="false" visibility="public" xmi.id="35" isRoot="false" isAbstract="false" isQuery="false" name="is_valid_structure" >
        <UML:BehavioralFeature.parameter>
-        <UML:Parameter kind="return" xmi.id="72431" type="32" />
+        <UML:Parameter kind="return" xmi.id="73457" type="32" />
         <UML:Parameter isSpecification="false" visibility="public" xmi.id="1" value="" type="1577" name="c" />
        </UML:BehavioralFeature.parameter>
       </UML:Operation>
@@ -242,14 +242,14 @@
       </UML:Operation>
       <UML:Operation isSpecification="false" isLeaf="false" visibility="public" xmi.id="12577" isRoot="false" isAbstract="false" isQuery="false" name="make_phasespace" >
        <UML:BehavioralFeature.parameter>
-        <UML:Parameter kind="return" xmi.id="72432" type="8643" />
+        <UML:Parameter kind="return" xmi.id="73458" type="8643" />
         <UML:Parameter isSpecification="false" visibility="private" xmi.id="12578" value="" type="1882" name="s" />
         <UML:Parameter isSpecification="false" visibility="private" xmi.id="12608" value="" type="6" name="temperature" />
        </UML:BehavioralFeature.parameter>
       </UML:Operation>
       <UML:Operation isSpecification="false" isLeaf="false" visibility="public" xmi.id="41480" isRoot="false" isAbstract="false" isQuery="false" name="copy_phasespace" >
        <UML:BehavioralFeature.parameter>
-        <UML:Parameter kind="return" xmi.id="72433" type="8643" />
+        <UML:Parameter kind="return" xmi.id="73459" type="8643" />
         <UML:Parameter isSpecification="false" visibility="private" xmi.id="41481" value="" type="8643" name="ps_in" />
        </UML:BehavioralFeature.parameter>
       </UML:Operation>
@@ -266,7 +266,7 @@
      <UML:Classifier.feature>
       <UML:Operation isSpecification="false" isLeaf="false" visibility="public" xmi.id="1983" isRoot="false" isAbstract="false" isQuery="false" name="func_val" >
        <UML:BehavioralFeature.parameter>
-        <UML:Parameter kind="return" xmi.id="72434" type="6" />
+        <UML:Parameter kind="return" xmi.id="73460" type="6" />
         <UML:Parameter isSpecification="false" visibility="private" xmi.id="1987" value="" type="1882" name="s" />
         <UML:Parameter isSpecification="false" kind="inout" visibility="private" xmi.id="7775" value="" type="9927" name="l" />
        </UML:BehavioralFeature.parameter>
@@ -314,7 +314,7 @@
      <UML:Classifier.feature>
       <UML:Operation isSpecification="false" isLeaf="false" visibility="protected" xmi.id="2511" isRoot="false" isAbstract="false" isQuery="false" name="validate_cutoff_constraint" >
        <UML:BehavioralFeature.parameter>
-        <UML:Parameter kind="return" xmi.id="72435" type="32" />
+        <UML:Parameter kind="return" xmi.id="73461" type="32" />
         <UML:Parameter isSpecification="false" visibility="private" xmi.id="2512" value="" type="1882" name="s" />
         <UML:Parameter isSpecification="false" visibility="private" xmi.id="4429" value="" type="2595" name="t" />
        </UML:BehavioralFeature.parameter>
@@ -337,7 +337,7 @@
       </UML:Operation>
       <UML:Operation isSpecification="false" isLeaf="false" visibility="public" xmi.id="18363" isRoot="false" isAbstract="false" isQuery="false" name="copy_histogram" >
        <UML:BehavioralFeature.parameter>
-        <UML:Parameter kind="return" xmi.id="72436" type="3247" />
+        <UML:Parameter kind="return" xmi.id="73462" type="3247" />
         <UML:Parameter isSpecification="false" visibility="private" xmi.id="18364" value="" type="3247" name="h_in" />
        </UML:BehavioralFeature.parameter>
       </UML:Operation>
@@ -364,7 +364,7 @@
      <UML:Classifier.feature>
       <UML:Operation isSpecification="false" isLeaf="false" visibility="public" xmi.id="3618" isRoot="false" isAbstract="false" isQuery="false" name="make_rdf" >
        <UML:BehavioralFeature.parameter>
-        <UML:Parameter kind="return" xmi.id="72437" type="3637" />
+        <UML:Parameter kind="return" xmi.id="73463" type="3637" />
         <UML:Parameter isSpecification="false" visibility="private" xmi.id="4686" value="" type="6" name="volume" />
         <UML:Parameter isSpecification="false" visibility="private" xmi.id="4694" value="" type="2" name="n_atoms" />
         <UML:Parameter isSpecification="false" visibility="private" xmi.id="4702" value="" type="6" name="r_max" />
@@ -390,7 +390,7 @@
      <UML:Classifier.feature>
       <UML:Operation isSpecification="false" isLeaf="false" visibility="protected" xmi.id="3668" isRoot="false" isAbstract="false" isQuery="false" name="rdf_fom_val" >
        <UML:BehavioralFeature.parameter>
-        <UML:Parameter kind="return" xmi.id="72438" type="6" />
+        <UML:Parameter kind="return" xmi.id="73464" type="6" />
         <UML:Parameter isSpecification="false" visibility="private" xmi.id="3669" value="" type="1882" name="s" />
         <UML:Parameter isSpecification="false" kind="inout" visibility="private" xmi.id="4573" value="" type="16437" name="c" />
        </UML:BehavioralFeature.parameter>
@@ -416,7 +416,7 @@
      <UML:Classifier.feature>
       <UML:Operation isSpecification="false" isLeaf="false" visibility="public" xmi.id="6311" isRoot="false" isAbstract="false" isQuery="false" name="get_func_param_val" >
        <UML:BehavioralFeature.parameter>
-        <UML:Parameter kind="return" xmi.id="72439" type="6" />
+        <UML:Parameter kind="return" xmi.id="73465" type="6" />
         <UML:Parameter isSpecification="false" visibility="private" xmi.id="6370" value="" type="6395" name="p" />
         <UML:Parameter isSpecification="false" visibility="private" xmi.id="6428" value="" type="3" name="name" />
        </UML:BehavioralFeature.parameter>
@@ -437,7 +437,7 @@
       </UML:Operation>
       <UML:Operation isSpecification="false" isLeaf="false" visibility="public" xmi.id="21206" isRoot="false" isAbstract="false" isQuery="false" name="does_func_param_exist" >
        <UML:BehavioralFeature.parameter>
-        <UML:Parameter kind="return" xmi.id="72440" type="4" />
+        <UML:Parameter kind="return" xmi.id="73466" type="4" />
         <UML:Parameter isSpecification="false" visibility="private" xmi.id="21207" value="" type="6395" name="p" />
         <UML:Parameter isSpecification="false" visibility="private" xmi.id="21224" value="" type="3" name="name" />
        </UML:BehavioralFeature.parameter>
@@ -510,7 +510,7 @@
       </UML:Operation>
       <UML:Operation isSpecification="false" isLeaf="false" visibility="protected" xmi.id="42014" isRoot="false" isAbstract="false" isQuery="false" name="copy_near_neighb_list" >
        <UML:BehavioralFeature.parameter>
-        <UML:Parameter kind="return" xmi.id="72441" type="7530" />
+        <UML:Parameter kind="return" xmi.id="73467" type="7530" />
         <UML:Parameter isSpecification="false" visibility="private" xmi.id="42015" value="" type="7530" name="nn_in" />
        </UML:BehavioralFeature.parameter>
       </UML:Operation>
@@ -544,7 +544,7 @@
       </UML:Operation>
       <UML:Operation isSpecification="false" isLeaf="false" visibility="private" xmi.id="13319" isRoot="false" isAbstract="false" isQuery="false" name="get_num_near_neighb_with_cell" >
        <UML:BehavioralFeature.parameter>
-        <UML:Parameter kind="return" xmi.id="72442" type="2" />
+        <UML:Parameter kind="return" xmi.id="73468" type="2" />
         <UML:Parameter isSpecification="false" visibility="private" xmi.id="13320" value="" type="13237" name="c" />
         <UML:Parameter isSpecification="false" visibility="private" xmi.id="13333" value="" type="1882" name="s" />
         <UML:Parameter isSpecification="false" visibility="private" xmi.id="13346" value="" type="6" name="r_cut_neighbour" />
@@ -552,14 +552,14 @@
       </UML:Operation>
       <UML:Operation isSpecification="false" isLeaf="false" visibility="private" xmi.id="13282" isRoot="false" isAbstract="false" isQuery="false" name="get_num_near_neighb_without_cell" >
        <UML:BehavioralFeature.parameter>
-        <UML:Parameter kind="return" xmi.id="72443" type="2" />
+        <UML:Parameter kind="return" xmi.id="73469" type="2" />
         <UML:Parameter isSpecification="false" visibility="private" xmi.id="13283" value="" type="1882" name="s" />
         <UML:Parameter isSpecification="false" visibility="private" xmi.id="13295" value="" type="6" name="r_cut_neighbour" />
        </UML:BehavioralFeature.parameter>
       </UML:Operation>
       <UML:Operation isSpecification="false" isLeaf="false" visibility="private" xmi.id="42120" isRoot="false" isAbstract="false" isQuery="false" name="copy_cell_list" >
        <UML:BehavioralFeature.parameter>
-        <UML:Parameter kind="return" xmi.id="72444" type="13237" />
+        <UML:Parameter kind="return" xmi.id="73470" type="13237" />
         <UML:Parameter isSpecification="false" visibility="private" xmi.id="42121" value="" type="13237" name="l_in" />
        </UML:BehavioralFeature.parameter>
       </UML:Operation>
@@ -621,7 +621,7 @@
        <UML:Classifier.feature>
         <UML:Operation isSpecification="false" isLeaf="false" visibility="protected" xmi.id="750" isRoot="false" isAbstract="false" isQuery="false" name="lj_val" >
          <UML:BehavioralFeature.parameter>
-          <UML:Parameter kind="return" xmi.id="72445" type="6" />
+          <UML:Parameter kind="return" xmi.id="73471" type="6" />
           <UML:Parameter isSpecification="false" visibility="private" xmi.id="751" value="" type="1882" name="s" />
           <UML:Parameter isSpecification="false" visibility="private" xmi.id="4480" value="" type="2197" name="c" />
          </UML:BehavioralFeature.parameter>
@@ -637,7 +637,7 @@
         </UML:Operation>
         <UML:Operation isSpecification="false" isLeaf="false" visibility="private" xmi.id="13541" isRoot="false" isAbstract="false" isQuery="false" name="lj_val_nn" >
          <UML:BehavioralFeature.parameter>
-          <UML:Parameter kind="return" xmi.id="72446" type="6" />
+          <UML:Parameter kind="return" xmi.id="73472" type="6" />
           <UML:Parameter isSpecification="false" visibility="private" xmi.id="13542" value="" type="1882" name="s" />
           <UML:Parameter isSpecification="false" visibility="private" xmi.id="13556" value="" type="2197" name="c" />
          </UML:BehavioralFeature.parameter>
@@ -759,7 +759,7 @@
       </UML:Operation>
       <UML:Operation isSpecification="false" isLeaf="false" visibility="private" xmi.id="42555" isRoot="false" isAbstract="false" isQuery="false" name="do_time_correlation" >
        <UML:BehavioralFeature.parameter>
-        <UML:Parameter kind="return" xmi.id="72447" type="4" />
+        <UML:Parameter kind="return" xmi.id="73473" type="4" />
         <UML:Parameter isSpecification="false" visibility="private" xmi.id="42612" value="" type="52816" name="c" />
         <UML:Parameter isSpecification="false" visibility="private" xmi.id="42556" value="" type="1882" name="s" />
        </UML:BehavioralFeature.parameter>
@@ -816,14 +816,14 @@
      <UML:Classifier.feature>
       <UML:Operation isSpecification="false" isLeaf="false" visibility="protected" xmi.id="51840" isRoot="false" isAbstract="false" isQuery="false" name="make_histogram_cutdown" >
        <UML:BehavioralFeature.parameter>
-        <UML:Parameter kind="return" xmi.id="72448" type="42763" />
+        <UML:Parameter kind="return" xmi.id="73474" type="42763" />
         <UML:Parameter isSpecification="false" visibility="private" xmi.id="42943" value="" type="6" name="r_max" />
         <UML:Parameter isSpecification="false" visibility="private" xmi.id="42964" value="" type="6" name="bin_length" />
        </UML:BehavioralFeature.parameter>
       </UML:Operation>
       <UML:Operation isSpecification="false" isLeaf="false" visibility="protected" xmi.id="52128" isRoot="false" isAbstract="false" isQuery="false" name="cal_g_s_histogram" >
        <UML:BehavioralFeature.parameter>
-        <UML:Parameter kind="return" xmi.id="72449" type="6" />
+        <UML:Parameter kind="return" xmi.id="73475" type="6" />
         <UML:Parameter isSpecification="false" kind="inout" visibility="private" xmi.id="42706" value="" type="42763" name="g_s_hist" />
         <UML:Parameter isSpecification="false" visibility="private" xmi.id="42802" value="" type="7295" name="org_r" />
         <UML:Parameter isSpecification="false" visibility="private" xmi.id="42822" value="" type="7295" name="act_r" />
@@ -848,7 +848,7 @@
       <UML:Attribute isSpecification="false" visibility="private" xmi.id="56417" initialValue="1" type="2" name="filename_number3" />
       <UML:Operation isSpecification="false" isLeaf="false" visibility="public" xmi.id="52727" isRoot="false" isAbstract="false" isQuery="false" name="make_time_corr_hist_container" >
        <UML:BehavioralFeature.parameter>
-        <UML:Parameter kind="return" xmi.id="72450" type="52816" />
+        <UML:Parameter kind="return" xmi.id="73476" type="52816" />
         <UML:Parameter isSpecification="false" visibility="private" xmi.id="52861" value="" type="6" name="r_max" />
         <UML:Parameter isSpecification="false" visibility="private" xmi.id="52884" value="" type="6" name="bin_length" />
         <UML:Parameter isSpecification="false" visibility="private" xmi.id="52907" value="" type="2" name="n_time" />
@@ -889,19 +889,19 @@
       </UML:Operation>
       <UML:Operation isSpecification="false" isLeaf="false" visibility="public" xmi.id="65094" isRoot="false" isAbstract="false" isQuery="false" name="get_time_corr_hist_n_time_evals" >
        <UML:BehavioralFeature.parameter>
-        <UML:Parameter kind="return" xmi.id="72451" type="2" />
+        <UML:Parameter kind="return" xmi.id="73477" type="2" />
         <UML:Parameter isSpecification="false" visibility="private" xmi.id="65120" value="" type="52816" name="c" />
        </UML:BehavioralFeature.parameter>
       </UML:Operation>
       <UML:Operation isSpecification="false" isLeaf="false" visibility="public" xmi.id="65198" isRoot="false" isAbstract="false" isQuery="false" name="get_time_corr_hist_bin_length" >
        <UML:BehavioralFeature.parameter>
-        <UML:Parameter kind="return" xmi.id="72452" type="6" />
+        <UML:Parameter kind="return" xmi.id="73478" type="6" />
         <UML:Parameter isSpecification="false" visibility="private" xmi.id="65199" value="" type="52816" name="c" />
        </UML:BehavioralFeature.parameter>
       </UML:Operation>
       <UML:Operation isSpecification="false" isLeaf="false" visibility="public" xmi.id="65280" isRoot="false" isAbstract="false" isQuery="false" name="get_time_corr_hist_r_max" >
        <UML:BehavioralFeature.parameter>
-        <UML:Parameter kind="return" xmi.id="72453" type="6" />
+        <UML:Parameter kind="return" xmi.id="73479" type="6" />
         <UML:Parameter isSpecification="false" visibility="private" xmi.id="65281" value="" type="52816" name="c" />
        </UML:BehavioralFeature.parameter>
       </UML:Operation>
@@ -922,7 +922,7 @@
       </UML:Operation>
       <UML:Operation isSpecification="false" isLeaf="false" visibility="public" xmi.id="57556" isRoot="false" isAbstract="false" isQuery="false" name="make_s_q_time" >
        <UML:BehavioralFeature.parameter>
-        <UML:Parameter kind="return" xmi.id="72454" type="57439" />
+        <UML:Parameter kind="return" xmi.id="73480" type="57439" />
         <UML:Parameter isSpecification="false" visibility="private" xmi.id="57654" value="" type="57605" name="q" />
         <UML:Parameter isSpecification="false" visibility="private" xmi.id="57679" value="" type="6" name="delta_time" />
         <UML:Parameter isSpecification="false" visibility="private" xmi.id="57704" value="" type="2" name="n_time" />
@@ -952,7 +952,7 @@
       </UML:Operation>
       <UML:Operation isSpecification="false" isLeaf="false" visibility="public" xmi.id="59023" isRoot="false" isAbstract="false" isQuery="false" name="make_s_q_omegas" >
        <UML:BehavioralFeature.parameter>
-        <UML:Parameter kind="return" xmi.id="72455" type="57463" />
+        <UML:Parameter kind="return" xmi.id="73481" type="57463" />
         <UML:Parameter isSpecification="false" visibility="private" xmi.id="59024" value="" type="57605" name="q" />
         <UML:Parameter isSpecification="false" visibility="private" xmi.id="59049" value="" type="57605" name="omega" />
        </UML:BehavioralFeature.parameter>
@@ -963,7 +963,7 @@
      <UML:Classifier.feature>
       <UML:Operation isSpecification="false" isLeaf="false" visibility="public" xmi.id="59680" isRoot="false" isAbstract="false" isQuery="false" name="s_q_omega_fom_val" >
        <UML:BehavioralFeature.parameter>
-        <UML:Parameter kind="return" xmi.id="72456" type="6" />
+        <UML:Parameter kind="return" xmi.id="73482" type="6" />
         <UML:Parameter isSpecification="false" visibility="private" xmi.id="59681" value="" type="52816" name="c" />
         <UML:Parameter isSpecification="false" visibility="private" xmi.id="60047" value="" type="59994" name="c2" />
        </UML:BehavioralFeature.parameter>
@@ -1318,9 +1318,9 @@
   </UML:Model>
  </XMI.content>
  <XMI.extensions xmi.extender="umbrello" >
-  <docsettings viewid="32237" documentation="" uniqueid="72456" />
+  <docsettings viewid="34777" documentation="" uniqueid="73482" />
   <diagrams>
-   <diagram snapgrid="0" showattsig="1" fillcolor="#ffffc0" linewidth="0" zoom="100" showgrid="0" showopsig="1" usefillcolor="1" snapx="10" canvaswidth="1880" snapy="10" showatts="1" xmi.id="32237" documentation="" type="405" showops="1" showpackage="0" name="nn logic in cal_histogram" localid="900000" showstereotype="0" showscope="1" snapcsgrid="0" font="Sans,10,-1,5,50,0,0,0,0,0" linecolor="#ff0000" canvasheight="988" >
+   <diagram snapgrid="0" showattsig="1" fillcolor="#ffffc0" linewidth="0" zoom="100" showgrid="0" showopsig="1" usefillcolor="1" snapx="10" canvaswidth="1122" snapy="10" showatts="1" xmi.id="32237" documentation="" type="405" showops="1" showpackage="0" name="nn logic in cal_histogram" localid="900000" showstereotype="0" showscope="1" snapcsgrid="0" font="Sans,10,-1,5,50,0,0,0,0,0" linecolor="#ff0000" canvasheight="998" >
     <widgets>
      <activitywidget usesdiagramfillcolour="1" width="10" activityname="" usesdiagramusefillcolour="1" x="568" y="116" linewidth="none" fillcolour="none" height="10" usefillcolor="1" isinstance="0" xmi.id="32274" documentation="" activitytype="0" font="Sans,10,-1,5,50,0,0,0,0,0" linecolor="none" />
      <activitywidget usesdiagramfillcolour="1" width="161" activityname="ignore_list = .false." usesdiagramusefillcolour="1" x="514" y="152" linewidth="none" fillcolour="none" height="33" usefillcolor="1" isinstance="0" xmi.id="32293" documentation="" activitytype="1" font="Sans,10,-1,5,50,0,0,0,0,0" linecolor="none" />
@@ -1354,41 +1354,41 @@
        <startpoint startx="564" starty="288" />
        <endpoint endx="504" endy="291" />
       </linepath>
-      <floatingtext usesdiagramfillcolour="1" width="28" usesdiagramusefillcolour="1" x="510" y="288" linewidth="none" posttext="" role="703" fillcolour="none" height="27" usefillcolor="1" pretext="" isinstance="0" xmi.id="67016" text="no" font="Sans,10,-1,5,50,0,0,0,0,0" linecolor="none" />
+      <floatingtext usesdiagramfillcolour="1" width="28" usesdiagramusefillcolour="1" x="510" y="288" linewidth="none" posttext="" role="703" fillcolour="none" height="27" usefillcolor="1" pretext="" isinstance="0" xmi.id="72578" text="no" font="Sans,10,-1,5,50,0,0,0,0,0" linecolor="none" />
      </assocwidget>
      <assocwidget totalcounta="2" indexa="1" visibilityB="200" totalcountb="2" indexb="1" linewidth="none" widgetbid="32368" widgetaid="32621" roleBdoc="" documentation="" roleAdoc="" type="515" changeabilityA="900" changeabilityB="900" linecolor="none" visibilityA="200" >
       <linepath>
        <startpoint startx="584" starty="288" />
        <endpoint endx="707" endy="291" />
       </linepath>
-      <floatingtext usesdiagramfillcolour="1" width="36" usesdiagramusefillcolour="1" x="645" y="288" linewidth="none" posttext="" role="703" fillcolour="none" height="27" usefillcolor="1" pretext="" isinstance="0" xmi.id="67017" text="yes" font="Sans,10,-1,5,50,0,0,0,0,0" linecolor="none" />
+      <floatingtext usesdiagramfillcolour="1" width="36" usesdiagramusefillcolour="1" x="645" y="288" linewidth="none" posttext="" role="703" fillcolour="none" height="27" usefillcolor="1" pretext="" isinstance="0" xmi.id="72579" text="yes" font="Sans,10,-1,5,50,0,0,0,0,0" linecolor="none" />
      </assocwidget>
     </associations>
    </diagram>
-   <diagram snapgrid="0" showattsig="1" fillcolor="#ffffc0" linewidth="0" zoom="100" showgrid="0" showopsig="1" usefillcolor="1" snapx="10" canvaswidth="1865" snapy="10" showatts="1" xmi.id="34777" documentation="" type="405" showops="1" showpackage="0" name="mdmc_control" localid="900000" showstereotype="0" showscope="1" snapcsgrid="0" font="Sans,10,-1,5,50,0,0,0,0,0" linecolor="#ff0000" canvasheight="1065" >
+   <diagram snapgrid="0" showattsig="1" fillcolor="#ffffc0" linewidth="0" zoom="75" showgrid="0" showopsig="1" usefillcolor="1" snapx="10" canvaswidth="1649" snapy="10" showatts="1" xmi.id="34777" documentation="" type="405" showops="1" showpackage="0" name="mdmc_control" localid="900000" showstereotype="0" showscope="1" snapcsgrid="0" font="Sans,10,-1,5,50,0,0,0,0,0" linecolor="#ff0000" canvasheight="1331" >
     <widgets>
-     <activitywidget usesdiagramfillcolour="1" width="10" activityname="" usesdiagramusefillcolour="1" x="620" y="12" linewidth="none" fillcolour="none" height="10" usefillcolor="1" isinstance="0" xmi.id="34808" documentation="" activitytype="0" font="Sans,10,-1,5,50,0,0,0,0,0" linecolor="none" />
-     <activitywidget usesdiagramfillcolour="0" width="217" activityname="initial MD equilibration run" usesdiagramusefillcolour="0" x="546" y="119" linewidth="none" fillcolour="#ffffc0" height="33" usefillcolor="1" isinstance="0" xmi.id="34824" documentation="" activitytype="1" font="Sans,10,-1,5,50,0,0,0,0,0" linecolor="#ff0000" />
-     <activitywidget usesdiagramfillcolour="0" width="278" activityname="Has MD run reached equilibrium?" usesdiagramusefillcolour="0" x="524" y="207" linewidth="none" fillcolour="#ffffc0" height="33" usefillcolor="1" isinstance="0" xmi.id="34885" documentation="" activitytype="1" font="Sans,10,-1,5,50,0,0,0,0,0" linecolor="#ff0000" />
-     <activitywidget usesdiagramfillcolour="0" width="127" activityname="Calculate RDF" usesdiagramusefillcolour="0" x="475" y="363" linewidth="none" fillcolour="#ffffc0" height="33" usefillcolor="1" isinstance="0" xmi.id="34946" documentation="" activitytype="1" font="Sans,10,-1,5,50,0,0,0,0,0" linecolor="#ff0000" />
-     <activitywidget usesdiagramfillcolour="0" width="126" activityname="calculate FOM" usesdiagramusefillcolour="0" x="475" y="409" linewidth="none" fillcolour="#ffffc0" height="33" usefillcolor="1" isinstance="0" xmi.id="34992" documentation="" activitytype="1" font="Sans,10,-1,5,50,0,0,0,0,0" linecolor="#ff0000" />
-     <activitywidget usesdiagramfillcolour="0" width="92" activityname="save state" usesdiagramusefillcolour="0" x="487" y="456" linewidth="none" fillcolour="#ffffc0" height="33" usefillcolor="1" isinstance="0" xmi.id="35038" documentation="" activitytype="1" font="Sans,10,-1,5,50,0,0,0,0,0" linecolor="#ff0000" />
-     <notewidget usesdiagramfillcolour="1" width="360" usesdiagramusefillcolour="1" x="43" y="373" linewidth="none" fillcolour="none" height="103" usefillcolor="1" isinstance="0" xmi.id="35114" text="Code from mdmc_control.f90
+     <activitywidget usesdiagramfillcolour="1" width="10" activityname="" usesdiagramusefillcolour="1" x="589" y="33" linewidth="none" fillcolour="none" height="10" usefillcolor="1" isinstance="0" xmi.id="34808" documentation="" activitytype="0" font="Sans,10,-1,5,50,0,0,0,0,0" linecolor="none" />
+     <activitywidget usesdiagramfillcolour="0" width="217" activityname="initial MD equilibration run" usesdiagramusefillcolour="0" x="515" y="140" linewidth="none" fillcolour="#ffffc0" height="33" usefillcolor="1" isinstance="0" xmi.id="34824" documentation="" activitytype="1" font="Sans,10,-1,5,50,0,0,0,0,0" linecolor="#ff0000" />
+     <activitywidget usesdiagramfillcolour="0" width="278" activityname="Has MD run reached equilibrium?" usesdiagramusefillcolour="0" x="493" y="228" linewidth="none" fillcolour="#ffffc0" height="33" usefillcolor="1" isinstance="0" xmi.id="34885" documentation="" activitytype="1" font="Sans,10,-1,5,50,0,0,0,0,0" linecolor="#ff0000" />
+     <activitywidget usesdiagramfillcolour="0" width="127" activityname="Calculate RDF" usesdiagramusefillcolour="0" x="540" y="361" linewidth="none" fillcolour="#ffffc0" height="33" usefillcolor="1" isinstance="0" xmi.id="34946" documentation="" activitytype="1" font="Sans,10,-1,5,50,0,0,0,0,0" linecolor="#ff0000" />
+     <activitywidget usesdiagramfillcolour="0" width="126" activityname="calculate FOM" usesdiagramusefillcolour="0" x="540" y="407" linewidth="none" fillcolour="#ffffc0" height="33" usefillcolor="1" isinstance="0" xmi.id="34992" documentation="" activitytype="1" font="Sans,10,-1,5,50,0,0,0,0,0" linecolor="#ff0000" />
+     <activitywidget usesdiagramfillcolour="0" width="92" activityname="save state" usesdiagramusefillcolour="0" x="552" y="454" linewidth="none" fillcolour="#ffffc0" height="33" usefillcolor="1" isinstance="0" xmi.id="35038" documentation="" activitytype="1" font="Sans,10,-1,5,50,0,0,0,0,0" linecolor="#ff0000" />
+     <notewidget usesdiagramfillcolour="1" width="360" usesdiagramusefillcolour="1" x="108" y="371" linewidth="none" fillcolour="none" height="103" usefillcolor="1" isinstance="0" xmi.id="35114" text="Code from mdmc_control.f90
 
     fom_old = fom_val
     call backup_func_params(common_pe_list)
     call shallow_copy_phasespace(my_ps, my_ps_old) " font="Sans,10,-1,5,50,0,0,0,0,0" linecolor="none" />
      <activitywidget usesdiagramfillcolour="0" width="247" activityname="repeated MD equilibration run" usesdiagramusefillcolour="0" x="433" y="596" linewidth="none" fillcolour="#ffffc0" height="33" usefillcolor="1" isinstance="0" xmi.id="35190" documentation="" activitytype="1" font="Sans,10,-1,5,50,0,0,0,0,0" linecolor="#ff0000" />
      <activitywidget usesdiagramfillcolour="0" width="278" activityname="Has MD run reached equilibrium?" usesdiagramusefillcolour="0" x="421" y="689" linewidth="none" fillcolour="#ffffc0" height="33" usefillcolor="1" isinstance="0" xmi.id="35945" documentation="" activitytype="1" font="Sans,10,-1,5,50,0,0,0,0,0" linecolor="#ff0000" />
-     <activitywidget usesdiagramfillcolour="1" width="110" activityname="restore state" usesdiagramusefillcolour="1" x="298" y="685" linewidth="none" fillcolour="none" height="33" usefillcolor="1" isinstance="0" xmi.id="35976" documentation="" activitytype="1" font="Sans,10,-1,5,50,0,0,0,0,0" linecolor="none" />
+     <activitywidget usesdiagramfillcolour="1" width="110" activityname="restore state" usesdiagramusefillcolour="1" x="284" y="687" linewidth="none" fillcolour="none" height="33" usefillcolor="1" isinstance="0" xmi.id="35976" documentation="" activitytype="1" font="Sans,10,-1,5,50,0,0,0,0,0" linecolor="none" />
      <activitywidget usesdiagramfillcolour="0" width="221" activityname="Calculating RDF and FOM" usesdiagramusefillcolour="0" x="441" y="836" linewidth="none" fillcolour="#ffffc0" height="33" usefillcolor="1" isinstance="0" xmi.id="36067" documentation="" activitytype="1" font="Sans,10,-1,5,50,0,0,0,0,0" linecolor="#ff0000" />
      <activitywidget usesdiagramfillcolour="0" width="93" activityname="Metropolis" usesdiagramusefillcolour="0" x="487" y="893" linewidth="none" fillcolour="#ffffc0" height="33" usefillcolor="1" isinstance="0" xmi.id="36159" documentation="" activitytype="1" font="Sans,10,-1,5,50,0,0,0,0,0" linecolor="#ff0000" />
-     <activitywidget usesdiagramfillcolour="0" width="263" activityname="Set start Epot parameter values" usesdiagramusefillcolour="0" x="528" y="46" linewidth="none" fillcolour="#ffffc0" height="33" usefillcolor="1" isinstance="0" xmi.id="36235" documentation="" activitytype="1" font="Sans,10,-1,5,50,0,0,0,0,0" linecolor="#ff0000" />
-     <activitywidget usesdiagramfillcolour="1" width="10" activityname="" usesdiagramusefillcolour="1" x="325" y="308" linewidth="none" fillcolour="none" height="10" usefillcolor="1" isinstance="0" xmi.id="36416" documentation="" activitytype="2" font="Sans,10,-1,5,50,0,0,0,0,0" linecolor="none" />
-     <activitywidget usesdiagramfillcolour="1" width="20" activityname="" usesdiagramusefillcolour="1" x="512" y="302" linewidth="none" fillcolour="none" height="20" usefillcolor="1" isinstance="0" xmi.id="36462" documentation="" activitytype="3" font="Sans,10,-1,5,50,0,0,0,0,0" linecolor="none" />
+     <activitywidget usesdiagramfillcolour="0" width="263" activityname="Set start Epot parameter values" usesdiagramusefillcolour="0" x="497" y="67" linewidth="none" fillcolour="#ffffc0" height="33" usefillcolor="1" isinstance="0" xmi.id="36235" documentation="" activitytype="1" font="Sans,10,-1,5,50,0,0,0,0,0" linecolor="#ff0000" />
+     <activitywidget usesdiagramfillcolour="1" width="10" activityname="" usesdiagramusefillcolour="1" x="390" y="306" linewidth="none" fillcolour="none" height="10" usefillcolor="1" isinstance="0" xmi.id="36416" documentation="" activitytype="2" font="Sans,10,-1,5,50,0,0,0,0,0" linecolor="none" />
+     <activitywidget usesdiagramfillcolour="1" width="20" activityname="" usesdiagramusefillcolour="1" x="577" y="300" linewidth="none" fillcolour="none" height="20" usefillcolor="1" isinstance="0" xmi.id="36462" documentation="" activitytype="3" font="Sans,10,-1,5,50,0,0,0,0,0" linecolor="none" />
      <activitywidget usesdiagramfillcolour="1" width="20" activityname="" usesdiagramusefillcolour="1" x="512" y="771" linewidth="none" fillcolour="none" height="20" usefillcolor="1" isinstance="0" xmi.id="36692" documentation="" activitytype="3" font="Sans,10,-1,5,50,0,0,0,0,0" linecolor="none" />
      <activitywidget usesdiagramfillcolour="1" width="20" activityname="" usesdiagramusefillcolour="1" x="512" y="968" linewidth="none" fillcolour="none" height="20" usefillcolor="1" isinstance="0" xmi.id="36814" documentation="" activitytype="3" font="Sans,10,-1,5,50,0,0,0,0,0" linecolor="none" />
-     <notewidget usesdiagramfillcolour="1" width="474" usesdiagramusefillcolour="1" x="761" y="61" linewidth="none" fillcolour="none" height="142" usefillcolor="1" isinstance="0" xmi.id="36937" text="Input from mdmc_control.xml:
+     <notewidget usesdiagramfillcolour="1" width="332" usesdiagramusefillcolour="1" x="784" y="40" linewidth="none" fillcolour="none" height="186" usefillcolor="1" isinstance="0" xmi.id="36937" text="Input from mdmc_control.xml:
 
     &lt;total-steps-initial-equilibration number=&quot;15000&quot; average-over=&quot;1000&quot; />
     &lt;perform-initial-temperature-calibration>
@@ -1396,21 +1396,21 @@
       &lt;adjust-temp-at-interval number=&quot;200&quot; />
     &lt;/perform-initial-temperature-calibration>
 " font="Sans,10,-1,5,50,0,0,0,0,0" linecolor="none" />
-     <activitywidget usesdiagramfillcolour="0" width="92" activityname="save state" usesdiagramusefillcolour="0" x="136" y="1024" linewidth="none" fillcolour="#ffffc0" height="33" usefillcolor="1" isinstance="0" xmi.id="37073" documentation="" activitytype="1" font="Sans,10,-1,5,50,0,0,0,0,0" linecolor="#ff0000" />
-     <notewidget usesdiagramfillcolour="1" width="467" usesdiagramusefillcolour="1" x="19" y="150" linewidth="none" fillcolour="none" height="140" usefillcolor="1" isinstance="0" xmi.id="38414" text="When reached md-steps = total-step-temp-cali 
+     <activitywidget usesdiagramfillcolour="0" width="92" activityname="save state" usesdiagramusefillcolour="0" x="125" y="1019" linewidth="none" fillcolour="#ffffc0" height="33" usefillcolor="1" isinstance="0" xmi.id="37073" documentation="" activitytype="1" font="Sans,10,-1,5,50,0,0,0,0,0" linecolor="#ff0000" />
+     <notewidget usesdiagramfillcolour="1" width="368" usesdiagramusefillcolour="1" x="111" y="68" linewidth="none" fillcolour="none" height="207" usefillcolor="1" isinstance="0" xmi.id="38414" text="When reached md-steps = total-step-temp-cali 
 store Etot_end_of_temp_cali.
 
 Then judge if equilibrium has been reached on whether:
 
   Is temperature at the end of the above MD run within T_target +- 50% ?
   Is Etot_end_of_MD_run within Etot_end_of_temp_cali +- 50% ?" font="Sans,10,-1,5,50,0,0,0,0,0" linecolor="none" />
-     <notewidget usesdiagramfillcolour="1" width="347" usesdiagramusefillcolour="1" x="643" y="316" linewidth="none" fillcolour="none" height="121" usefillcolor="1" isinstance="0" xmi.id="38895" text="Input from mdmc_control.xml:
+     <notewidget usesdiagramfillcolour="1" width="347" usesdiagramusefillcolour="1" x="758" y="317" linewidth="none" fillcolour="none" height="121" usefillcolor="1" isinstance="0" xmi.id="38895" text="Input from mdmc_control.xml:
 
     &lt;calculate-rdf>
       &lt;cal-rdf-at-interval number=&quot;50&quot; />
       &lt;average-over-this-many-rdf number=&quot;20&quot; />  
     &lt;/calculate-rdf>" font="Sans,10,-1,5,50,0,0,0,0,0" linecolor="none" />
-     <notewidget usesdiagramfillcolour="1" width="493" usesdiagramusefillcolour="1" x="672" y="540" linewidth="none" fillcolour="none" height="139" usefillcolor="1" isinstance="0" xmi.id="39721" text="Input from mdmc_control.xml:
+     <notewidget usesdiagramfillcolour="1" width="393" usesdiagramusefillcolour="1" x="706" y="542" linewidth="none" fillcolour="none" height="169" usefillcolor="1" isinstance="0" xmi.id="39721" text="Input from mdmc_control.xml:
 
     &lt;md-steps-repeated-equilibration number=&quot;10000&quot; average-over=&quot;1000&quot; />
     &lt;perform-repeated-temperature-calibration>
@@ -1420,8 +1420,8 @@ Then judge if equilibrium has been reached on whether:
      <activitywidget usesdiagramfillcolour="1" width="259" activityname="Change Epot parameter values" usesdiagramusefillcolour="1" x="428" y="530" linewidth="none" fillcolour="none" height="33" usefillcolor="1" isinstance="0" xmi.id="40127" documentation="" activitytype="1" font="Sans,10,-1,5,50,0,0,0,0,0" linecolor="none" />
      <activitywidget usesdiagramfillcolour="1" width="20" activityname="" usesdiagramusefillcolour="1" x="329" y="533" linewidth="none" fillcolour="none" height="20" usefillcolor="1" isinstance="0" xmi.id="40503" documentation="" activitytype="3" font="Sans,10,-1,5,50,0,0,0,0,0" linecolor="none" />
      <activitywidget usesdiagramfillcolour="1" width="20" activityname="" usesdiagramusefillcolour="1" x="329" y="771" linewidth="none" fillcolour="none" height="20" usefillcolor="1" isinstance="0" xmi.id="40519" documentation="" activitytype="3" font="Sans,10,-1,5,50,0,0,0,0,0" linecolor="none" />
-     <boxwidget usesdiagramfillcolour="1" width="1165" usesdiagramusefillcolour="1" x="38" y="511" linewidth="none" fillcolour="none" height="544" usefillcolor="1" isinstance="0" xmi.id="40914" font="Sans,10,-1,5,50,0,0,0,0,0" linecolor="#000000" />
-     <notewidget usesdiagramfillcolour="1" width="307" usesdiagramusefillcolour="1" x="828" y="845" linewidth="none" fillcolour="none" height="146" usefillcolor="1" isinstance="0" xmi.id="40975" text="Other input from mdmc_control.xml:
+     <boxwidget usesdiagramfillcolour="1" width="1011" usesdiagramusefillcolour="1" x="107" y="511" linewidth="none" fillcolour="none" height="555" usefillcolor="1" isinstance="0" xmi.id="40914" font="Sans,10,-1,5,50,0,0,0,0,0" linecolor="#000000" />
+     <notewidget usesdiagramfillcolour="1" width="307" usesdiagramusefillcolour="1" x="717" y="849" linewidth="none" fillcolour="none" height="146" usefillcolor="1" isinstance="0" xmi.id="40975" text="Other input from mdmc_control.xml:
 
     &lt;mc-steps number=&quot;300&quot; /> 
     &lt;temperature-mc val=&quot;0.005&quot; /> 
@@ -1433,46 +1433,46 @@ Then judge if equilibrium has been reached on whether:
     <associations>
      <assocwidget totalcounta="2" indexa="1" visibilityB="200" totalcountb="2" indexb="1" linewidth="none" widgetbid="36235" widgetaid="34808" roleBdoc="" documentation="" roleAdoc="" type="515" changeabilityA="900" changeabilityB="900" linecolor="none" visibilityA="200" >
       <linepath>
-       <startpoint startx="625" starty="22" />
-       <endpoint endx="659" endy="46" />
+       <startpoint startx="594" starty="43" />
+       <endpoint endx="628" endy="67" />
       </linepath>
      </assocwidget>
      <assocwidget totalcounta="2" indexa="1" visibilityB="200" totalcountb="2" indexb="1" linewidth="none" widgetbid="34824" widgetaid="36235" roleBdoc="" documentation="" roleAdoc="" type="515" changeabilityA="900" changeabilityB="900" linecolor="none" visibilityA="200" >
       <linepath>
-       <startpoint startx="659" starty="79" />
-       <endpoint endx="654" endy="119" />
+       <startpoint startx="628" starty="100" />
+       <endpoint endx="623" endy="140" />
       </linepath>
      </assocwidget>
      <assocwidget totalcounta="2" indexa="1" visibilityB="200" totalcountb="2" indexb="1" linewidth="none" widgetbid="36462" widgetaid="34885" roleBdoc="" documentation="" roleAdoc="" type="515" changeabilityA="900" changeabilityB="900" linecolor="none" visibilityA="200" >
       <linepath>
-       <startpoint startx="663" starty="240" />
-       <endpoint endx="532" endy="312" />
+       <startpoint startx="632" starty="261" />
+       <endpoint endx="587" endy="300" />
       </linepath>
      </assocwidget>
      <assocwidget totalcounta="2" indexa="1" visibilityB="200" totalcountb="2" indexb="1" linewidth="none" widgetbid="34946" widgetaid="36462" roleBdoc="" documentation="" roleAdoc="" type="515" changeabilityA="900" changeabilityB="900" linecolor="none" visibilityA="200" >
       <linepath>
-       <startpoint startx="522" starty="322" />
-       <endpoint endx="538" endy="363" />
+       <startpoint startx="587" starty="320" />
+       <endpoint endx="603" endy="361" />
       </linepath>
-      <floatingtext usesdiagramfillcolour="1" width="39" usesdiagramusefillcolour="1" x="532" y="330" linewidth="none" posttext="" role="703" fillcolour="none" height="27" usefillcolor="1" pretext="" isinstance="0" xmi.id="67018" text="Yes" font="Sans,10,-1,5,50,0,0,0,0,0" linecolor="none" />
+      <floatingtext usesdiagramfillcolour="1" width="39" usesdiagramusefillcolour="1" x="532" y="329" linewidth="none" posttext="" role="703" fillcolour="none" height="27" usefillcolor="1" pretext="" isinstance="0" xmi.id="72580" text="Yes" font="Sans,10,-1,5,50,0,0,0,0,0" linecolor="none" />
      </assocwidget>
      <assocwidget totalcounta="2" indexa="1" visibilityB="200" totalcountb="2" indexb="1" linewidth="none" widgetbid="36416" widgetaid="36462" roleBdoc="" documentation="" roleAdoc="" type="515" changeabilityA="900" changeabilityB="900" linecolor="none" visibilityA="200" >
       <linepath>
-       <startpoint startx="512" starty="312" />
-       <endpoint endx="335" endy="313" />
+       <startpoint startx="577" starty="310" />
+       <endpoint endx="400" endy="311" />
       </linepath>
-      <floatingtext usesdiagramfillcolour="1" width="31" usesdiagramusefillcolour="1" x="421" y="313" linewidth="none" posttext="" role="703" fillcolour="none" height="27" usefillcolor="1" pretext="" isinstance="0" xmi.id="67019" text="No" font="Sans,10,-1,5,50,0,0,0,0,0" linecolor="none" />
+      <floatingtext usesdiagramfillcolour="1" width="31" usesdiagramusefillcolour="1" x="486" y="311" linewidth="none" posttext="" role="703" fillcolour="none" height="27" usefillcolor="1" pretext="" isinstance="0" xmi.id="72581" text="No" font="Sans,10,-1,5,50,0,0,0,0,0" linecolor="none" />
      </assocwidget>
      <assocwidget totalcounta="2" indexa="1" visibilityB="200" totalcountb="2" indexb="1" linewidth="none" widgetbid="34992" widgetaid="34946" roleBdoc="" documentation="" roleAdoc="" type="515" changeabilityA="900" changeabilityB="900" linecolor="none" visibilityA="200" >
       <linepath>
-       <startpoint startx="538" starty="396" />
-       <endpoint endx="538" endy="409" />
+       <startpoint startx="603" starty="394" />
+       <endpoint endx="603" endy="407" />
       </linepath>
      </assocwidget>
      <assocwidget totalcounta="2" indexa="1" visibilityB="200" totalcountb="2" indexb="1" linewidth="none" widgetbid="35038" widgetaid="34992" roleBdoc="" documentation="" roleAdoc="" type="515" changeabilityA="900" changeabilityB="900" linecolor="none" visibilityA="200" >
       <linepath>
-       <startpoint startx="538" starty="442" />
-       <endpoint endx="533" endy="456" />
+       <startpoint startx="603" starty="440" />
+       <endpoint endx="598" endy="454" />
       </linepath>
      </assocwidget>
      <assocwidget totalcounta="2" indexa="1" visibilityB="200" totalcountb="2" indexb="1" linewidth="none" widgetbid="36692" widgetaid="35945" roleBdoc="" documentation="" roleAdoc="" type="515" changeabilityA="900" changeabilityB="900" linecolor="none" visibilityA="200" >
@@ -1486,7 +1486,7 @@ Then judge if equilibrium has been reached on whether:
        <startpoint startx="522" starty="791" />
        <endpoint endx="551" endy="836" />
       </linepath>
-      <floatingtext usesdiagramfillcolour="1" width="39" usesdiagramusefillcolour="1" x="525" y="804" linewidth="none" posttext="" role="703" fillcolour="none" height="27" usefillcolor="1" pretext="" isinstance="0" xmi.id="67020" text="Yes" font="Sans,10,-1,5,50,0,0,0,0,0" linecolor="none" />
+      <floatingtext usesdiagramfillcolour="1" width="39" usesdiagramusefillcolour="1" x="525" y="804" linewidth="none" posttext="" role="703" fillcolour="none" height="27" usefillcolor="1" pretext="" isinstance="0" xmi.id="72582" text="Yes" font="Sans,10,-1,5,50,0,0,0,0,0" linecolor="none" />
      </assocwidget>
      <assocwidget totalcounta="2" indexa="1" visibilityB="200" totalcountb="2" indexb="1" linewidth="none" widgetbid="36814" widgetaid="36159" roleBdoc="" documentation="" roleAdoc="" type="515" changeabilityA="900" changeabilityB="900" linecolor="none" visibilityA="200" >
       <linepath>
@@ -1497,33 +1497,33 @@ Then judge if equilibrium has been reached on whether:
      <assocwidget totalcounta="2" indexa="1" visibilityB="200" totalcountb="2" indexb="1" linewidth="none" widgetbid="37073" widgetaid="36814" roleBdoc="" documentation="" roleAdoc="" type="515" changeabilityA="900" changeabilityB="900" linecolor="none" visibilityA="200" >
       <linepath>
        <startpoint startx="522" starty="988" />
-       <endpoint endx="228" endy="1040" />
+       <endpoint endx="217" endy="1035" />
        <point x="522" y="1037" />
       </linepath>
-      <floatingtext usesdiagramfillcolour="1" width="63" usesdiagramusefillcolour="1" x="422" y="1034" linewidth="none" posttext="" role="703" fillcolour="none" height="27" usefillcolor="1" pretext="" isinstance="0" xmi.id="67021" text="Accept" font="Sans,10,-1,5,50,0,0,0,0,0" linecolor="none" />
+      <floatingtext usesdiagramfillcolour="1" width="63" usesdiagramusefillcolour="1" x="422" y="1034" linewidth="none" posttext="" role="703" fillcolour="none" height="27" usefillcolor="1" pretext="" isinstance="0" xmi.id="72583" text="Accept" font="Sans,10,-1,5,50,0,0,0,0,0" linecolor="none" />
      </assocwidget>
-     <assocwidget totalcounta="2" indexa="1" visibilityB="200" totalcountb="2" indexb="1" linewidth="none" widgetbid="34885" widgetaid="34824" roleBdoc="" documentation="" roleAdoc="" type="515" changeabilityA="900" changeabilityB="900" linecolor="none" visibilityA="200" >
+     <assocwidget totalcounta="2" indexa="1" visibilityB="200" totalcountb="3" indexb="2" linewidth="none" widgetbid="34885" widgetaid="34824" roleBdoc="" documentation="" roleAdoc="" type="515" changeabilityA="900" changeabilityB="900" linecolor="none" visibilityA="200" >
       <linepath>
-       <startpoint startx="654" starty="152" />
-       <endpoint endx="663" endy="207" />
+       <startpoint startx="623" starty="173" />
+       <endpoint endx="678" endy="228" />
       </linepath>
      </assocwidget>
      <assocwidget totalcounta="2" indexa="1" visibilityB="200" totalcountb="2" indexb="1" linewidth="none" widgetbid="36937" widgetaid="34824" roleBdoc="" documentation="" roleAdoc="" type="513" changeabilityA="900" changeabilityB="900" linecolor="none" visibilityA="200" >
       <linepath>
-       <startpoint startx="763" starty="135" />
-       <endpoint endx="761" endy="132" />
+       <startpoint startx="732" starty="156" />
+       <endpoint endx="784" endy="133" />
       </linepath>
      </assocwidget>
-     <assocwidget totalcounta="2" indexa="1" visibilityB="200" totalcountb="2" indexb="1" linewidth="none" widgetbid="34885" widgetaid="38414" roleBdoc="" documentation="" roleAdoc="" type="513" changeabilityA="900" changeabilityB="900" linecolor="none" visibilityA="200" >
+     <assocwidget totalcounta="2" indexa="1" visibilityB="200" totalcountb="3" indexb="1" linewidth="none" widgetbid="34885" widgetaid="38414" roleBdoc="" documentation="" roleAdoc="" type="513" changeabilityA="900" changeabilityB="900" linecolor="none" visibilityA="200" >
       <linepath>
-       <startpoint startx="486" starty="220" />
-       <endpoint endx="524" endy="223" />
+       <startpoint startx="479" starty="171" />
+       <endpoint endx="585" endy="228" />
       </linepath>
      </assocwidget>
      <assocwidget totalcounta="2" indexa="1" visibilityB="200" totalcountb="2" indexb="1" linewidth="none" widgetbid="38895" widgetaid="34946" roleBdoc="" documentation="" roleAdoc="" type="513" changeabilityA="900" changeabilityB="900" linecolor="none" visibilityA="200" >
       <linepath>
-       <startpoint startx="602" starty="379" />
-       <endpoint endx="643" endy="376" />
+       <startpoint startx="667" starty="377" />
+       <endpoint endx="758" endy="377" />
       </linepath>
      </assocwidget>
      <assocwidget totalcounta="2" indexa="1" visibilityB="200" totalcountb="2" indexb="1" linewidth="none" widgetbid="35945" widgetaid="35190" roleBdoc="" documentation="" roleAdoc="" type="515" changeabilityA="900" changeabilityB="900" linecolor="none" visibilityA="200" >
@@ -1534,7 +1534,7 @@ Then judge if equilibrium has been reached on whether:
      </assocwidget>
      <assocwidget totalcounta="2" indexa="1" visibilityB="200" totalcountb="2" indexb="1" linewidth="none" widgetbid="40127" widgetaid="35038" roleBdoc="" documentation="" roleAdoc="" type="515" changeabilityA="900" changeabilityB="900" linecolor="none" visibilityA="200" >
       <linepath>
-       <startpoint startx="533" starty="489" />
+       <startpoint startx="598" starty="487" />
        <endpoint endx="557" endy="530" />
       </linepath>
      </assocwidget>
@@ -1546,8 +1546,8 @@ Then judge if equilibrium has been reached on whether:
      </assocwidget>
      <assocwidget totalcounta="2" indexa="1" visibilityB="200" totalcountb="2" indexb="1" linewidth="none" widgetbid="35038" widgetaid="35114" roleBdoc="" documentation="" roleAdoc="" type="513" changeabilityA="900" changeabilityB="900" linecolor="none" visibilityA="200" >
       <linepath>
-       <startpoint startx="403" starty="424" />
-       <endpoint endx="487" endy="472" />
+       <startpoint startx="468" starty="422" />
+       <endpoint endx="552" endy="470" />
       </linepath>
      </assocwidget>
      <assocwidget totalcounta="2" indexa="1" visibilityB="200" totalcountb="2" indexb="1" linewidth="none" widgetbid="40519" widgetaid="36692" roleBdoc="" documentation="" roleAdoc="" type="515" changeabilityA="900" changeabilityB="900" linecolor="none" visibilityA="200" >
@@ -1555,7 +1555,7 @@ Then judge if equilibrium has been reached on whether:
        <startpoint startx="512" starty="781" />
        <endpoint endx="349" endy="781" />
       </linepath>
-      <floatingtext usesdiagramfillcolour="1" width="31" usesdiagramusefillcolour="1" x="430" y="781" linewidth="none" posttext="" role="703" fillcolour="none" height="27" usefillcolor="1" pretext="" isinstance="0" xmi.id="67022" text="No" font="Sans,10,-1,5,50,0,0,0,0,0" linecolor="none" />
+      <floatingtext usesdiagramfillcolour="1" width="31" usesdiagramusefillcolour="1" x="430" y="781" linewidth="none" posttext="" role="703" fillcolour="none" height="27" usefillcolor="1" pretext="" isinstance="0" xmi.id="72584" text="No" font="Sans,10,-1,5,50,0,0,0,0,0" linecolor="none" />
      </assocwidget>
      <assocwidget totalcounta="2" indexa="1" visibilityB="200" totalcountb="2" indexb="1" linewidth="none" widgetbid="40519" widgetaid="36814" roleBdoc="" documentation="" roleAdoc="" type="515" changeabilityA="900" changeabilityB="900" linecolor="none" visibilityA="200" >
       <linepath>
@@ -1563,17 +1563,17 @@ Then judge if equilibrium has been reached on whether:
        <endpoint endx="339" endy="791" />
        <point x="339" y="978" />
       </linepath>
-      <floatingtext usesdiagramfillcolour="1" width="59" usesdiagramusefillcolour="1" x="425" y="978" linewidth="none" posttext="" role="703" fillcolour="none" height="27" usefillcolor="1" pretext="" isinstance="0" xmi.id="67023" text="Reject" font="Sans,10,-1,5,50,0,0,0,0,0" linecolor="none" />
+      <floatingtext usesdiagramfillcolour="1" width="59" usesdiagramusefillcolour="1" x="425" y="978" linewidth="none" posttext="" role="703" fillcolour="none" height="27" usefillcolor="1" pretext="" isinstance="0" xmi.id="72585" text="Reject" font="Sans,10,-1,5,50,0,0,0,0,0" linecolor="none" />
      </assocwidget>
      <assocwidget totalcounta="2" indexa="1" visibilityB="200" totalcountb="2" indexb="1" linewidth="none" widgetbid="35976" widgetaid="40519" roleBdoc="" documentation="" roleAdoc="" type="515" changeabilityA="900" changeabilityB="900" linecolor="none" visibilityA="200" >
       <linepath>
        <startpoint startx="339" starty="771" />
-       <endpoint endx="353" endy="718" />
+       <endpoint endx="339" endy="720" />
       </linepath>
      </assocwidget>
      <assocwidget totalcounta="2" indexa="1" visibilityB="200" totalcountb="2" indexb="1" linewidth="none" widgetbid="40503" widgetaid="35976" roleBdoc="" documentation="" roleAdoc="" type="515" changeabilityA="900" changeabilityB="900" linecolor="none" visibilityA="200" >
       <linepath>
-       <startpoint startx="353" starty="685" />
+       <startpoint startx="339" starty="687" />
        <endpoint endx="339" endy="553" />
       </linepath>
      </assocwidget>
@@ -1585,7 +1585,7 @@ Then judge if equilibrium has been reached on whether:
      </assocwidget>
      <assocwidget totalcounta="2" indexa="1" visibilityB="200" totalcountb="2" indexb="1" linewidth="none" widgetbid="40503" widgetaid="37073" roleBdoc="" documentation="" roleAdoc="" type="515" changeabilityA="900" changeabilityB="900" linecolor="none" visibilityA="200" >
       <linepath>
-       <startpoint startx="182" starty="1024" />
+       <startpoint startx="171" starty="1019" />
        <endpoint endx="329" endy="543" />
        <point x="171" y="543" />
       </linepath>
@@ -1593,7 +1593,7 @@ Then judge if equilibrium has been reached on whether:
      <assocwidget totalcounta="2" indexa="1" visibilityB="200" totalcountb="2" indexb="1" linewidth="none" widgetbid="39721" widgetaid="35190" roleBdoc="" documentation="" roleAdoc="" type="513" changeabilityA="900" changeabilityB="900" linecolor="none" visibilityA="200" >
       <linepath>
        <startpoint startx="680" starty="612" />
-       <endpoint endx="672" endy="609" />
+       <endpoint endx="706" endy="626" />
       </linepath>
      </assocwidget>
      <assocwidget totalcounta="2" indexa="1" visibilityB="200" totalcountb="2" indexb="1" linewidth="none" widgetbid="36159" widgetaid="36067" roleBdoc="" documentation="" roleAdoc="" type="515" changeabilityA="900" changeabilityB="900" linecolor="none" visibilityA="200" >
