@@ -51,6 +51,7 @@ contains
     
     type (rdf) :: rdf_printout
     type (histogram) :: rdf_printout_histogram 
+    type (histogram) :: rdf_cal_histogram
     
     real (db), dimension(6) :: sigma_search  ! to hold what sigmas
                                              ! loop over
@@ -79,6 +80,8 @@ contains
     ! to print out g(r) to file 
     
     rdf_printout_histogram = make_histogram(c%r_max, c%bin_length)
+    
+    rdf_cal_histogram = make_histogram(c%n_bin_cal_rdf, c%bin_length_cal_rdf)
                         
     rdf_printout = make_rdf(product(a_config%str%box_edges), size(a_config%str%atoms), &
                        floor(c%r_max/c%bin_length), c%bin_length)                    
@@ -229,7 +232,7 @@ contains
         call trajectory_in_phasespace(my_ps, common_pe_list, c%cal_rdf_at_interval, c%time_step)
 
        
-        call func_accum_histogram(my_ps%str, common_fom_list)
+        call accum_histogram(rdf_cal_histogram, my_ps%str)
         
         ! to print out rdf
         
@@ -237,7 +240,7 @@ contains
         
       end do 
       
-      write(print_to_file,'(a,f12.4)') "FOM = ", func_val(my_ps%str, common_fom_list)
+      write(print_to_file,'(a,f12.4)') "FOM = ", func_val(rdf_cal_histogram, common_fom_list)
       write(print_to_file, '(a,f12.4)') "Finished cal FOM. Time: ", toc()
       write(print_to_file, *) " "
       write(print_to_screen, '(a,f12.4)') "Finished cal FOM. Time: ", toc()
@@ -251,7 +254,7 @@ contains
       call save_rdf(rdf_printout, c%temperature, density)
       call clear_histogram(rdf_printout_histogram)
       
-      call func_clear_histogram(my_ps%str, common_fom_list)
+      call clear_histogram(rdf_cal_histogram)
           
     end do ! end of sigma search
                              

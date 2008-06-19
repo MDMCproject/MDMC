@@ -22,14 +22,37 @@ implicit none
     
     ! stuff which is in common for all function containers
     type (func_params) :: params
-    type (histogram) :: hist ! used for calculating rdf_cal
+    !type (histogram) :: hist ! used for calculating rdf_cal
   end type rdf_fom_container
 
+  interface rdf_fom_val
+    module procedure rdf_fom_val_structure
+    module procedure rdf_fom_val_histogram
+  end interface 
 
 contains
 
-  function rdf_fom_val(str, c) result (val)
+  function rdf_fom_val_structure(str, c) result (val)
     type (structure), intent(in) :: str
+  	type (rdf_fom_container), intent(inout) :: c
+    real (db) :: val
+  
+    real(db) :: n_bin  
+    type (histogram) :: l_hist
+   
+    n_bin = size(c%rdf_cal%val)
+    
+    l_hist = make_histogram(n_bin, c%rdf_cal%bin_length)
+    call cal_rdf(c%rdf_cal, l_hist) 
+    call deallocate_histogram(l_hist)
+    
+    val = c%weight / n_bin * &
+      sum( (c%rdf_data%val(1:n_bin) - c%scale_factor*c%rdf_cal%val)**2 )
+
+  end function rdf_fom_val_structure
+  
+  function rdf_fom_val_histogram(hist, c) result (val)
+    type (histogram), intent(in) :: hist
   	type (rdf_fom_container), intent(inout) :: c
     real (db) :: val
   
@@ -37,20 +60,13 @@ contains
    
     n_bin = size(c%rdf_cal%val)
     
-    ! in case hist%n_accum > 0 then this implies that this histogram
-    ! has been calculated by some other means (that is in particular
-    ! hist%sum)
-     
-    if (c%hist%n_accum == 0) then
-      call cal_histogram(c%hist, str)
-    end if
     
-    call cal_rdf(c%rdf_cal, c%hist) 
+    call cal_rdf(c%rdf_cal, hist) 
     
     val = c%weight / n_bin * &
-      sum((c%rdf_data%val(1:n_bin) - c%scale_factor*c%rdf_cal%val)**2)
+      sum( (c%rdf_data%val(1:n_bin) - c%scale_factor*c%rdf_cal%val)**2 )
 
-  end function rdf_fom_val
+  end function rdf_fom_val_histogram
   
     
 end module rdf_fom_class

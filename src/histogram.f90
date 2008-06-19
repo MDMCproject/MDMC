@@ -5,7 +5,7 @@ use structure_class
 implicit none
 
 
-  public :: make_histogram
+  public :: make_histogram, deallocate_histogram
   public :: copy_histogram
   public :: cal_histogram
   public :: accum_histogram, clear_histogram
@@ -32,6 +32,11 @@ implicit none
     ! ....
     
   end type histogram
+  
+  interface make_histogram
+    module procedure make_histogram_r_max
+    module procedure make_histogram_n_bin
+  end interface  
 
 contains
 
@@ -69,12 +74,27 @@ contains
   end subroutine clear_histogram
   
   
-  function make_histogram(r_max, bin_length) result(hist)
+  subroutine deallocate_histogram(hist)
+    type (histogram), intent(inout) :: hist
+    
+    hist%bin_length = -1000
+    
+    deallocate(hist%val)
+    deallocate(hist%sum)
+  
+  end subroutine deallocate_histogram
+  
+    
+  function make_histogram_r_max(r_max, bin_length) result(hist)
     real(db), intent(in) :: r_max, bin_length
     type (histogram) :: hist
     
     
     hist%bin_length = bin_length 
+    
+    ! Want the histogram to ideally represent values not 
+    ! larger than r_max here. Hence the reason for using floor()
+    ! here rather than nint().
     
     allocate(hist%val(floor(r_max/bin_length)))
     allocate(hist%sum(floor(r_max/bin_length)))
@@ -85,7 +105,30 @@ contains
     hist%sum = 0
     hist%n_accum = 0
   
-  end function make_histogram
+  end function make_histogram_r_max
+
+  function make_histogram_n_bin(n_bin, bin_length) result(hist)
+    real(db), intent(in) :: bin_length
+    integer, intent(in):: n_bin
+    type (histogram) :: hist
+    
+    
+    hist%bin_length = bin_length 
+    
+    ! Want the histogram to ideally represent values not 
+    ! larger than r_max here. Hence the reason for using floor()
+    ! here rather than nint().
+    
+    allocate(hist%val(n_bin))
+    allocate(hist%sum(n_bin))
+    
+    ! initialise
+    
+    hist%val = 0
+    hist%sum = 0
+    hist%n_accum = 0
+  
+  end function make_histogram_n_bin 
   
   
   function copy_histogram(hist_in) result(hist_out)

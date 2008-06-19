@@ -20,10 +20,22 @@ program mdmc
   
   ! set build in random generator function seeds
   ! note only need to do this once 
+  !
+  ! Note I can't seem to force random_number to always
+  ! produce the same sequence of random numbers...
+  !
+  ! Intel fortran has another random number function
+  ! which is called rand() which seem to able to do
+  ! this but it may not be part of standard F90.
+  ! Tried it and the f'ing rand() worked the same as
+  ! random_number
   
   integer :: n_seeds
+  INTEGER, ALLOCATABLE :: new (:)
   call random_seed(size=n_seeds)
-  call random_seed(put=(/(i, i = 1, n_seeds)/))
+  ALLOCATE (new(I))
+  new = 5
+  CALL RANDOM_SEED (PUT=new(1:I))
   
   
   write (*,*) "Enter pathname/filename"
@@ -31,6 +43,10 @@ program mdmc
     
   ! Because of bug in otherwise very useful xmlf90 library 
   ! need to read in input file in bits...... 
+  
+  ! Assume <structure> element is before the <fom> element
+  ! and make structure differently depending on whether the
+  ! <structure> element has an attribute "filename" or not
   
   call open_xmlfile(trim(filename),fxml,iostat)
   if (iostat /= 0) stop "Cannot open file."
@@ -43,7 +59,7 @@ program mdmc
     call make_structure(trim(structure_filename))
   end if
    
-  call close_xmlfile(fxml)
+  call close_xmlfile(fxml)  
   
   
   if (build_structure_from_model) then
@@ -51,15 +67,11 @@ program mdmc
   end if
   
   
-  ! open main input file to check if an rdf_fom present in input file
-  ! and if this is the case look for rdf data filename. Grab name of
-  ! this file and run make_rdf_fom(). This is done in this way because of a 
-  ! bug in the xmlf90 library (otherwise an excellent library)  
+  ! Same as above but for the <fom> element. 
   
   call open_xmlfile(trim(filename),fxml,iostat)
   
   call get_node(fxml, path="//fom/rdf-fom/rdf-data",attributes=structure_attributes,status=iostat)
-  
   call get_value(structure_attributes, "filename", structure_filename, iostat)
   
   call close_xmlfile(fxml)  
@@ -75,7 +87,6 @@ program mdmc
   call open_xmlfile(trim(filename),fxml,iostat)
   
   call get_node(fxml, path="//fix-this-later-g-d-data",attributes=structure_attributes,status=iostat)
-  
   call get_value(structure_attributes, "filename", structure_filename, iostat)
   
   call close_xmlfile(fxml)  

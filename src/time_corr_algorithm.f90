@@ -322,31 +322,5 @@ contains
     num_buffs_cal_thus_far = 0
 
   end subroutine reset_buffer
-  
-
-
-!  function g_d_fom_val() result(val)
-!    real(db) :: val
-!    
-!    integer :: i, i_bin
-!    
-!    integer n_eval_times, n_bin
-!    
-!    n_eval_times = size(g_d_data, 2)
-!    n_bin = size(g_d_data, 1)
-!  
-!    val = 0.0
-!    
-!    g_prefac = g_prefac / n_buffer_average_over
-!
-!    do i = 1, n_eval_times    
-!      do i_bin = 20, n_bin
-!         val = val + (g_d_data(i_bin, i) - g_d_hists_sum(i)%val(i_bin)*g_prefac(i_bin))**2
-!      end do 
-!    end do
-!    
-!    g_prefac = g_prefac * n_buffer_average_over  
-!  
-!  end function g_d_fom_val
     
 end module time_corr_algorithm_class

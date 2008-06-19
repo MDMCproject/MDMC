@@ -99,7 +99,7 @@
     
     
     
-    <mc-steps number="50" /> 
+    <mc-steps number="10" /> 
     <temperature-mc val="0.02" />    
     
     <!-- specify stuff which is repeated mc-steps times 

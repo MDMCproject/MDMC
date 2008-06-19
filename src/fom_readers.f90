@@ -17,6 +17,19 @@ use converters_class
 
 contains
 
+  ! Populates parts of target_rdf_fom (which is of type rdf_fom_container)
+  ! More specifically this method 
+  !
+  !   1. counts the number of <g-of-r> tags in file and store this
+  !      as number_of_g_of_r
+  !   2. read "bin-length" attribute of <rdf> tag
+  !   3. Assumes common_config%str already has been created and allocate
+  !      space for target_rdf_fom%rdf_data and then populate rdf_data with data
+  !
+  ! So the parts populated are:
+  ! 
+  !  target_rdf_fom%rdf_data
+  !  
   subroutine make_rdf_fom(filename)
     use flib_sax  
     use flib_xpath    
@@ -27,7 +40,7 @@ contains
     
     
     ! before reading the rdf data file from a-to-z determine
-    ! separately how many g-or-r elements it contains
+    ! separately how many g-of-r elements it contains
     
     call open_xmlfile(trim(filename),fxml,iostat)
     
@@ -81,8 +94,6 @@ contains
       case("rdf")
         call get_value(attributes,"title", target_rdf_fom%title, status)
         
-        !call get_value(attributes,"r-max", read_db,status)
-        !number_db = string_to_db(read_db) 
         
         call get_value(attributes,"bin-length", read_db,status)
         number_db2 = string_to_db(read_db)
@@ -101,18 +112,6 @@ contains
         target_rdf_fom%rdf_data%val(count_number_atoms) = string_to_db(read_db)
    
         count_number_atoms = count_number_atoms + 1        
-
-
-      case("scale-factor")
-        call get_value(attributes,"val", read_db,status)
-        target_rdf_fom%scale_factor = string_to_db(read_db)
-        
-              
-      case("sigma")
-        call get_value(attributes,"val", read_db,status)
-        number_db = string_to_db(read_db)
-        target_rdf_fom%weight = 1/(number_db*number_db)
-        
         	
     end select
 

@@ -206,7 +206,7 @@ contains
     real (db), intent(in) :: temperature
     type (phasespace) :: ps
 
-    integer :: n_tot, i
+    integer :: n_tot, i, j
     !real(db), dimension(ndim) :: momentum_sum  ! mainly for debugging    
     real(db) :: momentum_scale
     real(db), dimension(ndim) :: dummy_vec
@@ -255,9 +255,11 @@ contains
 
     
     ! assign random velocities
-    
+
     do i = 1, n_tot
+      ! generate random numbers not in predictable sequence
       call random_number(ps%p(i,:))
+      
       ps%p(i,:) = ps%p(i,:) * momentum_scale / sqrt(sum(ps%p(i,:)*ps%p(i,:)))
     end do 
       

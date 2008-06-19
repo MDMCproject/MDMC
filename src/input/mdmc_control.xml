@@ -81,7 +81,7 @@
     </perform-initial-temperature-calibration>
     
     
-    <mc-steps number="100" /> 
+    <mc-steps number="2" /> 
     <temperature-mc val="0.005" />    
     
     <!-- specify stuff which is repeated mc-steps times 

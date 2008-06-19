@@ -405,8 +405,11 @@ contains
           
           ! It is assumed here that rdf-data is positioned
           ! above r-max in rdf-fom
+          ! Note prefer floor() rather than nint() perhaps - not
+          ! that important.
           
           size_of_rdf_cal_val_array = floor(number_db/target_rdf_fom%rdf_data%bin_length)
+          
           
           ! this number cannot be larger the number of data points
           
@@ -414,11 +417,14 @@ contains
             size_of_rdf_cal_val_array = size(target_rdf_fom%rdf_data%val)
           end if
           
+          ! Allocate space for dummy rdf_cal attribute
           target_rdf_fom%rdf_cal = make_rdf(product(common_config%str%box_edges), &
               size(common_config%str%atoms), size_of_rdf_cal_val_array, &
-              target_rdf_fom%rdf_data%bin_length)  
-          target_rdf_fom%hist = make_histogram(number_db, &
-              target_rdf_fom%rdf_data%bin_length)          
+              target_rdf_fom%rdf_data%bin_length)       
+ 
+          ! set stuff which enable user to create histogram suitable for calculating rdf
+          setup_mdmc_control_params%n_bin_cal_rdf = size_of_rdf_cal_val_array
+          setup_mdmc_control_params%bin_length_cal_rdf = target_rdf_fom%rdf_data%bin_length      
           
         case("scale-factor")
           call get_value(attributes,"val",read_db,status)

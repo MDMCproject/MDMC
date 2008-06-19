@@ -271,9 +271,9 @@ contains
     else if (filname_number2 < 1000) then
       write(filename, '(i3)') filname_number2
     else
-      write(*,*) "ERROR: in save_rdf"
+      write(*,*) "ERROR: in print_g_s"
       write(*,*) "It is assumed that you did not intend to write"
-      write(*,*) "to disk 1000 rdf xml files!!!!"
+      write(*,*) "to disk 1000 g_s xml files!!!!"
       stop
     end if
     
@@ -360,9 +360,9 @@ contains
     else if (filname_number3 < 1000) then
       write(filename, '(i3)') filname_number3
     else
-      write(*,*) "ERROR: in save_rdf"
+      write(*,*) "ERROR: in print_g_d"
       write(*,*) "It is assumed that you did not intend to write"
-      write(*,*) "to disk 1000 rdf xml files!!!!"
+      write(*,*) "to disk 1000 g_d xml files!!!!"
       stop
     end if
     

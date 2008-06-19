@@ -48,6 +48,13 @@ implicit none
     ! r-max and bin-length are here only used when wanting to save g(r) to file
     real(db) :: r_max                  ! cal rdf for interval [0:r_max]
     real(db) :: bin_length             ! at positions 0.5*bin_length, 1.5*bin_length, etc ....    
+    
+    ! Used for creating a histogram that has a binning and 
+    ! length which is determined by the binning of the rdf data
+    ! and either the length of the data or the <r-max> sub-
+    ! element of <rdf-fom>.
+    integer :: n_bin_cal_rdf = -1000 
+    real(db) :: bin_length_cal_rdf = -1000.0   
         
     integer :: mc_steps   ! number of Monte carlo steps  
     

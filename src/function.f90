@@ -9,10 +9,6 @@ implicit none
 
   public :: func_val
   public :: func_deriv
-  
-  ! for accummulating and clearing the common histogram attribute
-  public :: func_accum_histogram
-  public :: func_clear_histogram
 
   private :: add_lj_pe_container
   private :: add_rdf_fom_container
@@ -27,6 +23,11 @@ implicit none
     module procedure add_lj_pe_container
     module procedure add_rdf_fom_container
   end interface
+  
+  interface func_val
+    module procedure func_val_histogram
+    module procedure func_val_structure
+  end interface  
   
 contains
 
@@ -46,7 +47,7 @@ contains
   end subroutine add_rdf_fom_container  
 
   
-  function func_val(str, list) result (val)
+  function func_val_structure(str, list) result (val)
     type (structure), intent(in) :: str
     type (func_list), intent(inout) :: list
     real (db) :: val
@@ -56,40 +57,26 @@ contains
     else if ( associated(list%pt_rdf_fom) ) then
       val = rdf_fom_val(str, list%pt_rdf_fom)
     else
-      print *, "Error in func_val"
+      print *, "Error in func_val_structure"
       stop
     end if
-  end function func_val
-  
-  
-  subroutine func_accum_histogram(str, list)
-    type (structure), intent(in) :: str
+  end function func_val_structure
+
+  function func_val_histogram(hist, list) result (val)
+    type (histogram), intent(in) :: hist
     type (func_list), intent(inout) :: list
+    real (db) :: val
 
     if ( associated(list%pt_lj_pe) ) then
-      call accum_histogram(list%pt_lj_pe%hist, str)
+      print *, "Problem in func_val_histogram"
+      stop
     else if ( associated(list%pt_rdf_fom) ) then
-      call accum_histogram(list%pt_rdf_fom%hist, str)
+      val = rdf_fom_val(hist, list%pt_rdf_fom)
     else
-      print *, "Error in func_val"
+      print *, "Error in func_val_histogram"
       stop
     end if
-  end subroutine func_accum_histogram
-  
-  
-  subroutine func_clear_histogram(str, list)
-    type (structure), intent(in) :: str
-    type (func_list), intent(inout) :: list
-
-    if ( associated(list%pt_lj_pe) ) then
-      call clear_histogram(list%pt_lj_pe%hist)
-    else if ( associated(list%pt_rdf_fom) ) then
-      call clear_histogram(list%pt_rdf_fom%hist)
-    else
-      print *, "Error in func_val"
-      stop
-    end if
-  end subroutine func_clear_histogram
+  end function func_val_histogram  
   
   
   subroutine func_deriv(str, deriv, list, pressure_comp, pot_energy)

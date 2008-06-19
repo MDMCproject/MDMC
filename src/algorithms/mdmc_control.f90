@@ -49,6 +49,7 @@ contains
     
     type (rdf) :: rdf_printout
     type (histogram) :: rdf_printout_histogram 
+    type (histogram) :: rdf_cal_histogram
 
 	
     integer :: print_to_file = 555
@@ -97,6 +98,7 @@ contains
     ! of the MDMC algorithm and may be removed later)
     
     rdf_printout_histogram = make_histogram(c%r_max, c%bin_length)
+    rdf_cal_histogram = make_histogram(c%n_bin_cal_rdf, c%bin_length_cal_rdf)
     rdf_printout = make_rdf(product(a_config%str%box_edges), size(a_config%str%atoms), &
                        floor(c%r_max/c%bin_length), c%bin_length)                    
                                                
@@ -202,7 +204,7 @@ contains
 
       call trajectory_in_phasespace(my_ps, common_pe_list, c%cal_rdf_at_interval, c%time_step)
       
-      call func_accum_histogram(my_ps%str, common_fom_list)
+      call accum_histogram(rdf_cal_histogram, my_ps%str)
       
       ! to print out rdf
       
@@ -211,8 +213,8 @@ contains
     end do 
     
     !! print also out what the param values are
-    fom_val = func_val(my_ps%str, common_fom_list)
-    call func_clear_histogram(my_ps%str, common_fom_list)
+    fom_val = func_val(rdf_cal_histogram, common_fom_list)
+    call clear_histogram(rdf_cal_histogram)
     write(print_to_file,'(a,f12.4)') "1st FOM = ", fom_val
     write(print_to_file, '(a,f12.4)') "Finished cal 1st FOM. Time: ", toc()
     write(print_to_file, *) " "
@@ -341,7 +343,7 @@ contains
 
         call trajectory_in_phasespace(my_ps, common_pe_list, c%cal_rdf_at_interval, c%time_step)
        
-        call func_accum_histogram(my_ps%str, common_fom_list)
+        call accum_histogram(rdf_cal_histogram, my_ps%str)
         
         ! to print out rdf
         
@@ -350,8 +352,8 @@ contains
       end do 
       
       !! print also out what the param values are
-      fom_val = func_val(my_ps%str, common_fom_list)
-      call func_clear_histogram(my_ps%str, common_fom_list)
+      fom_val = func_val(rdf_cal_histogram, common_fom_list)
+      call clear_histogram(rdf_cal_histogram)
       write(print_to_file,'(a,f12.4)') "FOM = ", fom_val
       write(print_to_file, '(a,f12.4)') "Finished cal FOM. Time: ", toc()
       write(print_to_file, *) " "
@@ -431,7 +433,7 @@ contains
 
       call trajectory_in_phasespace(my_ps, common_pe_list, c%cal_rdf_at_interval, c%time_step)
        
-      call func_accum_histogram(my_ps%str, common_fom_list)
+      call accum_histogram(rdf_cal_histogram, my_ps%str)
         
       ! to print out rdf
         
@@ -439,8 +441,8 @@ contains
         
     end do 
       
-    fom_val = func_val(my_ps%str, common_fom_list)
-    call func_clear_histogram(my_ps%str, common_fom_list)
+    fom_val = func_val(rdf_cal_histogram, common_fom_list)
+    call clear_histogram(rdf_cal_histogram)
     write(print_to_file,'(a,f12.4)') "BEST FOM = ", fom_val
     write(print_to_file,'(a)') "WITH: "
     call print_all_func_params(print_to_file, common_pe_list)
