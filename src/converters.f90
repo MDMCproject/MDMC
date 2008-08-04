@@ -58,7 +58,11 @@ function string_to_db(str) result(db_out)
   call token_analysis(s,ntokens,last_pos)
   if (ntokens /= 1) STOP "ERROR in string_to_db"
   read(unit=s(1:last_pos),fmt=*,iostat=status) db_out
-  if (status /= 0) STOP "db conversion error"
+  if (status /= 0) then
+    print *, "Cannot convert the following string to double:"
+    print *, str
+    STOP "db conversion error"
+  end if
 
 end function string_to_db
 

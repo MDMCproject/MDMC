@@ -14,7 +14,7 @@
   <structure what-init-structure-to-build="fcc">
     <title>Liquid Ar</title>
     <density units="atom/AA3" val="0.020265" />
-    <number-of-unit-cells nx="6" ny ="6" nz="6" />
+    <number-of-unit-cells nx="5" ny ="5" nz="5" />
   </structure>
   
   <!-- To not use nearest neighbour method include element below.
@@ -35,19 +35,17 @@
     <soft-cutoff-constraint /> 
   </constraints>
   
-<!--  
+  
   <fom>
-    <rdf-fom>
-      <rdf-data filename="../data/Argon_liquid_P1atm/xml_copy_of_robert_Ar.xml" />
-      <r-max units="AA" val="10.0" />
+    <g-d-rt-fom>
+      <data-file filename="C:\Backup\Backup_folder1\work\code\RMC++\mdmc\trunk\src\output\g_d_data_fcc_864atomsAve100r18AA.xml" />
+    <!--  <r-cut units="AA" min="0.0" max="10000.0" />
+      <t-cut units="AA" min="0.0" max="10000.0" /> -->
       <scale-factor val="1.0" />
       <sigma val="1.0" />
-    </rdf-fom>
-  </fom>
--->  
-  
-  <fix-this-later-g-d-data filename="C:\Backup\Backup_folder1\work\code\RMC++\mdmc\trunk\src\output\g_d_data_fcc_864atoms_1.xml" />
-  
+    </g-d-rt-fom>
+  </fom> 
+
   
   <gpe>
     <lj-potential>
@@ -83,25 +81,22 @@
       <total-step-temp-cali number="20000" />
       <adjust-temp-at-interval number="200" />
     </perform-initial-temperature-calibration>
-    
-    
+
+
     <time-correlation>
-      <!-- If n-time-evals/n-time-buffers is not an integer then
-           set n-time-evals = n-time-buffers * floor(n-time-evals/n-time-buffers)
-           -->
-      <n-time-buffers number="10" />
-      <n-buffer-average-over number="50" />
-   <!--   
-      <n-time-evals number="250" />
-      <n-delta-t number="4" />
-      -->
+      <n-g-r-t-to-average-over number="25" />    <!-- Number of g(r,t) to average over -->
+      <n-md-step-between-buffers number="100" />  <!-- how long between the calculated g(r,t) to make stat. independent -->
+      <md-per-time-bin number="4" />  <!-- Robert said nearly always set to 1, although it may be used
+                                           to reduce the number of output t-points when outputting g(r,t)
+                                           for plotting -->
+      <n-time-bin number="100" />
     </time-correlation>
-    
-    
-    
-    <mc-steps number="10" /> 
-    <temperature-mc val="0.02" />    
-    
+
+
+
+    <mc-steps number="200" />
+    <temperature-mc val="0.02" />
+
     <!-- specify stuff which is repeated mc-steps times 
          -->
     <md-steps-repeated-equilibration number="20000" average-over="1000" />
@@ -110,9 +105,11 @@
       <adjust-temp-at-interval-repeated number="200" />
     </perform-repeated-temperature-calibration>
     <calculate-rdf>
-      <cal-rdf-at-interval number="50" />
-      <average-over-this-many-rdf number="200" />  
-      
+      <!-- <cal-rdf-at-interval number="50" />
+      <average-over-this-many-rdf number="200" />
+      -->
+      <r-max units="AA" val="50.0" />
+      <bin-length units="AA" val="0.1" />
     </calculate-rdf>    
         
   </control-object>

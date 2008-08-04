@@ -14,7 +14,7 @@
   <structure what-init-structure-to-build="fcc">
     <title>Liquid Ar</title>
     <density units="atom/AA3" val="0.020265" />
-    <number-of-unit-cells nx="6" ny ="6" nz="6" />
+    <number-of-unit-cells nx="5" ny ="5" nz="5" />
   </structure>
   
   <!-- To not use nearest neighbour method include element below.
@@ -81,14 +81,13 @@
     </perform-initial-temperature-calibration>
     
     
-    <time-correlation>
-      <!-- If n-time-evals/n-time-buffers is not an integer then
-           set n-time-evals = n-time-buffers * floor(n-time-evals/n-time-buffers)
-           -->
-      <n-time-buffers number="10" />
-      <n-time-evals number="250" />
-      <n-buffer-average-over number="50" />
-      <n-delta-t number="4" />
+    <time-correlation> 
+      <n-g-r-t-to-average-over number="100" />  <!-- Number of g(r,t) to average over -->
+      <n-md-step-between-buffers number="100" /> <!-- how long between the calculated g(r,t) to make stat. independent -->      
+      <md-per-time-bin number="4" />  <!-- Robert said nearly always set to 1, although it may be used
+                                           to reduce the number of output t-points when outputting g(r,t)
+                                           for plotting -->
+      <n-time-bin number="100" />
     </time-correlation>
     
 

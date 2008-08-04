@@ -84,6 +84,7 @@ integer  :: n, i
 status = -1
 n = dict%number_of_items
 do  i = 1, n
+      !print *, str(dict%key(i))
       if (dict%key(i) .EQUAL. key) then
          value = str(dict%value(i))
          status = 0

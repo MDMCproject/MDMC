@@ -74,11 +74,11 @@ contains
     ! Notice should also compare the Q array in that container with 
     ! Q array in the s_q_t container  
     
-    n_r = get_time_corr_hist_n_bin(g_r_t)
+    n_r = get_time_corr_hist_n_r_bin(g_r_t)
     
     if (is_integrat_over_r_precal_allocated(local_integrat_over_r_precal) == .false.) then
       local_integrat_over_r_precal = make_and_cal_integrat_over_r_precal( &
-        n_r, get_time_corr_hist_bin_length(g_r_t) &
+        n_r, get_time_corr_hist_r_bin(g_r_t) &
         , s_q_t%q)
     end if
   
@@ -89,7 +89,7 @@ contains
     density = get_density(str)
     
     n_q = size(s_q_t%q)
-    n_t = get_time_corr_hist_n_time_evals(g_r_t)
+    n_t = get_time_corr_hist_n_time_bin(g_r_t)
     
     
     allocate(prefac_s_d(n_r))

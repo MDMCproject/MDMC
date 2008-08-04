@@ -54,20 +54,20 @@ if nargout == 1
 end
 
 
-subplot(1,3,1)
-surf(q, omega, S_d')
-xlabel('q [AA\^-1]')
-ylabel('\omega 1/[10\^-13 s]')
-zlabel('S_d (q,\omega)')
-title(char(top_element.item(0).getAttribute('title')))
+%subplot(1,3,1)
+%surf(q, omega, S_d')
+%xlabel('q [AA\^-1]')
+%ylabel('\omega 1/[10\^-13 s]')
+%zlabel('S_d (q,\omega)')
+%title(char(top_element.item(0).getAttribute('title')))
 
-subplot(1,3,2)
-surf(q, omega, S_s')
-xlabel('q [AA\^-1]')
-ylabel('\omega 1/[10\^-13 s]')
-zlabel('S_s (q,\omega)')
+%subplot(1,3,2)
+%surf(q, omega, S_s')
+%xlabel('q [AA\^-1]')
+%ylabel('\omega 1/[10\^-13 s]')
+%zlabel('S_s (q,\omega)')
 
-subplot(1,3,3)
+%subplot(1,3,3)
 surf(q, omega, S_s'+S_d')
 xlabel('q [AA\^-1]')
 ylabel('\omega 1/[10\^-13 s]')

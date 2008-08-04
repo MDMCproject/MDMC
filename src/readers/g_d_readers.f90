@@ -19,15 +19,15 @@ use time_corr_algorithm_class
   ! changed in the future (notice have left some commented out
   ! code for g_d_fom_val() in time_corr_algorithm.f90
   
-  real(db), dimension(:,:), allocatable :: g_d_data
+  !real(db), dimension(:,:), allocatable :: g_d_data
 
 
 contains
 
 
-  ! read data from filename into public g_d_data array in time_correlation  
+  ! read G_d(r,t) data from file and store in target_g_d_rt_fom
 
-  subroutine make_g_d_data_array(filename)
+  subroutine make_g_d_rt_fom_container(filename)
     use flib_sax  
     use flib_xpath    
     character(len=*), intent(in) :: filename
@@ -35,14 +35,14 @@ contains
     type(xml_t) :: fxml
     integer     :: iostat
     
-    character(len=40) :: read_db
+    character(len=40) :: read_db, read_int
     type (dictionary_t) :: structure_attributes
     
     real(db) :: r_first, r_last, r_max
     real(db) :: t_last
-    real(db) :: bin_length, delta_t
+    real(db) :: r_bin, t_bin
     
-    integer :: n_bin, n_time_evals
+    integer :: n_r_bin, n_time_bin
     integer :: i, j
     
     integer :: number_of_g_d  ! counts # of G-d elements
@@ -51,14 +51,31 @@ contains
     ! separately how many g-d elements it contains
     
     call open_xmlfile(trim(filename),fxml,iostat)
+    if (iostat /= 0) stop "Cannot open g_d data file."
     
     
-    ! get bin_length
+    ! get r_bin, density and number of atoms
     
-    call get_node(fxml, path="//G_d-space-time-pair-correlation-function", attributes=structure_attributes, status=iostat)    
-   
+    call get_node(fxml, path="//G_d-space-time-pair-correlation-function", attributes=structure_attributes, status=iostat)       
     call get_value(structure_attributes,"bin-length",read_db,status=iostat)
-    bin_length = string_to_db(read_db)    
+    if (iostat /= 0) stop "No bin-length attribute in g_d data file."
+    r_bin = string_to_db(read_db)   
+    
+    !print *, "r_bin = ", r_bin
+    
+    call get_value(structure_attributes,"density",read_db,status=iostat)
+    if (iostat /= 0) stop "No density attribute in g_d data file."
+    target_g_d_rt_fom%density = string_to_db(read_db)  
+    
+    call get_value(structure_attributes,"n-atom",read_int,status=iostat)
+    if (iostat /= 0) stop "No n-atom attribute in g_d data file."
+    target_g_d_rt_fom%n_atom = string_to_int(read_int)
+        
+    !print *, target_g_d_rt_fom%n_atom   
+        
+    !stop    
+        
+     
     
     ! count first g_d element
     
@@ -88,40 +105,39 @@ contains
 
 
     r_max = r_last+r_first
-    n_bin = nint( (r_last+r_first) / bin_length )
-    n_time_evals = number_of_g_d / n_bin
-    delta_t = t_last / (n_time_evals-1)
+    n_r_bin = nint( (r_last+r_first) / r_bin )
+    n_time_bin = number_of_g_d / n_r_bin
+    t_bin = t_last / (n_time_bin-1)
     
     
-    ! VERY BAD WHAT I AM DOING HERE
-    
-    setup_mdmc_control_params%r_max = r_max
-    setup_mdmc_control_params%bin_length = bin_length
-    setup_mdmc_control_params%n_time_evals = n_time_evals
-    setup_mdmc_control_params%g_d_data_time_step = delta_t
+    target_g_d_rt_fom%n_r_bin = n_r_bin
+    target_g_d_rt_fom%r_bin = r_bin
+    target_g_d_rt_fom%n_t_bin = n_time_bin
+    target_g_d_rt_fom%t_bin = t_bin
 
 
-    allocate(g_d_data(floor(r_max/bin_length), n_time_evals))
+    allocate(target_g_d_rt_fom%obs(floor(r_max/r_bin), n_time_bin))
   
   
     call close_xmlfile(fxml)  
-
+    
 
     call open_xmlfile(trim(filename),fxml,iostat)
     
     
-    do j = 1, n_time_evals
-      do i = 1, n_bin
+    do j = 1, n_time_bin
+      do i = 1, n_r_bin
       
         call get_node(fxml, path="//G_d-space-time-pair-correlation-function/G-d", &
           attributes=structure_attributes, status=iostat) 
         call get_value(structure_attributes,"G",read_db,status=iostat)
-        g_d_data(i, j) = string_to_db(read_db)             
+        target_g_d_rt_fom%obs(i, j) = string_to_db(read_db)         
         
+        !print *, j, i 
       end do
     end do
 
-
+!stop
 
 !    ! now begin reading rdf data file from a-to-z
 !
@@ -138,7 +154,7 @@ contains
     
     call close_xmlfile(fxml)                             
 
-  end subroutine make_g_d_data_array
+  end subroutine make_g_d_rt_fom_container
 
   
   
@@ -159,45 +175,9 @@ contains
     character(len=40) :: read_db, read_int    
     
 
-    select case(name)
-      case("rdf")
-!        call get_value(attributes,"title", target_rdf_fom%title, status)
-!        
-!        !call get_value(attributes,"r-max", read_db,status)
-!        !number_db = string_to_db(read_db) 
-!        
-!        call get_value(attributes,"bin-length", read_db,status)
-!        number_db2 = string_to_db(read_db)
-!
-!        
-!        target_rdf_fom%rdf_data = make_rdf(product(common_config%str%box_edges), &
-!                                  size(common_config%str%atoms), number_of_g_d, &
-!                                  number_db2)
-!                        
-!        count_number_atoms = 1
-
-                        
-      case("G-d")
-
-        
-!
-!        call get_value(attributes,"g", read_db,status)
-!        target_rdf_fom%rdf_data%val(count_number_atoms) = string_to_db(read_db)
-!   
-!        count_number_atoms = count_number_atoms + 1        
-
-
-!      case("scale-factor")
-!        call get_value(attributes,"val", read_db,status)
-!        target_rdf_fom%scale_factor = string_to_db(read_db)
-!        
-!              
-!      case("sigma")
-!        call get_value(attributes,"val", read_db,status)
-!        number_db = string_to_db(read_db)
-!        target_rdf_fom%weight = 1/(number_db*number_db)
-        
-        	
+    select case(name)                       
+      !case("G-d")
+	
     end select
 
 

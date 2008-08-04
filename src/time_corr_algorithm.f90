@@ -9,7 +9,7 @@ use phasespace_class
 implicit none
 
   public :: cal_time_corr_container
-  public :: set_n_buffer_average_over, set_n_time_buffers  ! used in handler only
+  public :: set_n_g_r_t_to_average_over, set_n_buffers  ! used in handler only
 
   private :: update_act_r 
   private :: allocate_buffer, reset_buffer
@@ -19,7 +19,7 @@ implicit none
   type buffer
     ! time_count may be negative, but buffers are only calculated
     ! for time_count values: 0,1,2,...,N-1, where N equals the XML 
-    ! element <n-time-evals> 
+    ! element <n-time-bin> 
     
     integer :: time_count
  
@@ -32,13 +32,14 @@ implicit none
     
     
     ! sum of square differences between org_r and act_r for
-    ! all the atoms. This array has dimension <n-time-evals>
+    ! all the atoms. This array has dimension <n-time-bin>
     
     real(db), dimension(:), allocatable :: sum_square_diffs
    
     
     ! histograms for g_s and g_d for various values of time_count.
-    ! These arrayes have dimension <n-time-evals>
+    ! These arrays have dimension <n-time-bin>, i.e. that many histograms.
+    ! So effectively g_s and g_d are functions of r and t.
     
     type (histogram_cutdown), dimension(:), allocatable :: g_s_hists
     type (histogram_cutdown), dimension(:), allocatable :: g_d_hists
@@ -54,33 +55,34 @@ implicit none
     
   integer, private :: num_buffs_cal_thus_far
 
-  integer, private :: n_buffer_average_over
-  integer, private :: n_time_buffers
+  integer, private :: n_g_r_t_to_average_over
+  integer, private :: n_buffers
 
 contains
 
+  ! calculate the average of n_g_r_t_to_average_over g_s_hist(r,t)'s and g_d_hist(r,t)'s
 
-  subroutine cal_time_corr_container(container, ps, f_list, n_delta_t, time_step)
+  subroutine cal_time_corr_container(container, ps, f_list, md_per_time_bin, time_step)
     type (time_corr_hist_container), intent(inout) :: container
     type (phasespace), intent(inout) :: ps
     type (func_list), intent(in) :: f_list
-    integer, intent(in) :: n_delta_t
+    integer, intent(in) :: md_per_time_bin
     real(db), intent(in) :: time_step
     
-    integer n_time_evals
+    integer n_time_bin
 
     call check_if_time_corr_hist_container_is_allocated(container)
 
-    n_time_evals = get_time_corr_hist_n_time_evals(container)
+    n_time_bin = get_time_corr_hist_n_time_bin(container)
 
     if (allocated(bufs) == .false.) then
-      call allocate_buffer(n_time_evals, &
+      call allocate_buffer(n_time_bin, &
                            size(ps%str%atoms), &
                            get_time_corr_hist_r_max(container), &
-                           get_time_corr_hist_bin_length(container))
+                           get_time_corr_hist_r_bin(container))
     end if
     
-    call reset_buffer(n_time_evals)
+    call reset_buffer(n_time_bin)
     
     call check_if_time_corr_hist_container_is_allocated(container)
 
@@ -115,26 +117,26 @@ contains
 !      end if
     
     
-      call trajectory_in_phasespace(ps, f_list, n_delta_t, time_step)
+      call trajectory_in_phasespace(ps, f_list, md_per_time_bin, time_step)
     end do
      
   end subroutine cal_time_corr_container
 
 
 
-  subroutine set_n_time_buffers(n)
+  subroutine set_n_buffers(n)
     integer, intent(in) :: n
     
-    n_time_buffers = n
-  end subroutine set_n_time_buffers
+    n_buffers = n
+  end subroutine set_n_buffers
 
 
 
-  subroutine set_n_buffer_average_over(n)
+  subroutine set_n_g_r_t_to_average_over(n)
     integer, intent(in) :: n
     
-    n_buffer_average_over = n
-  end subroutine set_n_buffer_average_over
+    n_g_r_t_to_average_over = n
+  end subroutine set_n_g_r_t_to_average_over
 
   
   
@@ -157,8 +159,10 @@ contains
   end subroutine update_act_r
 
 
-
-  ! time_step is here equal to real MD delta_t times n_delta_t
+  ! This function updates the bufs container after the MD has moved the atoms
+  ! along by md_per_time_bin*time_step.
+  ! It returns .true. when enough data have been simulated to calculate the average
+  ! of n_g_r_t_to_average_over g_s_hist(r,t)'s and g_d_hist(r,t)'s. 
 
   function do_time_correlation(container, str) result(job_done)
     type (time_corr_hist_container), intent(inout) :: container
@@ -169,13 +173,13 @@ contains
   
     integer :: i_buf, i_time
     integer :: tc    ! shorthand for time_count
-    integer :: n_time_evals
+    integer :: n_time_bin
     real(db) :: fac
    
     
     ! bufs holds all the buffers
     
-    n_time_evals = size(bufs(1)%sum_square_diffs)
+    n_time_bin = size(bufs(1)%sum_square_diffs)
   
   
     ! sum over all the buffers
@@ -214,7 +218,7 @@ contains
       
       ! check if this buffer reached time series end point
       
-      if (tc + 1 == n_time_evals) then
+      if (tc + 1 == n_time_bin) then
       
         ! reset time_count
         
@@ -227,13 +231,13 @@ contains
         container%einstein_diffuse_exp = container%einstein_diffuse_exp + bufs(i_buf)%sum_square_diffs
         
         
-        ! sum up G_s(r,t) and G_d(r,t) histograms for each n_time_evals
+        ! sum up G_s(r,t) and G_d(r,t) histograms for each n_time_bin
         
-        do i_time = 2, n_time_evals
+        do i_time = 2, n_time_bin
           container%g_s_hists_sum(i_time)%val = container%g_s_hists_sum(i_time)%val + bufs(i_buf)%g_s_hists(i_time)%val
         end do
 
-        do i_time = 1, n_time_evals
+        do i_time = 1, n_time_bin
           container%g_d_hists_sum(i_time)%val = container%g_d_hists_sum(i_time)%val + bufs(i_buf)%g_d_hists(i_time)%val
         end do
         
@@ -249,12 +253,12 @@ contains
         
         ! check if enough buffers have been completed to calculate average
         
-        if (num_buffs_cal_thus_far == n_buffer_average_over) then
+        if (num_buffs_cal_thus_far == n_g_r_t_to_average_over) then
         
           ! calculate einstein diff. expression according to (5.2.4) Rapaport book
         
-          fac = 1 / (ndim*2*container%time_step*n_buffer_average_over)
-          do i_time = 2, n_time_evals             
+          fac = 1 / (ndim*2*container%time_bin*n_g_r_t_to_average_over)
+          do i_time = 2, n_time_bin             
             container%einstein_diffuse_exp(i_time) = container%einstein_diffuse_exp(i_time) * fac / (i_time-1)
           end do           
           
@@ -279,27 +283,29 @@ contains
   end function do_time_correlation
 
   
+  ! Allocate bufs, which has dimensions n_buffers * number of time bins * number of r bins.
+  ! It also has dimensions n_buffers * n_atoms * ndim.
 
-  subroutine allocate_buffer(n_time_evals, n_atoms, r_max, bin_length)
-    integer, intent(in) :: n_time_evals, n_atoms
+  subroutine allocate_buffer(n_time_bin, n_atoms, r_max, bin_length)
+    integer, intent(in) :: n_time_bin, n_atoms
     real(db), intent(in) :: r_max, bin_length
  
     integer :: i, j, n_bin
     real(db) :: r_i, temp
 
 
-    allocate(bufs(n_time_buffers))
+    allocate(bufs(n_buffers))
 
-    do i = 0, n_time_buffers-1
+    do i = 0, n_buffers-1
       
       allocate(bufs(i+1)%org_r(n_atoms, ndim)) 
       allocate(bufs(i+1)%act_r(n_atoms, ndim))
-      allocate(bufs(i+1)%sum_square_diffs(n_time_evals))
+      allocate(bufs(i+1)%sum_square_diffs(n_time_bin))
       
-      allocate(bufs(i+1)%g_s_hists(n_time_evals))
-      allocate(bufs(i+1)%g_d_hists(n_time_evals))
+      allocate(bufs(i+1)%g_s_hists(n_time_bin))
+      allocate(bufs(i+1)%g_d_hists(n_time_bin))
       
-      do j = 1, n_time_evals
+      do j = 1, n_time_bin
         bufs(i+1)%g_s_hists(j) = make_histogram_cutdown(r_max, bin_length)
         bufs(i+1)%g_d_hists(j) = make_histogram_cutdown(r_max, bin_length)
       end do
@@ -310,13 +316,13 @@ contains
    
 
   
-  subroutine reset_buffer(n_time_evals)
-    integer, intent(in) :: n_time_evals
+  subroutine reset_buffer(n_time_bin)
+    integer, intent(in) :: n_time_bin
   
     integer :: i
   
-    do i = 0, n_time_buffers-1
-      bufs(i+1)%time_count = - i * n_time_evals / n_time_buffers
+    do i = 0, n_buffers-1
+      bufs(i+1)%time_count = - i * n_time_bin / n_buffers
     end do  
   
     num_buffs_cal_thus_far = 0

@@ -38,8 +38,9 @@ program mdmc
   CALL RANDOM_SEED (PUT=new(1:I))
   
   
-  write (*,*) "Enter pathname/filename"
-  read *, filename 
+  !write (*,*) "Enter pathname/filename"
+  !read *, filename 
+  filename = ".\input\mdmc_control_time_corr.xml"
     
   ! Because of bug in otherwise very useful xmlf90 library 
   ! need to read in input file in bits...... 
@@ -81,21 +82,23 @@ program mdmc
   end if
   
   
-  ! open main input file to check for fix-this-later-g-d-data element
+  ! open main input file to check for g-d-rt-fom element
   ! otherwise this code is here for the same reason as above
   
   call open_xmlfile(trim(filename),fxml,iostat)
   
-  call get_node(fxml, path="//fix-this-later-g-d-data",attributes=structure_attributes,status=iostat)
+  call get_node(fxml, path="//fom/g-d-rt-fom/data-file",attributes=structure_attributes,status=iostat)
   call get_value(structure_attributes, "filename", structure_filename, iostat)
   
   call close_xmlfile(fxml)  
   
+  !print *, "before"
+  
   if (iostat == 0) then
-    call make_g_d_data_array(trim(structure_filename))
+    call make_g_d_rt_fom_container(trim(structure_filename))
   end if  
   
- 
+  !print * , "after"
   
   ! Now finally read in the rest of the main input file from a-to-z
   

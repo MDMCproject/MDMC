@@ -98,7 +98,7 @@ contains
     ! of the MDMC algorithm and may be removed later)
     
     rdf_printout_histogram = make_histogram(c%r_max, c%bin_length)
-    rdf_cal_histogram = make_histogram(c%n_bin_cal_rdf, c%bin_length_cal_rdf)
+    rdf_cal_histogram = make_histogram(c%n_r_bin_cal, c%bin_length_cal)
     rdf_printout = make_rdf(product(a_config%str%box_edges), size(a_config%str%atoms), &
                        floor(c%r_max/c%bin_length), c%bin_length)                    
                                                

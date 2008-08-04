@@ -22,7 +22,6 @@ implicit none
     
     ! stuff which is in common for all function containers
     type (func_params) :: params
-    !type (histogram) :: hist ! used for calculating rdf_cal
   end type rdf_fom_container
 
   interface rdf_fom_val

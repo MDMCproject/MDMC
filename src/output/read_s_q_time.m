@@ -53,15 +53,15 @@ if nargout == 1
 end
 
 
-subplot(1,2,1)
-surf(q, t, S_d')
+%subplot(1,2,1)
+surf(q, t, S_d'+S_s')
 xlabel('q [AA\^-1]')
 ylabel('t [10\^-13 s]')
-zlabel('S_d (q,t)')
+zlabel('S(q,t)')
 title(char(top_element.item(0).getAttribute('title')))
 
-subplot(1,2,2)
-surf(q, t, S_s')
-xlabel('q [AA\^-1]')
-ylabel('t [10\^-13 s]')
-zlabel('S_s (q,t)')
+%subplot(1,2,2)
+%surf(q, t, S_s')
+%xlabel('q [AA\^-1]')
+%ylabel('t [10\^-13 s]')
+%zlabel('S_s (q,t)')

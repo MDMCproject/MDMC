@@ -98,14 +98,14 @@ contains
     
     ! initiate time correlation histogram container
     
-    my_time_corr_container = make_time_corr_hist_container(c%r_max, c%bin_length, c%n_time_evals, &
-                             c%n_delta_t * c%time_step)
+    my_time_corr_container = make_time_corr_hist_container(c%r_max, c%bin_length, c%n_time_bin, &
+                             c%md_per_time_bin * c%time_step)
     call clear_time_corr_hist_container(my_time_corr_container)                         
     
     
     ! to cal and print out s_q_time and s_q_omega
     
-    my_s_q_time = make_s_q_time(q_values, c%n_delta_t * c%time_step, c%n_time_evals)
+    my_s_q_time = make_s_q_time(q_values, c%md_per_time_bin * c%time_step, c%n_time_bin)
     my_s_q_omega = make_s_q_omega(q_values, omega_values)
     
     ! save raw structure
@@ -210,7 +210,7 @@ contains
 
   density = size(my_ps%str%atoms) / product(my_ps%str%box_edges) ! for printing
 
-  call cal_time_corr_container(my_time_corr_container, my_ps, common_pe_list, c%n_delta_t, c%time_step)   
+  call cal_time_corr_container(my_time_corr_container, my_ps, common_pe_list, c%md_per_time_bin, c%time_step)   
   call print_g_d(my_time_corr_container, product(my_ps%str%box_edges), size(my_ps%str%atoms), c%temperature)
   call print_g_s(my_time_corr_container, density, c%temperature)
   call print_einstein_diffuse_exp(my_time_corr_container, density, c%temperature)

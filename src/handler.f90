@@ -42,6 +42,8 @@ use time_corr_algorithm_class
                                              
   integer, dimension(ndim), private :: n_param
   
+  integer, private :: n_md_step_between_buffers  ! number of md steps between buffers
+  
 contains
   
   subroutine startup_handler(filename)
@@ -81,7 +83,6 @@ contains
     character(len=40) :: read_db, read_int
     character(len=40) :: control_object_name, units
     character(len=120) :: filename
-
 
     select case(trim(name))
       case("constraints")
@@ -259,17 +260,17 @@ contains
           setup_mdmc_control_params%time_step = string_to_db(read_db)
           
           if (setup_mdmc_control_params%g_d_data_time_step /= 0.0) then
-            setup_mdmc_control_params%n_delta_t = &
+            setup_mdmc_control_params%md_per_time_bin = &
               nint(setup_mdmc_control_params%g_d_data_time_step / &
                    setup_mdmc_control_params%time_step)
             
-            if (setup_mdmc_control_params%n_delta_t == 0) then
-              setup_mdmc_control_params%n_delta_t = 1
+            if (setup_mdmc_control_params%md_per_time_bin == 0) then
+              setup_mdmc_control_params%md_per_time_bin = 1
             end if
             
             setup_mdmc_control_params%time_step =  &
               setup_mdmc_control_params%g_d_data_time_step / &
-              setup_mdmc_control_params%n_delta_t
+              setup_mdmc_control_params%md_per_time_bin
           end if
 
         case("temperature-mc")       
@@ -298,27 +299,26 @@ contains
           
         ! time correlation stuff  
           
-        case("n-time-buffers")       
+        case("n-md-step-between-buffers")       
           call get_value(attributes,"number",read_int,status)
-          setup_mdmc_control_params%n_time_buffers = string_to_int(read_int) ! used only in this file
           
-          ! set this parameter directly
-          call set_n_time_buffers(string_to_int(read_int))                    
+          ! This parameter is used to calculate n_buffers just
+          ! before the execution of the control element
+          n_md_step_between_buffers = string_to_int(read_int);                   
            
-        case("n-time-evals")       
+        case("n-time-bin")       
           call get_value(attributes,"number",read_int,status)
-          setup_mdmc_control_params%n_time_evals = string_to_int(read_int)
+          setup_mdmc_control_params%n_time_bin = string_to_int(read_int)
           
-        case("n-buffer-average-over")       
+        case("n-g-r-t-to-average-over")       
           call get_value(attributes,"number",read_int,status)
-          setup_mdmc_control_params%n_buffer_average_over = string_to_int(read_int) ! used only in this file
           
-          ! set this parameter directly
-          call set_n_buffer_average_over(string_to_int(read_int))
+          ! set this time_corr_container private attribute directly
+          call set_n_g_r_t_to_average_over(string_to_int(read_int))
           
-        case("n-delta-t")       
-          call get_value(attributes,"number",read_int,status)
-          setup_mdmc_control_params%n_delta_t = string_to_int(read_int)                              
+        case("md-per-time-bin")       
+          call get_value(attributes,"number",read_int,status) 
+          setup_mdmc_control_params%md_per_time_bin = string_to_int(read_int)                              
                
           
       end select
@@ -399,6 +399,9 @@ contains
         case("rdf-fom")       
           call add_function(common_fom_list, target_rdf_fom)
           
+        case("g-d-rt-fom")       
+          call add_function(common_fom_list, target_g_d_rt_fom)          
+          
         case("r-max")
           call get_value(attributes,"val",read_db,status)
           number_db = string_to_db(read_db) 
@@ -423,8 +426,8 @@ contains
               target_rdf_fom%rdf_data%bin_length)       
  
           ! set stuff which enable user to create histogram suitable for calculating rdf
-          setup_mdmc_control_params%n_bin_cal_rdf = size_of_rdf_cal_val_array
-          setup_mdmc_control_params%bin_length_cal_rdf = target_rdf_fom%rdf_data%bin_length      
+          setup_mdmc_control_params%n_r_bin_cal = size_of_rdf_cal_val_array
+          setup_mdmc_control_params%bin_length_cal = target_rdf_fom%rdf_data%bin_length      
           
         case("scale-factor")
           call get_value(attributes,"val",read_db,status)
@@ -465,6 +468,8 @@ contains
   subroutine end_element(name)
     character(len=*), intent(in)   :: name
 
+    integer :: n_time_step_between_buffers
+
     select case(name)
       case("constraints")
         in_constraints = .false.
@@ -476,62 +481,53 @@ contains
         if (in_md_control == .true.) then
           call run_md_control(common_config, setup_md_control_params)
         end if
+        
         if (in_mdmc_control == .true.) then
           call run_mdmc_control(common_config, setup_mdmc_control_params)
         end if
+        
         if (in_md_gridsearch_control == .true.) then
           call run_md_gridsearch_control(common_config, setup_mdmc_control_params)           
-        end if 
-        if (in_md_control_time_corr == .true.) then
-          ! check if time correlation parameters are ok
+        end if
+         
+        if (in_md_control_time_corr == .true. .or. in_mdmc_control_time_corr == .true.) then
+          ! First check and do stuff to prepare the time correlation container and associated
+          ! algorithms
           
-          if (setup_mdmc_control_params%n_time_buffers > &
-              setup_mdmc_control_params%n_time_evals) then
+          ! Convert to number of time steps between buffers (note this is only different
+          ! if md_per_time_bin > 1).                    
+          n_time_step_between_buffers = nint( dble(n_md_step_between_buffers) &
+            / dble(setup_mdmc_control_params%md_per_time_bin) )
+
+          ! Make sure that the number of time bins is an integer number of n_time_step_between_buffers
+          if ( mod(setup_mdmc_control_params%n_time_bin, n_time_step_between_buffers) /= 0) then
+            setup_mdmc_control_params%n_time_bin = n_time_step_between_buffers &
+              * ceiling(dble(setup_mdmc_control_params%n_time_bin)/dble(n_time_step_between_buffers))
+            print *, "n-time-bin adjusted reduced to ", setup_mdmc_control_params%n_time_bin
+          end if      
+          
+
+          ! set the private attribute n_buffer in time_corr_container. n_buffer is a pure technical
+          ! parameter which determine in time_corr_algorithm the distance (in number of md step) 
+          ! between when g(r,t)s are calculated
+          call set_n_buffers( setup_mdmc_control_params%n_time_bin/n_time_step_between_buffers ) 
+          
+          
+          if (n_time_step_between_buffers > &
+              setup_mdmc_control_params%n_time_bin) then
             write(*,*) " "
             write(*,*) "ERROR in handler.f90"
-            write(*,*) "n_time_buffers > n_time_evals"
+            write(*,*) "n_time_step_between_buffers > setup_mdmc_control_params%n_time_bin"
             stop
           end if
           
           
-          ! force n_time_evals/n_time_buffers to have no remainder since this make
-          ! the buffer algorithm better work better
-          
-          if (mod(setup_mdmc_control_params%n_time_evals, &
-                  setup_mdmc_control_params%n_time_buffers)) then
-            setup_mdmc_control_params%n_time_evals = setup_mdmc_control_params%n_time_buffers &
-              * (setup_mdmc_control_params%n_time_evals/setup_mdmc_control_params%n_time_buffers)
-            print *, "n-time-evals adjusted reduced to ", setup_mdmc_control_params%n_time_evals
-          end if
-          
-          
-          call run_md_control_time_corr(common_config, setup_mdmc_control_params)           
+          if (in_mdmc_control_time_corr == .true.) then
+            call run_mdmc_control_time_corr(common_config, setup_mdmc_control_params)
+          else
+            call run_md_control_time_corr(common_config, setup_mdmc_control_params)    
+          end if             
         end if 
-        if (in_mdmc_control_time_corr == .true.) then
-          ! check if time correlation parameters are ok
-          
-          if (setup_mdmc_control_params%n_time_buffers > &
-              setup_mdmc_control_params%n_time_evals) then
-            write(*,*) " "
-            write(*,*) "ERROR in handler.f90"
-            write(*,*) "n_time_buffers > n_time_evals"
-            stop
-          end if
-          
-          
-          ! force n_time_evals/n_time_buffers to have no remainder since this make
-          ! the buffer algorithm better work better
-          
-          if (mod(setup_mdmc_control_params%n_time_evals, &
-                  setup_mdmc_control_params%n_time_buffers)) then
-            setup_mdmc_control_params%n_time_evals = setup_mdmc_control_params%n_time_buffers &
-              * (setup_mdmc_control_params%n_time_evals/setup_mdmc_control_params%n_time_buffers)
-            print *, "n-time-evals adjusted reduced to ", setup_mdmc_control_params%n_time_evals
-          end if
-          
-          
-          call run_mdmc_control_time_corr(common_config, setup_mdmc_control_params)           
-        end if        
         
       case("fom")
         in_fom = .false.                

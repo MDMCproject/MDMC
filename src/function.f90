@@ -4,6 +4,7 @@ use structure_class
 use func_param_class
 use lennard_jones_class
 use rdf_fom_class
+use g_d_rt_fom_class
 
 implicit none
 
@@ -17,16 +18,19 @@ implicit none
     !private
     type (lj_pe_container), pointer :: pt_lj_pe => null()
     type (rdf_fom_container), pointer :: pt_rdf_fom => null()
+    type (g_d_rt_fom_container), pointer :: pt_g_d_rt_fom => null()
   end type func_list
 
   interface add_function
     module procedure add_lj_pe_container
     module procedure add_rdf_fom_container
+    module procedure add_g_d_rt_fom_container
   end interface
   
   interface func_val
     module procedure func_val_histogram
     module procedure func_val_structure
+    module procedure func_val_time_corr
   end interface  
   
 contains
@@ -37,8 +41,7 @@ contains
     
     list%pt_lj_pe => pe_target
   end subroutine add_lj_pe_container
-  
-  
+    
   subroutine add_rdf_fom_container(list, fom_target)
     type (func_list), intent(inout) :: list
     type (rdf_fom_container), target, intent(in) :: fom_target
@@ -46,7 +49,14 @@ contains
     list%pt_rdf_fom => fom_target
   end subroutine add_rdf_fom_container  
 
+  subroutine add_g_d_rt_fom_container(list, fom_target)
+    type (func_list), intent(inout) :: list
+    type (g_d_rt_fom_container), target, intent(in) :: fom_target
+    
+    list%pt_g_d_rt_fom => fom_target
+  end subroutine add_g_d_rt_fom_container  
   
+    
   function func_val_structure(str, list) result (val)
     type (structure), intent(in) :: str
     type (func_list), intent(inout) :: list
@@ -78,7 +88,26 @@ contains
     end if
   end function func_val_histogram  
   
+  function func_val_time_corr(time_corr, list) result (val)
+    type (time_corr_hist_container), intent(in) :: time_corr
+    type (func_list), intent(inout) :: list
+    real (db) :: val
+
+    if ( associated(list%pt_lj_pe) ) then
+      print *, "Problem in func_val_time_corr"
+      stop
+    else if ( associated(list%pt_rdf_fom) ) then
+      print *, "Problem in func_val_time_corr"
+      stop
+    else if ( associated(list%pt_g_d_rt_fom) ) then
+      val = g_d_rt_fom_val(time_corr, list%pt_g_d_rt_fom)
+    else
+      print *, "Error in func_val_time_corr"
+      stop
+    end if
+  end function func_val_time_corr
   
+    
   subroutine func_deriv(str, deriv, list, pressure_comp, pot_energy)
     type (structure), intent(in) :: str
     real(db), dimension(:,:), intent(out) :: deriv

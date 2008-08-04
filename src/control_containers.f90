@@ -49,12 +49,11 @@ implicit none
     real(db) :: r_max                  ! cal rdf for interval [0:r_max]
     real(db) :: bin_length             ! at positions 0.5*bin_length, 1.5*bin_length, etc ....    
     
-    ! Used for creating a histogram that has a binning and 
-    ! length which is determined by the binning of the rdf data
-    ! and either the length of the data or the <r-max> sub-
-    ! element of <rdf-fom>.
-    integer :: n_bin_cal_rdf = -1000 
-    real(db) :: bin_length_cal_rdf = -1000.0   
+    ! Used for creating a histogram or time_corr_hist that has a binning and 
+    ! length which is determined by the binning of data plus optionally some
+    ! additional fom elements (like <r-max>)
+    integer :: n_r_bin_cal = -1000 
+    real(db) :: bin_length_cal = -1000.0   
         
     integer :: mc_steps   ! number of Monte carlo steps  
     
@@ -63,12 +62,10 @@ implicit none
     real(db) :: temperature_mc   ! used in metropolis
     
     ! parameters for time correlation run
-    integer :: n_time_buffers  ! must be less than n_time_evals
-    integer :: n_time_evals    ! number of times time-correlation is calculated
-    integer :: n_buffer_average_over ! number of buffers to average over to improve stats
-    integer :: n_delta_t       ! n_delta_t * n_time_evals = total number of MD the corr is run for
+    integer :: n_time_bin    ! number of time bins
+    integer :: md_per_time_bin  ! number of md steps in a time bin. Robert say this one probably always 1 
     
-    ! (perhaps uncomment n_time_buffers and n_buffer_average_over later since only used in handler for check)
+    ! (perhaps uncomment n_time_buffers and n_g_r_t_to_average_over later since only used in handler for check)
     
     real(db) :: g_d_data_time_step = 0.0 ! VERY BAD WHAT I AM DOING HERE
     
