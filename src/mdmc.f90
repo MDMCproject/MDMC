@@ -7,6 +7,7 @@ program mdmc
   use flib_xpath
   use fom_readers_class
   use g_d_readers_class
+  use s_qt_reader_class
   use rdf_class
 
   type(xml_t) :: fxml
@@ -92,13 +93,25 @@ program mdmc
   
   call close_xmlfile(fxml)  
   
-  !print *, "before"
-  
   if (iostat == 0) then
     call make_g_d_rt_fom_container(trim(structure_filename))
   end if  
   
-  !print * , "after"
+  
+  ! open main input file to check for s-qt-fom element
+  ! otherwise this code is here for the same reason as above
+  
+  call open_xmlfile(trim(filename),fxml,iostat)
+  
+  call get_node(fxml, path="//fom/s-qt-fom/data-file",attributes=structure_attributes,status=iostat)
+  call get_value(structure_attributes, "filename", structure_filename, iostat)
+  
+  call close_xmlfile(fxml)  
+  
+  if (iostat == 0) then
+    call make_s_qt_fom_container(trim(structure_filename))
+  end if    
+  
   
   ! Now finally read in the rest of the main input file from a-to-z
   

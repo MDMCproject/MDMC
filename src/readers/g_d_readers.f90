@@ -14,14 +14,6 @@ use time_corr_algorithm_class
   private :: start_document, end_document                               
 
 
-  ! Temporary container for reading in G_d 'dataset'. 
-  ! Please read Umbrello documentation for how this be perhaps 
-  ! changed in the future (notice have left some commented out
-  ! code for g_d_fom_val() in time_corr_algorithm.f90
-  
-  !real(db), dimension(:,:), allocatable :: g_d_data
-
-
 contains
 
 

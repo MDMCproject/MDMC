@@ -5,6 +5,7 @@ use func_param_class
 use lennard_jones_class
 use rdf_fom_class
 use g_d_rt_fom_class
+use s_q_time_fom_class
 
 implicit none
 
@@ -19,18 +20,21 @@ implicit none
     type (lj_pe_container), pointer :: pt_lj_pe => null()
     type (rdf_fom_container), pointer :: pt_rdf_fom => null()
     type (g_d_rt_fom_container), pointer :: pt_g_d_rt_fom => null()
+    type (s_qt_fom_container), pointer :: pt_s_qt_fom => null()
   end type func_list
 
   interface add_function
     module procedure add_lj_pe_container
     module procedure add_rdf_fom_container
     module procedure add_g_d_rt_fom_container
+    module procedure add_s_qt_fom_container
   end interface
   
   interface func_val
     module procedure func_val_histogram
     module procedure func_val_structure
     module procedure func_val_time_corr
+    module procedure func_val_s_q_time
   end interface  
   
 contains
@@ -55,6 +59,13 @@ contains
     
     list%pt_g_d_rt_fom => fom_target
   end subroutine add_g_d_rt_fom_container  
+  
+  subroutine add_s_qt_fom_container(list, fom_target)
+    type (func_list), intent(inout) :: list
+    type (s_qt_fom_container), target, intent(in) :: fom_target
+    
+    list%pt_s_qt_fom => fom_target
+  end subroutine add_s_qt_fom_container    
   
     
   function func_val_structure(str, list) result (val)
@@ -106,6 +117,28 @@ contains
       stop
     end if
   end function func_val_time_corr
+  
+  function func_val_s_q_time(sqtime, list) result (val)
+    type (s_q_time), intent(in) :: sqtime
+    type (func_list), intent(inout) :: list
+    real (db) :: val
+
+    if ( associated(list%pt_lj_pe) ) then
+      print *, "Problem in func_val_s_q_time"
+      stop
+    else if ( associated(list%pt_rdf_fom) ) then
+      print *, "Problem in func_val_s_q_time"
+      stop
+    else if ( associated(list%pt_g_d_rt_fom) ) then
+      print *, "Problem in func_val_s_q_time"
+      stop
+    else if ( associated(list%pt_s_qt_fom) ) then
+      val = s_qt_fom_val(sqtime, list%pt_s_qt_fom)      
+    else
+      print *, "Error in func_val_s_q_time"
+      stop
+    end if
+  end function func_val_s_q_time  
   
     
   subroutine func_deriv(str, deriv, list, pressure_comp, pot_energy)

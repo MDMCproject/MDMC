@@ -7,6 +7,7 @@ use time_corr_hist_container_class
 
 implicit none
 
+  public :: get_s_q_time_n_t_bin
   public :: cal_s_q_time
   public :: make_s_q_time
   public :: check_if_s_q_time_allocated
@@ -17,11 +18,11 @@ implicit none
   
   type s_q_time
     real(db), dimension(:), allocatable :: q
-    real(db) :: delta_time  ! this number together with the lenght of
+    real(db) :: t_bin  ! this number together with the lenght of
                             ! the time dimension determines the time binning
                             
-    real(db), dimension(:,:), allocatable :: self   ! dimensions (n_q, n_time)
-    real(db), dimension(:,:), allocatable :: diff   ! dimensions (n_q, n_time)
+    real(db), dimension(:,:), allocatable :: self   ! dimensions (n_q, n_t_bin)
+    real(db), dimension(:,:), allocatable :: diff   ! dimensions (n_q, n_t_bin)
   end type s_q_time
 
   type integrat_over_r_precal
@@ -43,15 +44,15 @@ implicit none
   
 contains
 
-  function get_s_q_time_n_time(container) result(n_time)
+  function get_s_q_time_n_t_bin(container) result(n_t_bin)
     type(s_q_time), intent(in) :: container
-    integer :: n_time 
+    integer :: n_t_bin 
     
     call check_if_s_q_time_allocated(container)     
 
-    n_time = size(container%self, 2)
+    n_t_bin = size(container%self, 2)
   
-  end function get_s_q_time_n_time 
+  end function get_s_q_time_n_t_bin 
 
 
 
@@ -102,6 +103,7 @@ contains
     ! notice the was the calculation below could be done faster
     
     s_q_t%diff = 0
+    s_q_t%self = 0
     
     pre_s_d = density * (n_atom-1)/n_atom
     pre_s_s = density / n_atom
@@ -145,7 +147,7 @@ contains
     real(db), optional, intent(in) :: temperature
     
     type (xmlf_t) :: xf
-    integer :: i_q, i_t, n_time
+    integer :: i_q, i_t, n_t_bin
     
     character(len=50) :: filename
     
@@ -184,9 +186,10 @@ contains
                                          // "atoms/AA-3")                                                                        
     end if
     
-    !call xml_AddAttribute(xf, "bin-length", str(bin_length, format="(f10.5)"))
-    
     call xml_AddAttribute(xf, "q-units", "AA^-1")
+    call xml_AddAttribute(xf, "n-q-points", str(size(container%q), format="(i)") )
+    call xml_AddAttribute(xf, "n-time-bin", str(get_s_q_time_n_t_bin(container), format="(i)"))
+    call xml_AddAttribute(xf, "time-bin", str(container%t_bin, format="(f10.5)"))
     call xml_AddAttribute(xf, "time-unit", "10^-13 s")        
     
     call xml_NewElement(xf, "this-file-was-created")
@@ -194,13 +197,13 @@ contains
     call xml_EndElement(xf, "this-file-was-created")  
     
     
-    n_time = size(container%self, 2)
+    n_t_bin = size(container%self, 2)
 
-    do i_t = 1, n_time   
+    do i_t = 1, n_t_bin   
       do i_q = 1, size(container%q)
         call xml_NewElement(xf, "SQt")
         call xml_AddAttribute(xf, "q", str(container%q(i_q), format="(f10.5)"))
-        call xml_AddAttribute(xf, "t", str((i_t-1)*container%delta_time, format="(f10.5)"))
+        call xml_AddAttribute(xf, "t", str((i_t-1)*container%t_bin, format="(f10.5)"))
         call xml_AddAttribute(xf, "S-self", str(container%self(i_q, i_t), format="(f15.5)"))
         call xml_AddAttribute(xf, "S-diff", str(container%diff(i_q, i_t), format="(f15.5)"))        
         call xml_EndElement(xf, "SQt")
@@ -277,12 +280,12 @@ contains
 
 
 
-  ! delta_time and n_time are needed to pass on the time-binning info to this container
+  ! t_bin and n_t_bin are needed to pass on the time-binning info to this container
 
-  function make_s_q_time(q, delta_time, n_time) result(container)
+  function make_s_q_time(q, t_bin, n_t_bin) result(container)
     real(db), dimension(:), intent(in) :: q
-    real(db), intent(in) :: delta_time
-    integer, intent(in) :: n_time
+    real(db), intent(in) :: t_bin
+    integer, intent(in) :: n_t_bin
     type (s_q_time) :: container
     
     integer :: n_q
@@ -292,10 +295,10 @@ contains
     allocate(container%q(n_q))
     
     container%q = q
-    container%delta_time = delta_time
+    container%t_bin = t_bin
     
-    allocate(container%self(n_q,n_time)) 
-    allocate(container%diff(n_q,n_time))
+    allocate(container%self(n_q,n_t_bin)) 
+    allocate(container%diff(n_q,n_t_bin))
     
     container%self = 0
     container%diff = 0

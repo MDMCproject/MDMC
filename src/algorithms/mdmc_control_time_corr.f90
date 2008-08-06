@@ -11,6 +11,8 @@ use structure_reader_class
 use func_params_wrapper_class
 use time_corr_algorithm_class
 use time_corr_hist_container_class
+use s_q_time_class
+use s_q_omega_class
 
   implicit none
 
@@ -46,6 +48,12 @@ contains
     real(db) :: pressure_comp = 0.0, pot_energy = 0.0
 
     type(time_corr_hist_container) :: my_time_corr_container
+    
+    type (s_q_time) :: my_s_q_time
+    type (s_q_omega) :: my_s_q_omega    
+	
+    real(db), dimension(41) :: q_values = (/ (0.2+0.2*float(i), i = 0, 40) /)	
+    real(db), dimension(21) :: omega_values = (/ (0.05+0.05*float(i), i = 0, 20) /)		
 	
     integer :: print_to_file = 555
     integer :: print_to_screen = 0
@@ -93,6 +101,8 @@ contains
                              c%md_per_time_bin * c%time_step)
     call clear_time_corr_hist_container(my_time_corr_container)                             
                        
+    my_s_q_time = make_s_q_time(q_values, c%md_per_time_bin * c%time_step, c%n_time_bin)
+    my_s_q_omega = make_s_q_omega(q_values, omega_values)
                                          
 ! -------------- initial equilibration ---------------- !
 
@@ -195,12 +205,17 @@ contains
   
   call cal_time_corr_container(my_time_corr_container, my_ps, common_pe_list, c%md_per_time_bin, c%time_step)   
   call print_g_d(my_time_corr_container, product(my_ps%str%box_edges), size(my_ps%str%atoms), c%temperature) 
-  fom_val = func_val(my_time_corr_container, common_fom_list)
+  call cal_s_q_time(my_time_corr_container, my_ps%str, my_s_q_time)
+  call print_s_q_time(my_s_q_time, density, c%temperature)
+  !fom_val = func_val(my_time_corr_container, common_fom_list)
+  fom_val = func_val(my_s_q_time, common_fom_list)
+  
   call clear_time_corr_hist_container(my_time_corr_container) ! not sure if necessary!!?? 
   
   write(print_to_file,'(a,f12.4)') "1st FOM = ", fom_val
   write(print_to_file, '(a,f12.4)') "Finished cal 1st FOM. Time: ", toc()
   write(print_to_file, *) " "
+  write(print_to_screen,'(a,f12.4)') "1st FOM = ", fom_val
   write(print_to_screen, '(a,f12.4)') "Finished cal 1st FOM. Time: ", toc()
 
   
@@ -313,8 +328,11 @@ contains
       ! cal FOM
     
       call cal_time_corr_container(my_time_corr_container, my_ps, common_pe_list, c%md_per_time_bin, c%time_step)   
-      fom_val = func_val(my_time_corr_container, common_fom_list)
-      call print_g_d(my_time_corr_container, product(my_ps%str%box_edges), size(my_ps%str%atoms), c%temperature)
+      call cal_s_q_time(my_time_corr_container, my_ps%str, my_s_q_time)
+      !call print_s_q_time(my_s_q_time, density, c%temperature)
+      !fom_val = func_val(my_time_corr_container, common_fom_list)
+      fom_val = func_val(my_s_q_time, common_fom_list)
+      !call print_g_d(my_time_corr_container, product(my_ps%str%box_edges), size(my_ps%str%atoms), c%temperature)
       call clear_time_corr_hist_container(my_time_corr_container) ! not sure if necessary!!?? 
 
       write(print_to_file,'(a,f12.4)') "FOM = ", fom_val
@@ -391,7 +409,10 @@ contains
     call shallow_copy_phasespace(my_ps_best, my_ps)  
         
     call cal_time_corr_container(my_time_corr_container, my_ps, common_pe_list, c%md_per_time_bin, c%time_step)   
-    fom_val = func_val(my_time_corr_container, common_fom_list)
+    call cal_s_q_time(my_time_corr_container, my_ps%str, my_s_q_time)
+    call print_s_q_time(my_s_q_time, density, c%temperature)
+    !fom_val = func_val(my_time_corr_container, common_fom_list)
+    fom_val = func_val(my_s_q_time, common_fom_list)
     call print_g_d(my_time_corr_container, product(my_ps%str%box_edges), size(my_ps%str%atoms), c%temperature)   
     call clear_time_corr_hist_container(my_time_corr_container) ! not sure if necessary!!?? 
       

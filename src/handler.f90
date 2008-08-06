@@ -401,7 +401,10 @@ contains
           
         case("g-d-rt-fom")       
           call add_function(common_fom_list, target_g_d_rt_fom)          
-          
+
+        case("s-qt-fom")       
+          call add_function(common_fom_list, target_s_qt_fom)   
+                    
         case("r-max")
           call get_value(attributes,"val",read_db,status)
           number_db = string_to_db(read_db) 

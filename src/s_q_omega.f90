@@ -62,11 +62,11 @@ contains
     ! Notice should also compare the omega array in that container with 
     ! omega array in the s_q_omega container  
     
-    n_t = get_s_q_time_n_time(s_q_t)
+    n_t = get_s_q_time_n_t_bin(s_q_t)
     
     if (is_precal_cos_values_allocated(local_precal_cos_values) == .false.) then
       local_precal_cos_values = make_and_cal_precal_cos_values( &
-        n_t, s_q_t%delta_time, s_q_o%omega)
+        n_t, s_q_t%t_bin, s_q_o%omega)
     end if
   
 
@@ -223,7 +223,7 @@ contains
 
 
 
-  ! delta_time and n_time are needed to pass on the time-binning info to this container
+  ! t_bin and n_time are needed to pass on the time-binning info to this container
 
   function make_s_q_omega(q, omega) result(container)
     real(db), dimension(:), intent(in) :: q

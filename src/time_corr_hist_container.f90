@@ -340,7 +340,7 @@ contains
 
 
   ! The temperature is assumed to be in dimensionless units.
-
+  !
   subroutine print_g_d(container, volume, n_atom, temperature)
     use flib_wxml
     type(time_corr_hist_container), intent(inout) :: container  ! inout because volume_prefac modified  

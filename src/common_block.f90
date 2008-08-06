@@ -17,6 +17,7 @@ use function_class
   type (lj_pe_container), target :: target_lj_pe
   type (rdf_fom_container), target :: target_rdf_fom
   type (g_d_rt_fom_container), target :: target_g_d_rt_fom
+  type (s_qt_fom_container), target :: target_s_qt_fom
 
 
 end module common_block_class
