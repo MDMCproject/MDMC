@@ -52,9 +52,6 @@ contains
     type (s_q_time) :: my_s_q_time
     type (s_q_omega) :: my_s_q_omega    
 	
-    real(db), dimension(41) :: q_values = (/ (0.2+0.2*float(i), i = 0, 40) /)	
-    real(db), dimension(21) :: omega_values = (/ (0.05+0.05*float(i), i = 0, 20) /)		
-	
     integer :: print_to_file = 555
     integer :: print_to_screen = 0
     
@@ -101,8 +98,8 @@ contains
                              c%md_per_time_bin * c%time_step)
     call clear_time_corr_hist_container(my_time_corr_container)                             
                        
-    my_s_q_time = make_s_q_time(q_values, c%md_per_time_bin * c%time_step, c%n_time_bin)
-    my_s_q_omega = make_s_q_omega(q_values, omega_values)
+    my_s_q_time = make_s_q_time(c%q_values, c%md_per_time_bin * c%time_step, c%n_time_bin)
+    my_s_q_omega = make_s_q_omega(c%q_values, c%omega_values)
                                          
 ! -------------- initial equilibration ---------------- !
 

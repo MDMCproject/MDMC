@@ -77,8 +77,9 @@ contains
     character(len=*), intent(in)   :: name
     type(dictionary_t), intent(in) :: attributes
     
-    integer :: status, n
+    integer :: status, n, index
     real(db) :: number_db
+    real(db) :: l_start, l_end, l_step  ! used for reading in q and omega values
     integer :: size_of_rdf_cal_val_array  ! used in rdf-fom element
     character(len=40) :: read_db, read_int
     character(len=40) :: control_object_name, units
@@ -259,20 +260,52 @@ contains
           call get_value(attributes,"val",read_db,status)
           setup_mdmc_control_params%time_step = string_to_db(read_db)
           
-          if (setup_mdmc_control_params%g_d_data_time_step /= 0.0) then
-            setup_mdmc_control_params%md_per_time_bin = &
-              nint(setup_mdmc_control_params%g_d_data_time_step / &
-                   setup_mdmc_control_params%time_step)
+!          if (setup_mdmc_control_params%g_d_data_time_step /= 0.0) then
+!            setup_mdmc_control_params%md_per_time_bin = &
+!              nint(setup_mdmc_control_params%g_d_data_time_step / &
+!                   setup_mdmc_control_params%time_step)
             
-            if (setup_mdmc_control_params%md_per_time_bin == 0) then
-              setup_mdmc_control_params%md_per_time_bin = 1
-            end if
+!            if (setup_mdmc_control_params%md_per_time_bin == 0) then
+!              setup_mdmc_control_params%md_per_time_bin = 1
+!            end if
             
-            setup_mdmc_control_params%time_step =  &
-              setup_mdmc_control_params%g_d_data_time_step / &
-              setup_mdmc_control_params%md_per_time_bin
-          end if
+!            setup_mdmc_control_params%time_step =  &
+!              setup_mdmc_control_params%g_d_data_time_step / &
+!              setup_mdmc_control_params%md_per_time_bin
+!          end if
 
+        case("q-values")       
+          call get_value(attributes,"start",read_db,status)
+          l_start = string_to_db(read_db)
+          call get_value(attributes,"end",read_db,status)
+          l_end = string_to_db(read_db)
+          call get_value(attributes,"step",read_db,status)
+          l_step = string_to_db(read_db)
+          
+          n = nint((l_end-l_start) / l_step)
+          
+          allocate(setup_mdmc_control_params%q_values(n+1))
+          
+          do index = 0, n
+            setup_mdmc_control_params%q_values(index+1) = l_start + index*l_step
+          end do
+          
+        case("omega-values")       
+          call get_value(attributes,"start",read_db,status)
+          l_start = string_to_db(read_db)
+          call get_value(attributes,"end",read_db,status)
+          l_end = string_to_db(read_db)
+          call get_value(attributes,"step",read_db,status)
+          l_step = string_to_db(read_db)
+          
+          n = nint((l_end-l_start) / l_step)
+          
+          allocate(setup_mdmc_control_params%omega_values(n+1))
+          
+          do index = 0, n
+            setup_mdmc_control_params%omega_values(index+1) = l_start + index*l_step
+          end do          
+          
         case("temperature-mc")       
           call get_value(attributes,"val",read_db,status)
           setup_mdmc_control_params%temperature_mc = string_to_db(read_db)

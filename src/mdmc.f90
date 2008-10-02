@@ -42,7 +42,7 @@ program mdmc
   
   !write (*,*) "Enter pathname/filename"
   !read *, filename 
-  filename = ".\input\mdmc_control_time_corr.xml"
+  filename = ".\input\md_control_time_corr.xml"
     
   ! Because of bug in otherwise very useful xmlf90 library 
   ! need to read in input file in bits...... 

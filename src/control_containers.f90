@@ -65,9 +65,10 @@ implicit none
     integer :: n_time_bin    ! number of time bins
     integer :: md_per_time_bin  ! number of md steps in a time bin. Robert say this one probably always 1 
     
-    ! (perhaps uncomment n_time_buffers and n_g_r_t_to_average_over later since only used in handler for check)
+    !real(db) :: g_d_data_time_step = 0.0 ! VERY BAD WHAT I AM DOING HERE
     
-    real(db) :: g_d_data_time_step = 0.0 ! VERY BAD WHAT I AM DOING HERE
+    real(db), dimension(:), allocatable :: q_values
+    real(db), dimension(:), allocatable :: omega_values
     
   end type mdmc_control_container
 
