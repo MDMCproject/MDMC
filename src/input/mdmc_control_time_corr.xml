@@ -43,12 +43,17 @@
       <t-cut units="AA" min="0.0" max="10000.0" />
       <scale-factor val="1.0" />
       <sigma val="1.0" />
-    </g-d-rt-fom>  -->
+    </g-d-rt-fom>  
     <s-qt-fom>
       <data-file filename="C:\Backup\Backup_folder1\work\code\RMC++\mdmc\trunk\src\output\s_qt_data_fcc_500atoms.xml" />
       <scale-factor val="1.0" />
       <sigma val="1.0" />
-    </s-qt-fom>
+    </s-qt-fom>  -->
+    <s-qo-fom>
+      <data-file filename="C:\Backup\Backup_folder1\work\code\RMC++\mdmc\trunk\src\output\s_qo_data_fcc_500atoms.xml" />
+      <scale-factor val="1.0" />
+      <sigma val="1.0" />
+    </s-qo-fom>
   </fom> 
 
   

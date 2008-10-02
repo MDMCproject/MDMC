@@ -8,6 +8,7 @@ program mdmc
   use fom_readers_class
   use g_d_readers_class
   use s_qt_reader_class
+  use s_qo_reader_class
   use rdf_class
 
   type(xml_t) :: fxml
@@ -112,7 +113,22 @@ program mdmc
     call make_s_qt_fom_container(trim(structure_filename))
   end if    
   
+ 
+  ! open main input file to check for s-qo-fom element
+  ! otherwise this code is here for the same reason as above
   
+  call open_xmlfile(trim(filename),fxml,iostat)
+  
+  call get_node(fxml, path="//fom/s-qo-fom/data-file",attributes=structure_attributes,status=iostat)
+  call get_value(structure_attributes, "filename", structure_filename, iostat)
+  
+  call close_xmlfile(fxml)  
+  
+  if (iostat == 0) then
+    call make_s_qo_fom_container(trim(structure_filename))
+  end if    
+
+    
   ! Now finally read in the rest of the main input file from a-to-z
   
   call startup_handler(trim(filename))

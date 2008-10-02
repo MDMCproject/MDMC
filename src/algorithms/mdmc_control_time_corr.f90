@@ -207,8 +207,11 @@ contains
   call print_g_d(my_time_corr_container, product(my_ps%str%box_edges), size(my_ps%str%atoms), c%temperature) 
   call cal_s_q_time(my_time_corr_container, my_ps%str, my_s_q_time)
   call print_s_q_time(my_s_q_time, density, c%temperature)
+  call cal_s_q_omega(my_s_q_time, my_ps%str, my_s_q_omega)
+  call print_s_q_omega(my_s_q_omega, density, c%temperature)
   !fom_val = func_val(my_time_corr_container, common_fom_list)
-  fom_val = func_val(my_s_q_time, common_fom_list)
+  !fom_val = func_val(my_s_q_time, common_fom_list)
+  fom_val = func_val(my_s_q_omega, common_fom_list)
   
   call clear_time_corr_hist_container(my_time_corr_container) ! not sure if necessary!!?? 
   
@@ -218,7 +221,6 @@ contains
   write(print_to_screen,'(a,f12.4)') "1st FOM = ", fom_val
   write(print_to_screen, '(a,f12.4)') "Finished cal 1st FOM. Time: ", toc()
 
-  
   ! print FOM to xml file
   
   call xml_NewElement(xf, "accept")
@@ -329,9 +331,12 @@ contains
     
       call cal_time_corr_container(my_time_corr_container, my_ps, common_pe_list, c%md_per_time_bin, c%time_step)   
       call cal_s_q_time(my_time_corr_container, my_ps%str, my_s_q_time)
+      call cal_s_q_omega(my_s_q_time, my_ps%str, my_s_q_omega)
+      !call print_s_q_omega(my_s_q_omega, density, c%temperature)
       !call print_s_q_time(my_s_q_time, density, c%temperature)
       !fom_val = func_val(my_time_corr_container, common_fom_list)
-      fom_val = func_val(my_s_q_time, common_fom_list)
+      !fom_val = func_val(my_s_q_time, common_fom_list)
+      fom_val = func_val(my_s_q_omega, common_fom_list)
       !call print_g_d(my_time_corr_container, product(my_ps%str%box_edges), size(my_ps%str%atoms), c%temperature)
       call clear_time_corr_hist_container(my_time_corr_container) ! not sure if necessary!!?? 
 
@@ -411,8 +416,11 @@ contains
     call cal_time_corr_container(my_time_corr_container, my_ps, common_pe_list, c%md_per_time_bin, c%time_step)   
     call cal_s_q_time(my_time_corr_container, my_ps%str, my_s_q_time)
     call print_s_q_time(my_s_q_time, density, c%temperature)
+    call cal_s_q_omega(my_s_q_time, my_ps%str, my_s_q_omega)
+    call print_s_q_omega(my_s_q_omega, density, c%temperature)
     !fom_val = func_val(my_time_corr_container, common_fom_list)
-    fom_val = func_val(my_s_q_time, common_fom_list)
+    !fom_val = func_val(my_s_q_time, common_fom_list)
+    fom_val = func_val(my_s_q_omega, common_fom_list)
     call print_g_d(my_time_corr_container, product(my_ps%str%box_edges), size(my_ps%str%atoms), c%temperature)   
     call clear_time_corr_hist_container(my_time_corr_container) ! not sure if necessary!!?? 
       

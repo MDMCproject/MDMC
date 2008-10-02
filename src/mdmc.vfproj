@@ -40,12 +40,14 @@
 		<File RelativePath=".\algorithms\mdmc_control_time_corr.f90"/></Filter>
 		<Filter Name="functions">
 		<File RelativePath=".\functions\g_d_rt_fom.f90"/>
-		<File RelativePath=".\functions\s_q_time_fom.f90"/>
 		<File RelativePath=".\functions\lennard_jones.f90"/>
-		<File RelativePath=".\functions\rdf_fom.f90"/></Filter>
+		<File RelativePath=".\functions\rdf_fom.f90"/>
+		<File RelativePath=".\functions\s_q_omega_fom.f90"/>
+		<File RelativePath=".\functions\s_q_time_fom.f90"/></Filter>
 		<Filter Name="readers">
 		<File RelativePath=".\readers\fnc_constraint_reader.f90"/>
 		<File RelativePath=".\readers\g_d_readers.f90"/>
+		<File RelativePath=".\readers\s_qo_reader.f90"/>
 		<File RelativePath=".\readers\s_qt_reader.f90"/>
 		<File RelativePath=".\readers\structure_reader.f90"/></Filter>
 		<Filter Name="xmlf90">

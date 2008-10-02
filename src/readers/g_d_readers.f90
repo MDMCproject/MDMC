@@ -1,6 +1,3 @@
-! Please read Umbrello for how this code perhaps should be 
-! changed in the future
-
 module g_d_readers_class
 use common_block_class
 use various_constants_class

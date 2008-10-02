@@ -1,5 +1,3 @@
-! FOM function which compare 'data' G_d(r,t) with calculated G_d(r,t)
-
 module s_q_time_fom_class
 use various_constants_class
 use structure_class

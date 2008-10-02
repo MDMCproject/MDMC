@@ -43,10 +43,10 @@ implicit none
   
 contains
 
-  subroutine cal_s_q_omega(s_q_t, str, s_q_o)
-    type(s_q_time), intent(in) :: s_q_t
+  subroutine cal_s_q_omega(s_qt, str, s_qo)
+    type(s_q_time), intent(in) :: s_qt
     type(structure), intent(in) :: str
-    type(s_q_omega), intent(inout) :: s_q_o
+    type(s_q_omega), intent(inout) :: s_qo
   
     integer :: n_q, n_omega, n_t, i_q, i_omega, n_atom
     real(db) :: density, pre_s_d, pre_s_s
@@ -54,26 +54,26 @@ contains
   
     ! some checks
        
-    call check_if_s_q_time_allocated(s_q_t)
-    call check_if_s_q_omega_allocated(s_q_o)
+    call check_if_s_q_time_allocated(s_qt)
+    call check_if_s_q_omega_allocated(s_qo)
     
     
     ! Has local_precal_cos_values been allocated and populated
     ! Notice should also compare the omega array in that container with 
     ! omega array in the s_q_omega container  
     
-    n_t = get_s_q_time_n_t_bin(s_q_t)
+    n_t = get_s_q_time_n_t_bin(s_qt)
     
     if (is_precal_cos_values_allocated(local_precal_cos_values) == .false.) then
       local_precal_cos_values = make_and_cal_precal_cos_values( &
-        n_t, s_q_t%t_bin, s_q_o%omega)
+        n_t, s_qt%t_bin, s_qo%omega)
     end if
   
 
     ! calculate S(Q,omega)
   
-    s_q_o%self = matmul(s_q_t%self, local_precal_cos_values%val)
-    s_q_o%diff = matmul(s_q_t%diff, local_precal_cos_values%val) 
+    s_qo%self = matmul(s_qt%self, local_precal_cos_values%val)
+    s_qo%diff = matmul(s_qt%diff, local_precal_cos_values%val) 
 
   end subroutine cal_s_q_omega
 
@@ -127,9 +127,9 @@ contains
       call xml_AddAttribute(xf, "title", "rho = " // str(density, format="(f10.5)") &
                                          // "atoms/AA-3")                                                                        
     end if
-    
-    !call xml_AddAttribute(xf, "bin-length", str(bin_length, format="(f10.5)"))
-    
+
+    call xml_AddAttribute(xf, "n-omega-points", str(size(container%omega), format="(i)") )
+    call xml_AddAttribute(xf, "n-q-points", str(size(container%q), format="(i)") )
     call xml_AddAttribute(xf, "q-units", "AA^-1")
     call xml_AddAttribute(xf, "omega-unit", "1/[10^-13 s]")        
     

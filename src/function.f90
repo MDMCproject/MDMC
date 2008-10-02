@@ -6,6 +6,8 @@ use lennard_jones_class
 use rdf_fom_class
 use g_d_rt_fom_class
 use s_q_time_fom_class
+use s_q_omega_fom_class
+
 
 implicit none
 
@@ -21,6 +23,7 @@ implicit none
     type (rdf_fom_container), pointer :: pt_rdf_fom => null()
     type (g_d_rt_fom_container), pointer :: pt_g_d_rt_fom => null()
     type (s_qt_fom_container), pointer :: pt_s_qt_fom => null()
+    type (s_qo_fom_container), pointer :: pt_s_qo_fom => null()
   end type func_list
 
   interface add_function
@@ -28,6 +31,7 @@ implicit none
     module procedure add_rdf_fom_container
     module procedure add_g_d_rt_fom_container
     module procedure add_s_qt_fom_container
+    module procedure add_s_qo_fom_container
   end interface
   
   interface func_val
@@ -35,6 +39,7 @@ implicit none
     module procedure func_val_structure
     module procedure func_val_time_corr
     module procedure func_val_s_q_time
+    module procedure func_val_s_q_omega
   end interface  
   
 contains
@@ -67,6 +72,13 @@ contains
     list%pt_s_qt_fom => fom_target
   end subroutine add_s_qt_fom_container    
   
+  subroutine add_s_qo_fom_container(list, fom_target)
+    type (func_list), intent(inout) :: list
+    type (s_qo_fom_container), target, intent(in) :: fom_target
+    
+    list%pt_s_qo_fom => fom_target
+  end subroutine add_s_qo_fom_container   
+    
     
   function func_val_structure(str, list) result (val)
     type (structure), intent(in) :: str
@@ -139,7 +151,32 @@ contains
       stop
     end if
   end function func_val_s_q_time  
-  
+ 
+  function func_val_s_q_omega(s_qo, list) result (val)
+    type (s_q_omega), intent(in) :: s_qo
+    type (func_list), intent(inout) :: list
+    real (db) :: val
+
+    if ( associated(list%pt_lj_pe) ) then
+      print *, "Problem in func_val_s_q_omega"
+      stop
+    else if ( associated(list%pt_rdf_fom) ) then
+      print *, "Problem in func_val_s_q_omega"
+      stop
+    else if ( associated(list%pt_g_d_rt_fom) ) then
+      print *, "Problem in func_val_s_q_omega"
+      stop
+    else if ( associated(list%pt_s_qt_fom) ) then
+      print *, "Problem in func_val_s_q_omega"
+      stop      
+    else if ( associated(list%pt_s_qo_fom) ) then
+      val = s_qo_fom_val(s_qo, list%pt_s_qo_fom)          
+    else
+      print *, "Error in func_val_s_q_time"
+      stop
+    end if
+  end function func_val_s_q_omega  
+    
     
   subroutine func_deriv(str, deriv, list, pressure_comp, pot_energy)
     type (structure), intent(in) :: str
