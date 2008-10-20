@@ -140,7 +140,7 @@ for j = 1 : length(omega)
 end
  
 % Save the sample XML document.
-xmlFileName = 'Well s_q_omega Ag data.xml';
+xmlFileName = 'Well_s_q_omega_Ag_data.xml';
 xmlwrite(xmlFileName,docNode);
 %edit(xmlFileName);
 mesh(q,omega, S_Q_Omega')
