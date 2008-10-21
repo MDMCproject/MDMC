@@ -112,12 +112,14 @@ omega = [omega 2.5:0.5:10.0];
 omega = [omega 11:1:20];
 omega = omega / 10.0;  % to convert from 1/ps to 1/[10^-13 s]
 
-docNode = com.mathworks.xml.XMLUtils.createDocument('S_q_omega')
+docNode = com.mathworks.xml.XMLUtils.createDocument('s-q-omega')
 docRootNode = docNode.getDocumentElement;
 docRootNode.setAttribute('n-omega-points' , num2str(length(omega)));
 docRootNode.setAttribute('n-q-points' , num2str(length(q)));
 docRootNode.setAttribute('q-unit' , 'AA^-1');
 docRootNode.setAttribute('omega-unit' , '1/[10^-13 s]');
+%docRootNode.setAttribute('title' , ['Copy of data from A. A. Van Well thesis.' ...
+%    ' Table V page 41-2. Ag S(Q,Omega) data.']);
 thisElement = docNode.createElement('description');
 thisElement.appendChild... 
     (docNode.createTextNode(['Copy of data from A. A. Van Well thesis.' ...
@@ -134,9 +136,9 @@ for j = 1 : length(omega)
       omegaElement.setAttribute('S', num2str(S_Q_Omega(i,j)));
       omegaElement.setAttribute('error', num2str(sigma_S_Q_Omega(i,j)));
     end
-    thisElement.appendChild(omegaElement);
+    docRootNode.appendChild(omegaElement);
   end
-  docRootNode.appendChild(thisElement);
+  %docRootNode.appendChild(thisElement);
 end
  
 % Save the sample XML document.
@@ -144,3 +146,6 @@ xmlFileName = 'Well_s_q_omega_Ag_data.xml';
 xmlwrite(xmlFileName,docNode);
 %edit(xmlFileName);
 mesh(q,omega, S_Q_Omega')
+title('Van Well Ag S(q,\omega )')
+xlabel('q [AA^{-1}]')
+ylabel('\omega  [1/(10^-13 s)]')
