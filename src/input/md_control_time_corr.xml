@@ -14,7 +14,7 @@
   <structure what-init-structure-to-build="fcc">
     <title>Liquid Ar</title>
     <density units="atom/AA3" val="0.020265" />
-    <number-of-unit-cells nx="5" ny ="5" nz="5" />
+    <number-of-unit-cells nx="6" ny ="6" nz="6" />
   </structure>
   
   <!-- To not use nearest neighbour method include element below.
@@ -67,9 +67,29 @@
   
     <temperature units="Kelvin" val="85.0" />
     <time-step units="10e-13s" val="0.1075" />
+
+<!--
+    <q-values start="0.4" end="4.0" step="0.4" />
+    <omega-values start="0.0" end="0.05" step="0.001" />
+-->
     
-    <q-values start="0.2" end="8.2" step="0.2" />
-    <omega-values start="0.05" end="1.05" step="0.05" />
+    <q-values>
+      <q start="0.42" step="0.42" n-step="2" />
+      <q start="1.62" step="0.3" n-step="2" />
+      <q start="2.58" step="0.42" n-step="2" />
+      <q start="3.9" step="10000.0" n-step="0" />
+    </q-values>
+
+    <omega-values>
+      <omega start="0.0" step="0.02" n-step="10" />
+      <omega start="0.25" step="0.05" n-step="15" />
+      <omega start="1.1" step="0.1" n-step="9" />
+    </omega-values>
+
+    <!--   
+    <q-values start="0.4" end="4.0" step="0.4" />
+    <omega-values start="0.0" end="2.0" step="0.05556" />    
+    -->
     
     <!-- Specify stuff with is done only once
     
@@ -85,12 +105,12 @@
     
     
     <time-correlation> 
-      <n-g-r-t-to-average-over number="2" />  <!-- Number of g(r,t) to average over -->
+      <n-g-r-t-to-average-over number="20" />  <!-- Number of g(r,t) to average over -->
       <n-md-step-between-buffers number="100" /> <!-- how long between the calculated g(r,t) to make stat. independent -->      
       <md-per-time-bin number="4" />  <!-- Robert said nearly always set to 1, although it may be used
                                            to reduce the number of output t-points when outputting g(r,t)
                                            for plotting -->
-      <n-time-bin number="100" />
+      <n-time-bin number="350" />
     </time-correlation>
     
 
@@ -102,11 +122,13 @@
       <total-step-temp-cali-repeated number="3000" />
       <adjust-temp-at-interval-repeated number="200" />
     </perform-repeated-temperature-calibration>
+    
+    
     <calculate-rdf>
       <cal-rdf-at-interval number="50" />
       <average-over-this-many-rdf number="20" />  
       
-      <r-max units="AA" val="50.0" />
+      <r-max units="AA" val="10000.0" />
       <bin-length units="AA" val="0.1" /> 
     </calculate-rdf>    
         

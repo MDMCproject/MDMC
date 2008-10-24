@@ -30,7 +30,7 @@ implicit none
     ! integer :: n_atom 
     ! real(db) :: density
     
-    !real(db) :: scale_factor = 1.0
+    real(db) :: scale_factor = 1.0
     !real(db) :: weight = 1.0
     
     character(len=120) :: title = " "
@@ -66,7 +66,7 @@ contains
 
     do i_t = 1, s_qt_data%n_t_bin     
       do i_q = 1, n_q 
-         val = val + (s_qt_data%obs(i_q, i_t) - s_qt_cal%self(i_q, i_t) - s_qt_cal%diff(i_q,i_t))**2
+         val = val + (s_qt_data%obs(i_q, i_t) - s_qt_data%scale_factor*(s_qt_cal%self(i_q, i_t) + s_qt_cal%diff(i_q,i_t)))**2
          
       end do 
     end do

@@ -14,7 +14,7 @@
   <structure what-init-structure-to-build="fcc">
     <title>Liquid Ar</title>
     <density units="atom/AA3" val="0.020265" />
-    <number-of-unit-cells nx="5" ny ="5" nz="5" />
+    <number-of-unit-cells nx="6" ny ="6" nz="6" />
   </structure>
   
   <!-- To not use nearest neighbour method include element below.
@@ -45,13 +45,13 @@
       <sigma val="1.0" />
     </g-d-rt-fom>  
     <s-qt-fom>
-      <data-file filename="C:\Backup\Backup_folder1\work\code\RMC++\mdmc\trunk\src\output\s_qt_data_fcc_500atoms.xml" />
+      <data-file filename="C:\Backup\Backup_folder1\work\code\RMC++\mdmc\trunk\data\Van Well thesis Ag data\Well s_q_omega Ag data.xml" />
       <scale-factor val="1.0" />
       <sigma val="1.0" />
     </s-qt-fom>  -->
     <s-qo-fom>
-      <data-file filename="C:\Backup\Backup_folder1\work\code\RMC++\mdmc\trunk\src\output\s_qo_data_fcc_500atoms.xml" />
-      <scale-factor val="1.0" />
+      <data-file filename="../data/Van_Well_thesis_Ag_data/Well_s_q_omega_Ag_data.xml" />
+      <scale-factor val="0.15" />
       <sigma val="1.0" />
     </s-qo-fom>
   </fom> 
@@ -80,8 +80,16 @@
     <temperature units="Kelvin" val="85.0" />
     <time-step units="10e-13s" val="0.1075" />
 
-    <q-values start="0.2" end="8.2" step="0.2" />
-    <omega-values start="0.05" end="1.05" step="0.05" />
+    <q-values start="0.4" end="4.0" step="0.4" />
+
+    <!--
+    <q-values>
+      <values start="0.4" end="8.2" step="0.38" />
+      <values start="0.4" end="8.2" step="0.38" />
+    </q-values>    
+    -->
+    
+    <omega-values start="0.0" end="2.0" step="0.05556" />
     
     <!-- Specify stuff with is done only once
     
@@ -97,7 +105,7 @@
 
 
     <time-correlation>
-      <n-g-r-t-to-average-over number="25" />    <!-- Number of g(r,t) to average over -->
+      <n-g-r-t-to-average-over number="20" />    <!-- Number of g(r,t) to average over -->
       <n-md-step-between-buffers number="100" />  <!-- how long between the calculated g(r,t) to make stat. independent -->
       <md-per-time-bin number="4" />  <!-- Robert said nearly always set to 1, although it may be used
                                            to reduce the number of output t-points when outputting g(r,t)
@@ -107,7 +115,7 @@
 
 
 
-    <mc-steps number="200" />
+    <mc-steps number="100" />
     <temperature-mc val="0.02" />
 
     <!-- specify stuff which is repeated mc-steps times 

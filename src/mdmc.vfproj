@@ -45,6 +45,7 @@
 		<File RelativePath=".\functions\s_q_omega_fom.f90"/>
 		<File RelativePath=".\functions\s_q_time_fom.f90"/></Filter>
 		<Filter Name="readers">
+		<File RelativePath=".\readers\alloc_q_omega_arrays.f90"/>
 		<File RelativePath=".\readers\fnc_constraint_reader.f90"/>
 		<File RelativePath=".\readers\g_d_readers.f90"/>
 		<File RelativePath=".\readers\s_qo_reader.f90"/>

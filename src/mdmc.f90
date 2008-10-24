@@ -10,6 +10,7 @@ program mdmc
   use s_qt_reader_class
   use s_qo_reader_class
   use rdf_class
+  use alloc_q_omega_arrays_class
 
   type(xml_t) :: fxml
   integer     :: iostat
@@ -82,6 +83,13 @@ program mdmc
   if (iostat == 0) then
     call make_rdf_fom(trim(structure_filename))
   end if
+  
+  
+  ! Similar to above but for the <control-object/q-values> and <control-object/omega-values> elements. 
+  
+  call alloc_q_omega_arrays(trim(filename))
+
+  
   
   
   ! open main input file to check for g-d-rt-fom element

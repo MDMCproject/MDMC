@@ -27,8 +27,12 @@ implicit none
   real(db), parameter :: P_unit = 16387.2_db
   
   
+  ! To specify when a no-data datapoint (likelihood of having the
+  ! number specified below as a real datapoint is close to zero).
   
+  real(db), parameter :: no_datapoint_available = 120279047389.944_db
   
+    
   ! values below are copied from Ed Akin's figure 2.1
   
   real(db), parameter:: deg_per_rad  = 57.295779513082320876798155_db

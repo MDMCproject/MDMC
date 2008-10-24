@@ -88,11 +88,21 @@ contains
       
         call get_node(fxml, path="//s-q-omega/SQomega", attributes=structure_attributes, status=iostat) 
         
+        ! get S-diff, S-self or S
+        
         call get_value(structure_attributes,"S-self",read_db,status=iostat)
-        target_s_qo_fom%obs(i, j) = string_to_db(read_db)       
-          
-        call get_value(structure_attributes,"S-diff",read_db,status=iostat)
-        target_s_qo_fom%obs(i, j) = target_s_qo_fom%obs(i, j) + string_to_db(read_db)     
+        if (iostat /= 0) then
+          target_s_qo_fom%obs(i, j) = string_to_db(read_db)       
+          call get_value(structure_attributes,"S-diff",read_db,status=iostat)
+          target_s_qo_fom%obs(i, j) = target_s_qo_fom%obs(i, j) + string_to_db(read_db)
+        else ! when 'just' total S specified
+          call get_value(structure_attributes,"S",read_db,status=iostat)
+          if ( read_db == "no data") then
+            target_s_qo_fom%obs(i, j) = no_datapoint_available
+          else
+            target_s_qo_fom%obs(i, j) = string_to_db(read_db)
+          end if          
+        end if     
         
         if (i == 1) then
           call get_value(structure_attributes,"omega",read_db,status=iostat)

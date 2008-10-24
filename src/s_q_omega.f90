@@ -203,19 +203,32 @@ contains
     
     
     do i_omega = 1, n_omega
-      prefac = 1 / ( pi_value * omega(i_omega) )
+      ! when calculating integral this way (method 2 in my notes page 31)
+      ! I need to calculate omega=0 separately
       
-      lower_lim = 0  ! since sin(omega*t) = 0 for t=0
+      if ( omega(i_omega) == 0.0 ) then
+        lower_lim = 0  ! since first bin is assumed only to be a half delta-time
+        do i_t = 0, n_t-1
+          upper_lim = (i_t + 0.5) * time_length  ! all subsequent bins are a full delta-time
+          
+          container%val(i_t+1,i_omega) = (upper_lim - lower_lim) / pi_value
+          lower_lim = upper_lim 
+        end do
+      else
+        prefac = 1 / ( pi_value * omega(i_omega) )
       
-      do i_t = 0, n_t-1
-        t = (i_t + 0.5) * time_length
+        lower_lim = 0  ! since sin(omega*t) = 0 for t=0
+      
+        do i_t = 0, n_t-1
+          t = (i_t + 0.5) * time_length
         
-        upper_lim = sin(omega(i_omega)*t)
+          upper_lim = sin(omega(i_omega)*t)
         
-        container%val(i_t+1,i_omega) = (upper_lim - lower_lim) * prefac
+          container%val(i_t+1,i_omega) = (upper_lim - lower_lim) * prefac
+          lower_lim = upper_lim  
+        end do
+      end if
         
-        lower_lim = upper_lim  
-      end do
     end do
     
 
