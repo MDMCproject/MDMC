@@ -101,6 +101,10 @@ sigma_S_Q_Omega(2,1:num_omega_2) = sigma_S_Q_Omega_2;
 sigma_S_Q_Omega(2,num_omega_2+1:end) = NaN;
 sigma_S_Q_Omega(3:10,1:num_omega_3) = sigma_S_Q_Omega_3;
 
+% To convert van Well S(q,omega) from having
+% unit of ps to having unit of 0.1ps=10^-13s
+S_Q_Omega = 10*S_Q_Omega;
+sigma_S_Q_Omega = 10*sigma_S_Q_Omega;
 
 % Create the XML representation of Table V
 
@@ -118,6 +122,7 @@ docRootNode.setAttribute('n-omega-points' , num2str(length(omega)));
 docRootNode.setAttribute('n-q-points' , num2str(length(q)));
 docRootNode.setAttribute('q-unit' , 'AA^-1');
 docRootNode.setAttribute('omega-unit' , '1/[10^-13 s]');
+docRootNode.setAttribute('S-unit' , '0.1ps');
 %docRootNode.setAttribute('title' , ['Copy of data from A. A. Van Well thesis.' ...
 %    ' Table V page 41-2. Ag S(Q,Omega) data.']);
 thisElement = docNode.createElement('description');
@@ -148,4 +153,5 @@ xmlwrite(xmlFileName,docNode);
 mesh(q,omega, S_Q_Omega')
 title('Van Well Ag S(q,\omega )')
 xlabel('q [AA^{-1}]')
-ylabel('\omega  [1/(10^-13 s)]')
+ylabel('\omega  [1/(0.1ps)]')
+zlabel('S(q,\omega) [0.1ps]')
