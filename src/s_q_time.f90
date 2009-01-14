@@ -96,6 +96,8 @@ contains
     allocate(prefac_s_d(n_r))
     allocate(prefac_s_s(n_r))
     
+    ! This are to turn histogram counts in g functions. See page 29 equations
+    ! (29-30) in my notes
     prefac_s_d =  g_r_t%volume_prefac / (density*(n_atom-1)*g_r_t%n_accum)
     prefac_s_s =  g_r_t%volume_prefac / (density*g_r_t%n_accum)
     
@@ -242,7 +244,9 @@ contains
   end function is_integrat_over_r_precal_allocated
 
 
-
+  ! calculates 4pi/Q * [sin(Qr)/Q^2 - rcos(Qr)/Q] evaluated at r=i*delta_r minus evaluated
+  ! at r=(i-1)*delta_r for i=1..Nr, where Nr is the number of r-bins.
+  ! See page 27, equation (24) in my notes
   function make_and_cal_integrat_over_r_precal(n_r, bin_length, q) result(container)
     real(db), dimension(:), intent(in) :: q
     real(db), intent(in) :: bin_length

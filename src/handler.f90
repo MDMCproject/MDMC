@@ -544,7 +544,7 @@ contains
           if ( mod(setup_mdmc_control_params%n_time_bin, n_time_step_between_buffers) /= 0) then
             setup_mdmc_control_params%n_time_bin = n_time_step_between_buffers &
               * ceiling(dble(setup_mdmc_control_params%n_time_bin)/dble(n_time_step_between_buffers))
-            print *, "n-time-bin adjusted reduced to ", setup_mdmc_control_params%n_time_bin
+            print *, "n-time-bin adjusted to be multiple of n_time_step_between_buffers: ", setup_mdmc_control_params%n_time_bin
           end if      
           
 

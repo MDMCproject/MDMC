@@ -257,7 +257,7 @@ contains
         
           ! calculate einstein diff. expression according to (5.2.4) Rapaport book
         
-          fac = 1 / (ndim*2*container%time_bin*n_g_r_t_to_average_over)
+          fac = 1 / (ndim*2*container%time_bin*n_g_r_t_to_average_over*get_n_atom(str))
           do i_time = 2, n_time_bin             
             container%einstein_diffuse_exp(i_time) = container%einstein_diffuse_exp(i_time) * fac / (i_time-1)
           end do           

@@ -11,6 +11,7 @@ implicit none
 
   type s_qo_fom_container
     real(db), dimension(:,:), allocatable :: obs  ! holds the data
+    real(db), dimension(:,:), allocatable :: esd  ! holds esds for the data
     
     real(db), dimension(:), allocatable :: q 
     real(db), dimension(:), allocatable :: omega
@@ -53,7 +54,9 @@ contains
     do i_o = 1, n_omega     
       do i_q = 1, n_q 
          if ( s_qo_data%obs(i_q, i_o) /= no_datapoint_available ) then
-           val = val + (s_qo_data%obs(i_q, i_o) - s_qo_data%scale_factor*(s_qo_cal%self(i_q, i_o) + s_qo_cal%diff(i_q,i_o)))**2
+           val = val + &
+           (s_qo_data%obs(i_q, i_o) - s_qo_data%scale_factor*(s_qo_cal%self(i_q, i_o) + s_qo_cal%diff(i_q,i_o)))**2 &
+           / (s_qo_data%esd(i_q, i_o)**2)
          end if
       end do 
     end do

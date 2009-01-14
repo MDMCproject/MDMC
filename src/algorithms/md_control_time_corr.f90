@@ -209,8 +209,10 @@ contains
 
   call cal_time_corr_container(my_time_corr_container, my_ps, common_pe_list, c%md_per_time_bin, c%time_step)   
   call print_g_d(my_time_corr_container, product(my_ps%str%box_edges), size(my_ps%str%atoms), c%temperature)
+  call print_h_d_hist(my_time_corr_container, density, c%temperature)
   call print_g_s(my_time_corr_container, density, c%temperature)
-  call print_einstein_diffuse_exp(my_time_corr_container, density, c%temperature)
+  call print_h_s_hist(my_time_corr_container, density, c%temperature)
+  call print_einstein_diffuse_exp(my_time_corr_container, size(my_ps%str%atoms), density, c%temperature)
 
   call cal_s_q_time(my_time_corr_container, my_ps%str, my_s_q_time)
   call print_s_q_time(my_s_q_time, density, c%temperature)

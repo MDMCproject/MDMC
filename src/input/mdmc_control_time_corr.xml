@@ -51,7 +51,7 @@
     </s-qt-fom>  -->
     <s-qo-fom>
       <data-file filename="../data/Van_Well_thesis_Ag_data/Well_s_q_omega_Ag_data.xml" />
-      <scale-factor val="0.15" />
+      <scale-factor val="1.0" />
       <sigma val="1.0" />
     </s-qo-fom>
   </fom> 
@@ -80,16 +80,18 @@
     <temperature units="Kelvin" val="85.0" />
     <time-step units="10e-13s" val="0.1075" />
 
-    <q-values start="0.4" end="4.0" step="0.4" />
-
-    <!--
     <q-values>
-      <values start="0.4" end="8.2" step="0.38" />
-      <values start="0.4" end="8.2" step="0.38" />
-    </q-values>    
-    -->
-    
-    <omega-values start="0.0" end="2.0" step="0.05556" />
+      <q start="0.42" step="0.42" n-step="2" />
+      <q start="1.62" step="0.3" n-step="2" />
+      <q start="2.58" step="0.42" n-step="2" />
+      <q start="3.9" step="10000.0" n-step="0" />
+    </q-values>
+
+    <omega-values>
+      <omega start="0.0" step="0.02" n-step="10" />
+      <omega start="0.25" step="0.05" n-step="15" />
+      <omega start="1.1" step="0.1" n-step="9" />
+    </omega-values>
     
     <!-- Specify stuff with is done only once
     
@@ -97,10 +99,10 @@
          element specifies how many steps to average over when calculating
          MD properties 
          -->
-    <total-steps-initial-equilibration number="50000" average-over="1000" />
+    <total-steps-initial-equilibration number="10000" average-over="200" />
     <perform-initial-temperature-calibration>
-      <total-step-temp-cali number="20000" />
-      <adjust-temp-at-interval number="200" />
+      <total-step-temp-cali number="4000" />
+      <adjust-temp-at-interval number="40" />
     </perform-initial-temperature-calibration>
 
 
@@ -110,27 +112,27 @@
       <md-per-time-bin number="4" />  <!-- Robert said nearly always set to 1, although it may be used
                                            to reduce the number of output t-points when outputting g(r,t)
                                            for plotting -->
-      <n-time-bin number="100" />
+      <n-time-bin number="400" />
     </time-correlation>
 
 
 
     <mc-steps number="100" />
-    <temperature-mc val="0.02" />
+    <temperature-mc val="2" />
 
     <!-- specify stuff which is repeated mc-steps times 
          -->
-    <md-steps-repeated-equilibration number="20000" average-over="1000" />
+    <md-steps-repeated-equilibration number="2000" average-over="100" />
     <perform-repeated-temperature-calibration>
-      <total-step-temp-cali-repeated number="10000" />
-      <adjust-temp-at-interval-repeated number="200" />
+      <total-step-temp-cali-repeated number="1000" />
+      <adjust-temp-at-interval-repeated number="20" />
     </perform-repeated-temperature-calibration>
     <calculate-rdf>
       <!-- <cal-rdf-at-interval number="50" />
       <average-over-this-many-rdf number="200" />
       -->
       <r-max units="AA" val="50.0" />
-      <bin-length units="AA" val="0.1" />
+      <bin-length units="AA" val="0.2" />
     </calculate-rdf>    
         
   </control-object>

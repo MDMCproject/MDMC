@@ -212,17 +212,17 @@ contains
   
   call clear_time_corr_hist_container(my_time_corr_container) ! not sure if necessary!!?? 
   
-  write(print_to_file,'(a,f12.4)') "1st FOM = ", fom_val
-  write(print_to_file, '(a,f12.4)') "Finished cal 1st FOM. Time: ", toc()
+  write(print_to_file,'(a,f14.6)') "1st FOM = ", fom_val
+  write(print_to_file, '(a,f14.6)') "Finished cal 1st FOM. Time: ", toc()
   write(print_to_file, *) " "
-  write(print_to_screen,'(a,f12.4)') "1st FOM = ", fom_val
-  write(print_to_screen, '(a,f12.4)') "Finished cal 1st FOM. Time: ", toc()
+  write(print_to_screen,'(a,f14.6)') "1st FOM = ", fom_val
+  write(print_to_screen, '(a,f14.6)') "Finished cal 1st FOM. Time: ", toc()
 
   ! print FOM to xml file
   
   call xml_NewElement(xf, "accept")
   call add_xml_attribute_func_params(xf, common_pe_list)
-  call xml_AddAttribute(xf, "val", str(fom_val, format="(f10.5)"))
+  call xml_AddAttribute(xf, "val", str(fom_val, format="(f14.6)"))
   call xml_EndElement(xf, "accept")    
 
 
@@ -297,9 +297,9 @@ contains
               
       end do
          
-      write(print_to_file, '(a,f12.4)') "Finished repeated MD trajectory. Time: ", toc() 
+      write(print_to_file, '(a,f14.6)') "Finished repeated MD trajectory. Time: ", toc() 
       write(print_to_file, *) " "
-      write(print_to_screen, '(a,f12.4)') "Finished repeated MD trajectory. Time: ", toc()      
+      write(print_to_screen, '(a,f14.6)') "Finished repeated MD trajectory. Time: ", toc()      
       
 
       ! Determine if equilibrium was reached
@@ -337,11 +337,11 @@ contains
       !call print_g_d(my_time_corr_container, product(my_ps%str%box_edges), size(my_ps%str%atoms), c%temperature)
       call clear_time_corr_hist_container(my_time_corr_container) ! not sure if necessary!!?? 
 
-      write(print_to_file,'(a,f12.4)') "FOM = ", fom_val
-      write(print_to_file, '(a,f12.4)') "Finished cal FOM. Time: ", toc()
+      write(print_to_file,'(a,f14.6)') "FOM = ", fom_val
+      write(print_to_file, '(a,f14.6)') "Finished cal FOM. Time: ", toc()
       write(print_to_file, *) " "
-      write(print_to_screen,'(a,f12.4)') "FOM = ", fom_val
-      write(print_to_screen, '(a,f12.4)') "Finished cal FOM. Time: ", toc()
+      write(print_to_screen,'(a,f14.6)') "FOM = ", fom_val
+      write(print_to_screen, '(a,f14.6)') "Finished cal FOM. Time: ", toc()
       
       
       ! check if new best fom
@@ -375,7 +375,7 @@ contains
       
         call xml_NewElement(xf, "accept")
         call add_xml_attribute_func_params(xf, common_pe_list)
-        call xml_AddAttribute(xf, "val", str(fom_val, format="(f10.5)"))
+        call xml_AddAttribute(xf, "val", str(fom_val, format="(f14.6)"))
         call xml_EndElement(xf, "accept")       
      
       
@@ -389,7 +389,7 @@ contains
       
         call xml_NewElement(xf, "rejected")
         call add_xml_attribute_func_params(xf, common_pe_list)
-        call xml_AddAttribute(xf, "val", str(fom_val, format="(f10.5)"))
+        call xml_AddAttribute(xf, "val", str(fom_val, format="(f14.6)"))
         call xml_EndElement(xf, "rejected")
         
         
@@ -421,10 +421,10 @@ contains
     call print_g_d(my_time_corr_container, product(my_ps%str%box_edges), size(my_ps%str%atoms), c%temperature)   
     call clear_time_corr_hist_container(my_time_corr_container) ! not sure if necessary!!?? 
       
-    write(print_to_file,'(a,f12.4)') "BEST FOM = ", fom_val
+    write(print_to_file,'(a,f14.6)') "BEST FOM = ", fom_val
     write(print_to_file,'(a)') "WITH: "
     call print_all_func_params(print_to_file, common_pe_list)
-    write(print_to_file, '(a,f12.4)') "Finished cal FOM. Time: ", toc()
+    write(print_to_file, '(a,f14.6)') "Finished cal FOM. Time: ", toc()
     write(print_to_file, *) " "
  
     

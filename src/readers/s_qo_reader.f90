@@ -73,6 +73,10 @@ contains
 
     allocate(target_s_qo_fom%omega(n_omega))
     allocate(target_s_qo_fom%obs(n_q_points, n_omega))
+    allocate(target_s_qo_fom%esd(n_q_points, n_omega))
+  
+    ! initiate in case data contains no errorbars
+    target_s_qo_fom%esd = 1.0;
   
   
     call close_xmlfile(fxml)  
@@ -101,6 +105,12 @@ contains
             target_s_qo_fom%obs(i, j) = no_datapoint_available
           else
             target_s_qo_fom%obs(i, j) = string_to_db(read_db)
+            ! for this case also have a look for errorbars
+            call get_value(structure_attributes,"error",read_db,status=iostat)
+            if (iostat /= 0) then
+              target_s_qo_fom%esd(i, j) = string_to_db(read_db)
+            end if
+            
           end if          
         end if     
         

@@ -1,4 +1,8 @@
 function read_G_s(filename)
+% This function reads and plots \tilde{g}^s from a file, assumed
+% to be defined as described in my notes page 29 equation (29), i.e.
+% in theory this function should converge to 1 for large r.
+%
 
 s = xmlread(filename);
 
@@ -41,17 +45,26 @@ for j = 1 : n_time
 end
 
 
-subplot(2,1,1)
-surf(r, t, G_s')
+%% Plotting
+
+subplot(1,2,1)
+%G_s(1:10,1:10) =0; % to make peak a bit less significant
+surf(r, t, log(G_s'))
 xlabel('r [AA]')
 ylabel('t [10\^-13 s]')
-zlabel('G\_s (r,t)')
+zlabel('log(\\titde\{g\}\^s) (r,t)')
 title(char(top_element.item(0).getAttribute('title')))
-subplot(2,1,2)
-t_lower_cut = floor(length(t)/5)*4;
-t_new = t(t_lower_cut:end);
-G_s_new = G_s(:,t_lower_cut:end);
-surf(r, t_new, G_s_new')
+
+subplot(1,2,2)
+t_cut = floor(length(t)/15);
+r_cut = floor(length(r)/15);
+%t_new = t(t_lower_cut:end);
+%G_s_new = G_s(:,t_lower_cut:end);
+G_s_new = G_s;
+cutoff = max(max(G_s_new))/3000;
+[rr,cc] = find(G_s_new > cutoff);
+G_s_new(rr,cc) = 0;
+surf(r, t, G_s_new')
 xlabel('r [AA]')
 ylabel('t [10\^-13 s]')
-zlabel('G\_s (r,t)')
+zlabel('\\tilde\{g\}\^s (r,t)')

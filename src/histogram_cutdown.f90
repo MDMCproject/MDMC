@@ -25,6 +25,7 @@ contains
     allocate(hist%val(floor(r_max/bin_length)))
   end function make_histogram_cutdown
 
+  ! return sum of squared differences
   function cal_g_s_histogram(g_s_hist, org_r, act_r, box_edges) result(rr_sum)
     type (histogram_cutdown), intent(inout) :: g_s_hist
     real(db), dimension(:,:), intent(in) :: org_r, act_r

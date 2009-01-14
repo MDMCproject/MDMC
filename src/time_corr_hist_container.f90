@@ -11,16 +11,13 @@ implicit none
   public :: make_time_corr_hist_container 
 
   public :: print_g_d, print_g_s, print_einstein_diffuse_exp
-  
+  public :: print_h_s_hist, print_h_d_hist
+    
   public :: check_if_time_corr_hist_container_is_allocated
   
   public :: get_time_corr_hist_r_max, get_time_corr_hist_r_bin, &
             get_time_corr_hist_n_time_bin, get_time_corr_hist_n_r_bin
-            
-
-  ! for debugging
   
-  public :: print_h_s_hist, print_h_d_hist
 
 
   type time_corr_hist_container
@@ -184,9 +181,10 @@ contains
 
  ! The temperature is assumed to be in dimensionless units.
 
-  subroutine print_einstein_diffuse_exp(container, density, temperature)
+  subroutine print_einstein_diffuse_exp(container, n_atom, density, temperature)
     use flib_wxml
     type(time_corr_hist_container), intent(in) :: container
+    integer, intent(in) :: n_atom
     real(db), optional, intent(in) :: temperature, density
     
     type (xmlf_t) :: xf
@@ -232,6 +230,9 @@ contains
                                          // "atoms/AA-3")
     end if
     
+    call xml_AddAttribute(xf, "n-atom", str(n_atom, format="(i)"))
+    call xml_AddAttribute(xf, "density", str(density, format="(f10.5)"))    
+        
     call xml_AddAttribute(xf, "time-unit", "10^-13 s")
     call xml_AddAttribute(xf, "diffuse-units", "10^13 AA^2 s^-1")
     
@@ -316,7 +317,8 @@ contains
     call xml_AddAttribute(xf, "when", get_current_date_and_time())
     call xml_EndElement(xf, "this-file-was-created")
     
-    
+    ! Because of the way this prefactor is defined. This function prints out \tilde{q}^2
+    ! See page 29 equation 30 in my notes.
     container%volume_prefac = container%volume_prefac / (container%n_accum*density)
 
     do i = 1, n_eval_times    
@@ -413,7 +415,8 @@ contains
     call xml_AddAttribute(xf, "when", get_current_date_and_time())
     call xml_EndElement(xf, "this-file-was-created")
     
-    
+    ! Because of the way this prefactor is defined. This function prints out \tilde{q}^2
+    ! See page 29 equation 29 in my notes.
     container%volume_prefac = container%volume_prefac / (container%n_accum*density*(n_atom-1))
 
     do i = 1, n_time_bin    
