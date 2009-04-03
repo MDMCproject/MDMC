@@ -139,7 +139,7 @@ for j = 1 : length(omega)
       omegaElement.setAttribute('S', 'no data');     
     else
       omegaElement.setAttribute('S', num2str(S_Q_Omega(i,j)));
-      omegaElement.setAttribute('error', num2str(sigma_S_Q_Omega(i,j)));
+      omegaElement.setAttribute('error', num2str(sigma_S_Q_Omega(i,j), '%6.4f'));
     end
     docRootNode.appendChild(omegaElement);
   end

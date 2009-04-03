@@ -13,7 +13,8 @@
        -->
   <structure what-init-structure-to-build="fcc">
     <title>Liquid Ar</title>
-    <density units="atom/AA3" val="0.020265" />
+<!--    <density units="atom/AA3" val="0.020265" />-->
+    <density units="atom/AA3" val="0.0176" />    
     <number-of-unit-cells nx="7" ny ="7" nz="7" />
   </structure>
   
@@ -35,7 +36,7 @@
     <soft-cutoff-constraint /> 
   </constraints>
   
-  
+  <!--
   <fom>
     <rdf-fom>
       <rdf-data filename="../data/Argon_liquid_P1atm/xml_copy_of_robert_Ar.xml" />
@@ -43,12 +44,12 @@
       <scale-factor val="1.0" />
       <sigma val="1.0" />
     </rdf-fom>
-  </fom>
+  </fom> -->
   
   <gpe>
     <lj-potential>
-      <sigma units="AA" val="3.405"             fixed="no" min="1.0" max="6.0" max-move="0.1" />
-      <epsilon units="KJ/mole" val="0.9960172"  fixed="no" min="0.2" max="5.0" max-move="0.1" />
+      <sigma units="AA" val="3.36"             fixed="no" min="1.0" max="6.0" max-move="0.1" />
+      <epsilon units="KJ/mole" val="1.0243"  fixed="no" min="0.2" max="5.0" max-move="0.1" />
 
       <!-- Ag values are: sigma units="AA" val="3.405"
                           epsilon units="KJ/mole" val="0.9960172"
@@ -65,11 +66,11 @@
   
   <control-object name="md_control_time_corr">
   
-    <temperature units="Kelvin" val="85.0" />
+    <temperature units="Kelvin" val="120.0" />
     <time-step units="10e-13s" val="0.1075" />
 
     
-    <q-values>
+ <!--   <q-values>
       <q start="0.42" step="0.42" n-step="2" />
       <q start="1.62" step="0.3" n-step="2" />
       <q start="2.58" step="0.42" n-step="2" />
@@ -81,7 +82,13 @@
       <omega start="0.25" step="0.05" n-step="15" />
       <omega start="1.1" step="0.1" n-step="9" />
     </omega-values>
-
+-->
+    <q-values>
+      <q start="0.4" step="0.1" n-step="100" />
+    </q-values>
+    <omega-values>
+      <omega start="0.0" step="0.02" n-step="10" />
+    </omega-values>    
     
     <!-- Specify stuff with is done only once
     
@@ -89,9 +96,9 @@
          element specifies how many steps to average over when calculating
          MD properties 
          -->
-    <total-steps-initial-equilibration number="8000" average-over="1000" />
+    <total-steps-initial-equilibration number="50000" average-over="1000" />
     <perform-initial-temperature-calibration>
-      <total-step-temp-cali number="4000" />
+      <total-step-temp-cali number="20000" />
       <adjust-temp-at-interval number="1000" />
     </perform-initial-temperature-calibration>
     
@@ -102,18 +109,18 @@
       <md-per-time-bin number="12" />  <!-- Robert said nearly always set to 1, although it may be used
                                            to reduce the number of output t-points when outputting g(r,t)
                                            for plotting -->
-      <n-time-bin number="500" />
+      <n-time-bin number="1000" />
     </time-correlation>
     
 
     
     <!-- specify stuff which is repeated mc-steps times 
          -->
-    <md-steps-repeated-equilibration number="6000" average-over="1000" />
+<!--    <md-steps-repeated-equilibration number="6000" average-over="1000" />
     <perform-repeated-temperature-calibration>
       <total-step-temp-cali-repeated number="3000" />
       <adjust-temp-at-interval-repeated number="200" />
-    </perform-repeated-temperature-calibration>
+    </perform-repeated-temperature-calibration> -->
     
     
     <calculate-rdf>

@@ -439,7 +439,7 @@ contains
   end subroutine print_g_d  
 
 
-  ! 1st version of this function was written for debugging purposes
+  ! Printing out normalised version (i.e. divided by n_accum) of h_s
 
   subroutine print_h_s_hist(container, density, temperature)
     use flib_wxml
@@ -509,8 +509,8 @@ contains
         call xml_NewElement(xf, "h-s")
         call xml_AddAttribute(xf, "r", str((i_bin-0.5)*r_bin, format="(f10.5)"))
         call xml_AddAttribute(xf, "t", str((i-1)*container%time_bin, format="(f10.5)"))
-        call xml_AddAttribute(xf, "h", str(container%g_s_hists_sum(i)%val(i_bin) / &
-                              container%n_accum, format="(i10)"))
+        call xml_AddAttribute(xf, "h", str(dble(container%g_s_hists_sum(i)%val(i_bin)) / &
+                              dble(container%n_accum), format="(f15.5)"))
         call xml_EndElement(xf, "h-s")
       end do 
     end do
@@ -522,7 +522,7 @@ contains
   end subroutine print_h_s_hist
 
 
-  ! 1st version of this function was written for debugging purposes
+  ! Printing out normalised version (i.e. divided by n_accum) of h_d 
 
   subroutine print_h_d_hist(container, density, temperature)
     use flib_wxml
@@ -592,8 +592,8 @@ contains
         call xml_NewElement(xf, "h-d")
         call xml_AddAttribute(xf, "r", str((i_bin-0.5)*r_bin, format="(f10.5)"))
         call xml_AddAttribute(xf, "t", str((i-1)*container%time_bin, format="(f10.5)"))
-        call xml_AddAttribute(xf, "h", str(container%g_d_hists_sum(i)%val(i_bin) / &
-                              container%n_accum, format="(i10)"))
+        call xml_AddAttribute(xf, "h", str(dble(container%g_d_hists_sum(i)%val(i_bin)) / &
+                              dble(container%n_accum), format="(f15.5)"))
         call xml_EndElement(xf, "h-d")
       end do 
     end do

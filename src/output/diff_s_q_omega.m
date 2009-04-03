@@ -123,6 +123,20 @@ if nargout == 1
   return;
 end
 
+% calculate FOM value
+
+val = 0;
+for i_q = 1 : length(q)
+    for i_o = 1 : length(omega)
+        if ~isnan(S_tot2(i_q,i_o))
+            val = val + (S_tot2(i_q,i_o)-S_s(i_q,i_o)-S_d(i_q,i_o))^2; %...
+              %/ error2Plot(i_q,i_o)^2
+        end
+    end
+end
+FOM_val = val
+
+
 subplot(3,2,1)
 surf(q, omega, S_s'+S_d')
 xlabel('q [AA\^-1]')
@@ -153,7 +167,7 @@ Sq1 = zeros([1 length(q)]);
 for i = 1 : length(q)
     for j = 1 : length(omega)-1
         if isnan(S_tot1(i,j)) == 0 && isnan(S_tot1(i,j+1)) == 0
-          Sq1(i) = Sq1(i)+(omega(j+1)-omega(j))*(S_tot1(i,j+1)+S_tot1(i,j+1))/2;
+          Sq1(i) = Sq1(i)+(omega(j+1)-omega(j))*(S_tot1(i,j)+S_tot1(i,j+1))/2;
         end
     end
 end
@@ -168,8 +182,8 @@ subplot(3,2,4)
 Sq2 = zeros([1 length(q)]);
 for i = 1 : length(q)
     for j = 1 : length(omega)-1
-        if isnan(S_tot1(i,j)) == 0 && isnan(S_tot1(i,j+1)) == 0
-          Sq2(i) = Sq2(i)+(omega(j+1)-omega(j))*(S_tot2(i,j+1)+S_tot2(i,j+1))/2;
+        if isnan(S_tot2(i,j)) == 0 && isnan(S_tot2(i,j+1)) == 0
+          Sq2(i) = Sq2(i)+(omega(j+1)-omega(j))*(S_tot2(i,j)+S_tot2(i,j+1))/2;
         end
     end
 end

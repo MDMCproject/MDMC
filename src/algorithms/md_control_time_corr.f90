@@ -65,7 +65,7 @@ contains
     call xml_OpenFile("output/mdmc_results.xml", xf, indent=.true.)
     
     call xml_AddXMLDeclaration(xf, "UTF-8")
-    call xml_NewElement(xf, "mdmc-control-results")
+    call xml_NewElement(xf, "md-control-time-corr-results")
 
     call xml_AddAttribute(xf, "title", "rho = " // str(density, format="(f10.5)") &
                                          // "atoms/AA-3")
@@ -127,7 +127,7 @@ contains
       !call md_cal_properties(my_ps, my_props, common_pe_list)
       call md_cal_properties(my_ps, my_props, common_pe_list, pressure_comp, pot_energy)
       
-      ! case you want to adject the temperature in the initial stages of the MD simulation
+      ! case you want to adjust the temperature in the initial stages of the MD simulation
       ! (notice c%total_step_temp_cali = 0 if <perform-initial-temperature-calibration> 
       ! element not specified in input file)
 
@@ -163,7 +163,7 @@ contains
         end if
         
         call md_reset_properties(my_props)
-        write(*, '(a,i8,a,f12.4,a)') "MD steps = ", i, " MD run-time = ", time_now, "*10e-13"
+        write(*, '(a,i8,a,f15.5,a)') "MD steps = ", i, " MD run-time = ", time_now, "*10e-13"
       end if
       
       
@@ -231,7 +231,7 @@ contains
 	    close(print_to_file)
     end if    
 	  
-    call xml_EndElement(xf, "mdmc-control-results")
+    call xml_EndElement(xf, "md-control-time-corr-results")
     call xml_Close(xf)
     
   end subroutine run_md_control_time_corr

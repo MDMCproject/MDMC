@@ -95,7 +95,7 @@ contains
         ! get S-diff, S-self or S
         
         call get_value(structure_attributes,"S-self",read_db,status=iostat)
-        if (iostat /= 0) then
+        if (iostat == 0) then
           target_s_qo_fom%obs(i, j) = string_to_db(read_db)       
           call get_value(structure_attributes,"S-diff",read_db,status=iostat)
           target_s_qo_fom%obs(i, j) = target_s_qo_fom%obs(i, j) + string_to_db(read_db)
@@ -107,12 +107,16 @@ contains
             target_s_qo_fom%obs(i, j) = string_to_db(read_db)
             ! for this case also have a look for errorbars
             call get_value(structure_attributes,"error",read_db,status=iostat)
-            if (iostat /= 0) then
+            if (iostat == 0) then
               target_s_qo_fom%esd(i, j) = string_to_db(read_db)
+            else
+              target_s_qo_fom%esd(i, j) = 1.0
             end if
             
           end if          
         end if     
+        
+        !print *, target_s_qo_fom%obs(i, j), "and ", target_s_qo_fom%esd(i, j)
         
         if (i == 1) then
           call get_value(structure_attributes,"omega",read_db,status=iostat)

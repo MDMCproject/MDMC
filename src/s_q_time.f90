@@ -118,7 +118,7 @@ contains
             (prefac_s_d(i_r)*g_r_t%g_d_hists_sum(i_t)%val(i_r)-1) * &
                             local_integrat_over_r_precal%val(i_r,i_q)
           s_q_t%self(i_q, i_t) = s_q_t%self(i_q, i_t) + pre_s_s * &
-             (prefac_s_s(i_r)*g_r_t%g_s_hists_sum(i_t)%val(i_r)) * &
+             (prefac_s_s(i_r)*g_r_t%g_s_hists_sum(i_t)%val(i_r)-1) * &
                             local_integrat_over_r_precal%val(i_r,i_q)
         end do                          
       end do

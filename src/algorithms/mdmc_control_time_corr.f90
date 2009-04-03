@@ -140,7 +140,7 @@ contains
       call md_accum_properties(my_props)
         
         
-      ! print out stuff and interval = average_over_this_many_steps
+      ! print out stuff at interval = average_over_initial_equilibration
         
       if (mod(i,c%average_over_initial_equilibration) == 0) then 
         call md_print_properties(print_to_file, my_props)
@@ -212,17 +212,17 @@ contains
   
   call clear_time_corr_hist_container(my_time_corr_container) ! not sure if necessary!!?? 
   
-  write(print_to_file,'(a,f14.6)') "1st FOM = ", fom_val
-  write(print_to_file, '(a,f14.6)') "Finished cal 1st FOM. Time: ", toc()
+  write(print_to_file,'(a,f14.5)') "1st FOM = ", fom_val
+  write(print_to_file, '(a,f14.5)') "Finished cal 1st FOM. Time: ", toc()
   write(print_to_file, *) " "
-  write(print_to_screen,'(a,f14.6)') "1st FOM = ", fom_val
-  write(print_to_screen, '(a,f14.6)') "Finished cal 1st FOM. Time: ", toc()
+  write(print_to_screen,'(a,f14.5)') "1st FOM = ", fom_val
+  write(print_to_screen, '(a,f14.5)') "Finished cal 1st FOM. Time: ", toc()
 
   ! print FOM to xml file
   
   call xml_NewElement(xf, "accept")
   call add_xml_attribute_func_params(xf, common_pe_list)
-  call xml_AddAttribute(xf, "val", str(fom_val, format="(f14.6)"))
+  call xml_AddAttribute(xf, "val", str(fom_val, format="(f14.5)"))
   call xml_EndElement(xf, "accept")    
 
 
@@ -297,9 +297,9 @@ contains
               
       end do
          
-      write(print_to_file, '(a,f14.6)') "Finished repeated MD trajectory. Time: ", toc() 
+      write(print_to_file, '(a,f14.5)') "Finished repeated MD trajectory. Time: ", toc() 
       write(print_to_file, *) " "
-      write(print_to_screen, '(a,f14.6)') "Finished repeated MD trajectory. Time: ", toc()      
+      write(print_to_screen, '(a,f14.5)') "Finished repeated MD trajectory. Time: ", toc()      
       
 
       ! Determine if equilibrium was reached
@@ -337,11 +337,11 @@ contains
       !call print_g_d(my_time_corr_container, product(my_ps%str%box_edges), size(my_ps%str%atoms), c%temperature)
       call clear_time_corr_hist_container(my_time_corr_container) ! not sure if necessary!!?? 
 
-      write(print_to_file,'(a,f14.6)') "FOM = ", fom_val
-      write(print_to_file, '(a,f14.6)') "Finished cal FOM. Time: ", toc()
+      write(print_to_file,'(a,f14.5)') "FOM = ", fom_val
+      write(print_to_file, '(a,f14.5)') "Finished cal FOM. Time: ", toc()
       write(print_to_file, *) " "
-      write(print_to_screen,'(a,f14.6)') "FOM = ", fom_val
-      write(print_to_screen, '(a,f14.6)') "Finished cal FOM. Time: ", toc()
+      write(print_to_screen,'(a,f14.5)') "FOM = ", fom_val
+      write(print_to_screen, '(a,f14.5)') "Finished cal FOM. Time: ", toc()
       
       
       ! check if new best fom
@@ -374,8 +374,9 @@ contains
       if (accept_parameters) then
       
         call xml_NewElement(xf, "accept")
+        call xml_AddAttribute(xf, "N", str(i, format="(i)"))
         call add_xml_attribute_func_params(xf, common_pe_list)
-        call xml_AddAttribute(xf, "val", str(fom_val, format="(f14.6)"))
+        call xml_AddAttribute(xf, "val", str(fom_val, format="(f14.5)"))
         call xml_EndElement(xf, "accept")       
      
       
@@ -388,8 +389,9 @@ contains
       else
       
         call xml_NewElement(xf, "rejected")
+        call xml_AddAttribute(xf, "N", str(i, format="(i)"))
         call add_xml_attribute_func_params(xf, common_pe_list)
-        call xml_AddAttribute(xf, "val", str(fom_val, format="(f14.6)"))
+        call xml_AddAttribute(xf, "val", str(fom_val, format="(f14.5)"))
         call xml_EndElement(xf, "rejected")
         
         
@@ -421,15 +423,16 @@ contains
     call print_g_d(my_time_corr_container, product(my_ps%str%box_edges), size(my_ps%str%atoms), c%temperature)   
     call clear_time_corr_hist_container(my_time_corr_container) ! not sure if necessary!!?? 
       
-    write(print_to_file,'(a,f14.6)') "BEST FOM = ", fom_val
+    write(print_to_file,'(a,f14.5)') "BEST FOM = ", fom_val
     write(print_to_file,'(a)') "WITH: "
     call print_all_func_params(print_to_file, common_pe_list)
-    write(print_to_file, '(a,f14.6)') "Finished cal FOM. Time: ", toc()
+    write(print_to_file, '(a,f14.5)') "Finished cal FOM. Time: ", toc()
     write(print_to_file, *) " "
  
     
     print *, ' '
-    print *, 'Job took ', toc(), ' seconds to execute.'
+    write(print_to_screen,'(a,f11.2,a)') 'Job took ', toc(), ' seconds to execute.'
+
     
     if (print_to_file /= 0) then
 	    close(print_to_file)

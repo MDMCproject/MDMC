@@ -228,6 +228,14 @@ contains
           lower_lim = upper_lim  
         end do
       end if
+
+
+!      container%val(1,i_omega) = 0.5 * time_length / pi_value
+!        
+!      do i_t = 1, n_t-1
+!        container%val(i_t+1,i_omega) = cos(omega(i_omega)*i_t*time_length)*time_length / pi_value
+!      end do
+      
         
     end do
     

@@ -178,8 +178,8 @@ contains
           ! it is assumed for now that r-max should be smaller than L/2 here
           
           number_db = string_to_db(read_db)
-          if (number_db > minval(common_config%str%box_edges)/2.0) then
-            number_db = minval(common_config%str%box_edges)/2.0
+          if (number_db > minval(common_config%str%box_edges)/2.05) then
+            number_db = minval(common_config%str%box_edges)/2.05
           end if
           
           setup_md_control_params%r_max = number_db    
@@ -319,8 +319,8 @@ contains
           ! it is assumed for now that r-max should be smaller than L/2 here
           
           number_db = string_to_db(read_db)
-          if (number_db > minval(common_config%str%box_edges)/2.0) then
-            number_db = minval(common_config%str%box_edges)/2.0
+          if (number_db > minval(common_config%str%box_edges)/2.05) then
+            number_db = minval(common_config%str%box_edges)/2.05
           end if
           
           setup_mdmc_control_params%r_max = number_db    
@@ -544,7 +544,7 @@ contains
           if ( mod(setup_mdmc_control_params%n_time_bin, n_time_step_between_buffers) /= 0) then
             setup_mdmc_control_params%n_time_bin = n_time_step_between_buffers &
               * ceiling(dble(setup_mdmc_control_params%n_time_bin)/dble(n_time_step_between_buffers))
-            print *, "n-time-bin adjusted to be multiple of n_time_step_between_buffers: ", setup_mdmc_control_params%n_time_bin
+            print *, "n-time-bin adjusted to: ", setup_mdmc_control_params%n_time_bin
           end if      
           
 
@@ -579,8 +579,8 @@ contains
         ! check for this below and if necessary change r-cut accordingly
         
         if (nn_list_r_cut /= 0.0) then
-          if (nn_list_r_cut+nn_list_delta_r > minval(common_config%str%box_edges)/2.0) then
-            nn_list_r_cut = minval(common_config%str%box_edges)/2.0 - nn_list_delta_r
+          if (nn_list_r_cut+nn_list_delta_r > minval(common_config%str%box_edges)/2.05) then
+            nn_list_r_cut = minval(common_config%str%box_edges)/2.05 - nn_list_delta_r
           end if
           
           ! Print to screen

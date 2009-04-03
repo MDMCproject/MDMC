@@ -206,7 +206,7 @@ contains
         
         ! calculate g_s(r,t) and the sum of square differences
         
-        bufs(i_buf)%sum_square_diffs(tc+1) = cal_g_s_histogram( & 
+        bufs(i_buf)%sum_square_diffs(tc+1) = cal_g_s_histogram_no_wrap_around( & 
           bufs(i_buf)%g_s_hists(tc+1), bufs(i_buf)%org_r, bufs(i_buf)%act_r, str%box_edges)
         
         

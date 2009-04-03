@@ -43,15 +43,15 @@ contains
   end function md_convert_kin_energy_to_temperature
 
 
+  ! This one does not accumulate
+  ! It populates %kin_energy%val, %tot_energy%val and %pressure%val
   subroutine md_cal_properties(ps, props, list, pressure_comp, pot_energy)
     type (phasespace), intent(in) :: ps
     type (md_properties), intent(inout) :: props
     type (func_list), intent(inout) :: list
  		real (db), optional, intent(in) :: pressure_comp, pot_energy    
    
-  
     ! test for optional arguments
-    
     if (present(pressure_comp) .and. present(pot_energy)) then
       call md_cal_properties_extra(ps, props, list, pressure_comp, pot_energy)
     else if (present(pressure_comp)==.false. .and. present(pot_energy)==.false.) then
@@ -61,11 +61,11 @@ contains
       write(*,*) "Either both pressure_comp and pot_energy must be present"
       write(*,*) "none of them."
       stop    
-    end if 
-  
+    end if  
   end subroutine md_cal_properties
 
   
+  ! This one calculates nothing but just accumulates the 'sum' and 'sum2' attributes
   subroutine md_accum_properties(props)
     type (md_properties), intent(inout):: props    
 
@@ -81,7 +81,6 @@ contains
       props%pressure%val*props%pressure%val
       
     props%n_accum = props%n_accum + 1
-      
   end subroutine md_accum_properties
 
 
@@ -110,11 +109,11 @@ contains
     props%pressure%ave = props%pressure%sum / props%n_accum
     
     props%kin_energy%esd = sqrt(max(props%kin_energy%sum2/props%n_accum - &
-      props%kin_energy%ave*props%kin_energy%ave, 0.0))
+      (props%kin_energy%ave)**2, 0.0))
     props%tot_energy%esd = sqrt(max(props%tot_energy%sum2/props%n_accum - &
-      props%tot_energy%ave*props%tot_energy%ave, 0.0))
+      (props%tot_energy%ave)**2, 0.0))
     props%pressure%esd = sqrt(max(props%pressure%sum2/props%n_accum - &
-      props%pressure%ave*props%pressure%ave, 0.0)) 
+      (props%pressure%ave)**2, 0.0)) 
     
     write(file_pointer, *) " "
     write(file_pointer, '(a,i6)') "Average over this many moves = ", props%n_accum
@@ -128,6 +127,8 @@ contains
   
 !!!!!!!!!!!!!!!!!!!!!!! private functions/subroutines !!!!!!!!!!!!!!!!!!!!!!! 
   
+  ! This one does not accumulate
+  ! It populates %kin_energy%val, %tot_energy%val and %pressure%val
   subroutine md_cal_properties_not_extra(ps, props, list)
     type (phasespace), intent(in) :: ps
     type (md_properties), intent(inout) :: props
@@ -171,6 +172,8 @@ contains
   end subroutine md_cal_properties_not_extra
   
   
+  ! This one does not accumulate
+  ! It populates %kin_energy%val, %tot_energy%val and %pressure%val 
   subroutine md_cal_properties_extra(ps, props, list, pressure_comp, pot_energy)
     type (phasespace), intent(in) :: ps
     type (md_properties), intent(inout) :: props
