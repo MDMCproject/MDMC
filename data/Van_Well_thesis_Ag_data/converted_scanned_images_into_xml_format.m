@@ -76,7 +76,6 @@ while 1
     S_Q_Omega_3(i_q, i_omega) = str2num(dummy((fisse(i_q-1)+2):(fisse(i_q-1)+2+5)));
     sigma_S_Q_Omega_3(i_q, i_omega) = str2num(dummy((fisse_begin(i_q)+1):(fisse(i_q)-1)))*0.0001;
   end
-  
 end
 
 fclose(fid);
@@ -105,6 +104,9 @@ sigma_S_Q_Omega(3:10,1:num_omega_3) = sigma_S_Q_Omega_3;
 % unit of ps to having unit of 0.1ps=10^-13s
 S_Q_Omega = 10*S_Q_Omega;
 sigma_S_Q_Omega = 10*sigma_S_Q_Omega;
+
+% Convert all zero errors into upper min error value
+sigma_S_Q_Omega( find(sigma_S_Q_Omega == 0) ) = 0.001;
 
 % Create the XML representation of Table V
 
