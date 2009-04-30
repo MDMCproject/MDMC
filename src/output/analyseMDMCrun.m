@@ -1,4 +1,4 @@
-function analyseMDMCrun(filename)
+function [acceptX, acceptFOM, acceptSigma, acceptEpsilon, rejectX, rejectFOM, rejectSigma, rejectEpsilon] = analyseMDMCrun(filename)
 
 s = xmlread(filename);
 
@@ -40,25 +40,37 @@ for i = 0 : allNodes.getLength()-1
   end
 end
     
-subplot(1,3,1)
-plot(acceptXaxis, log10(acceptYaxis), 'bx')
-hold on
-plot(rejectedXaxis, log10(rejectedYaxis), 'rx')
-title(['percentage accepted = ' num2str(100*nAccept/(nAccept+nRejected)) '%'])
-ylabel('log10(FOM)')
-xlabel('MC step number')
-hold off
-subplot(1,3,2)
-plot(acceptXaxis, acceptYaxisSigma, 'bx')
-hold on
-plot(rejectedXaxis, rejectedYaxisSigma, 'rx')
-ylabel('\sigma')
-xlabel('MC step number')
-hold off
-subplot(1,3,3)
-plot(acceptXaxis, acceptYaxisEpsilon, 'bx')
-hold on
-plot(rejectedXaxis, rejectedYaxisEpsilon, 'rx')
-ylabel('\epsilon')
-xlabel('MC step number')
-hold off
+if nargout == 0
+    subplot(1,3,1)
+    plot(acceptXaxis, log10(acceptYaxis), 'bx')
+    hold on
+    plot(rejectedXaxis, log10(rejectedYaxis), 'ro')
+    title(['percentage accepted = ' num2str(100*nAccept/(nAccept+nRejected)) '%'])
+    ylabel('log10(FOM)')
+    xlabel('MC step')
+    hold off
+    subplot(1,3,2)
+    plot(acceptXaxis, acceptYaxisSigma, 'bx')
+    hold on
+    plot(rejectedXaxis, rejectedYaxisSigma, 'ro')
+    ylabel('\sigma')
+    xlabel('MC step')
+    hold off
+    subplot(1,3,3)
+    plot(acceptXaxis, acceptYaxisEpsilon, 'bx')
+    hold on
+    plot(rejectedXaxis, rejectedYaxisEpsilon, 'ro')
+    ylabel('\epsilon')
+    xlabel('MC step')
+    hold off
+else
+  acceptX = acceptXaxis; 
+  acceptFOM = acceptYaxis; 
+  acceptSigma = acceptYaxisSigma; 
+  acceptEpsilon = acceptYaxisEpsilon;
+  
+  rejectX = rejectedXaxis; 
+  rejectFOM = rejectedYaxis; 
+  rejectSigma = rejectedYaxisSigma; 
+  rejectEpsilon = rejectedYaxisEpsilon;  
+end

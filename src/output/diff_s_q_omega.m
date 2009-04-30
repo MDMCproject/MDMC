@@ -172,12 +172,8 @@ for i = 1 : length(q)
     end
 end
 
-plot(q,Sq1);
-xlabel('q [AA\^-1]')
-ylabel('\int S_1(q) d\omega')
-
-
-subplot(3,2,4)
+plot(q, Sq1, 'b');
+hold on;
 
 Sq2 = zeros([1 length(q)]);
 for i = 1 : length(q)
@@ -188,9 +184,18 @@ for i = 1 : length(q)
     end
 end
 
-plot(q,Sq2);
+plot(q, Sq2, 'r--');
+legend('\int S_1(q) d\omega', '\int S_2(q) d\omega')
 xlabel('q [AA\^-1]')
-ylabel('\int S_2(q) d\omega')
+hold off
+
+subplot(3,2,4)
+
+surf(q, omega, abs(S_tot2'- (S_s'+S_d'))./error2Plot')
+xlabel('q [AA\^-1]')
+ylabel('\omega 1/[10\^-13 s]')
+zlabel('abs(S_2-S_1)/error')
+colorbar
 
 subplot(3,2,6)
 surf(q, omega, error2Plot')
