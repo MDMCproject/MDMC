@@ -1,6 +1,6 @@
 # MDMC
 
-This software uses the XML reader/writer library called xmlf90. The version of this library used with this software can be found in src/xmlf90-1.2. For more information about this library see https://github.com/rscircus/xmlf90.
+This software uses the XML reader/writer library called xmlf90. The version of this library used with this software can be found in src/xmlf90-1.2. For more information about this library see https://github.com/rscircus/xmlf90 (xmlf90 is 3-clause BSD license which is compatible with GNU GPL).
 
 To compile
 ----------
