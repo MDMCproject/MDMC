@@ -1,0 +1,20 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{6989167D-11E4-40FE-8C1A-2192A86A7E90}") = "mdmc", "mdmc.vfproj", "{15E0B9D0-A2C1-41E9-855C-CA95C03CF33E}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{15E0B9D0-A2C1-41E9-855C-CA95C03CF33E}.Debug|Win32.ActiveCfg = Debug|Win32
+		{15E0B9D0-A2C1-41E9-855C-CA95C03CF33E}.Debug|Win32.Build.0 = Debug|Win32
+		{15E0B9D0-A2C1-41E9-855C-CA95C03CF33E}.Release|Win32.ActiveCfg = Release|Win32
+		{15E0B9D0-A2C1-41E9-855C-CA95C03CF33E}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
