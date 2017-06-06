@@ -5,7 +5,7 @@ This software uses the XML reader/writer library called xmlf90. The version of t
 To compile
 ----------
 
-* Intel Microsoft Visual studio: Open mdmc.vfproj in /src and compile.
+* Intel Microsoft Visual studio: Open mdmc.sln in /src and compile.
 
 * Other platforms: in /src find both a traditional makefile and SCons makefile scripts (named SConstruct and SConscript) are available (possibly a bit out of date).
 
