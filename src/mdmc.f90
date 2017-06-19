@@ -27,18 +27,26 @@ program mdmc
   ! Note I can't seem to force random_number to always
   ! produce the same sequence of random numbers...
   
-  integer :: n_seeds
+  integer :: n_seeds  
+  logical :: output_dir_exist
   INTEGER, ALLOCATABLE :: new (:)
   call random_seed(size=n_seeds)
   ALLOCATE (new(I))
   new = 5
   CALL RANDOM_SEED (PUT=new(1:I))
   
-  ! get or specify the MDMC job file
-  !write (*,*) "Enter the filename of a MDMC job file: "
-  !read *, filename 
-  filename = "./input/md_control.xml"
-    
+  ! Ask user for a MDMC job file
+  write (*,*) "Enter the filename of a MDMC job file: "
+  read *, filename 
+  !filename = "./input/md_control.xml"
+  
+  ! create output directory - at this point in time hardcoded to 'output'
+  inquire( directory="output", exist=output_dir_exist )
+  if ( output_dir_exist == .false. ) then
+    write(*,*), "create output directory"
+    call system('mkdir output')
+  end if    
+  
   ! Because of bug in otherwise very useful xmlf90 library 
   ! need to read in input file in bits...... 
   
