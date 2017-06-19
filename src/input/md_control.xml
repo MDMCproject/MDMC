@@ -1,8 +1,9 @@
 <job>
 
-<!--
+  <!-- Define structure from file -->
+  <!--
   <structure filename="../tests/recover_CCL4_FQ/CCl4_rmc++.xml"> </structure>
--->
+  -->
 
   <!-- When the attribute what-init-structure-to-build is defined the 
        x-direction box edge length is:
@@ -18,29 +19,19 @@
     <number-of-unit-cells nx="6" ny ="6" nz="6" />
   </structure>
   
-  <!-- To not use nearest neighbour method include element below.
-      Notice Rapaport recomment delta-r values around 1.2AA.
-      Further if r-cut+delta-r > 'smallest box edge'/2 then
-      set r-cut = 'smallest box edge'/2 - delta-r 
-      -->    
+  <!-- Notice Rapaport recommend delta-r values around 1.2AA.
+       Note if r-cut+delta-r > 'smallest box edge'/2 then
+       r-cut is reset to 'smallest box edge'/2 - delta-r 
+       -->    
   <use-near-neighbour-method>
     <r-cut units="AA" val="7.491" />   
     <delta-r units="AA" val="1.362" />            
   </use-near-neighbour-method>   
   
   <constraints>
-    <fnc-constraint filename="fnc.xml"></fnc-constraint>
-    <cutoff-constraint />
-    <coordination-constraint />
-    <soft-cutoff-constraint /> 
   </constraints>
   
-  
   <fom>
-    <pdf-fom filename="somefile" />
-    <sf-fom filename="somefile" />
-    <average-coor-fom />
-    <coordination-fom />
   </fom>
   
   <gpe>
@@ -48,9 +39,8 @@
       <sigma units="AA" val="3.405"  />
       <epsilon units="KJ/mole" val="0.9960172" />
       
-      <!-- you can argue whether r-cut here is a property of this potentially,
-           but for now you can optionally specify an r-cut value here, which
-           simply put the potential to zero for all r values higher than r-cut 
+      <!-- Optionally specify an r-cut value, which
+           put the potential to zero for all r values higher than r-cut 
            -->
       <r-cut units="AA" val="7.491" />   
     </lj-potential>
@@ -61,8 +51,7 @@
 
     <temperature units="Kelvin" val="85.0" />
     <time-step units="10e-13s" val="0.1075" />
-    
-    
+        
     <step-limit number="6000" />
     
     <!-- when calculating MD properties average over this 
@@ -78,10 +67,9 @@
       <adjust-temp-at-interval number="200" />
     </perform-initial-temperature-calibration>
 
-
-    <!-- To calculate a rdf include element below. 
+    <!-- To optionally calculate a rdf include the element below. 
          Notice if r-max > 'smallest box edge'/2 then it is set equal to
-         that value. 
+         that value 
          -->
     <calculate-rdf>
       <r-max units="AA" val="50.0" />
@@ -90,7 +78,6 @@
       <average-over-this-many-rdf number="5" />
     </calculate-rdf> 
 
-        
   </control-object>
 
 </job>

@@ -19,7 +19,8 @@ use time_corr_algorithm_class
   
   public :: startup_handler
   
-
+  ! The logical variables named 'in_ + something' are used to keep track of when the 
+  ! XML reader is inside or not inside an XML element
   logical, private  :: in_constraints = .false., in_use_near_neighbour_method = .false.
   logical, private  :: in_gpe = .false., in_fom = .false.
   logical, private  :: in_md_control = .false., in_mdmc_control = .false.

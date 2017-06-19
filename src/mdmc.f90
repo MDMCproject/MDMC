@@ -26,12 +26,6 @@ program mdmc
   !
   ! Note I can't seem to force random_number to always
   ! produce the same sequence of random numbers...
-  !
-  ! Intel fortran has another random number function
-  ! which is called rand() which seem to able to do
-  ! this but it may not be part of standard F90.
-  ! Tried it and the f'ing rand() worked the same as
-  ! random_number
   
   integer :: n_seeds
   INTEGER, ALLOCATABLE :: new (:)
@@ -40,10 +34,10 @@ program mdmc
   new = 5
   CALL RANDOM_SEED (PUT=new(1:I))
   
-  
-  !write (*,*) "Enter pathname/filename"
+  ! get or specify the MDMC job file
+  !write (*,*) "Enter the filename of a MDMC job file: "
   !read *, filename 
-  filename = "./input/mdmc_control.xml"
+  filename = "./input/md_control.xml"
     
   ! Because of bug in otherwise very useful xmlf90 library 
   ! need to read in input file in bits...... 
@@ -90,8 +84,6 @@ program mdmc
   call alloc_q_omega_arrays(trim(filename))
 
   
-  
-  
   ! open main input file to check for g-d-rt-fom element
   ! otherwise this code is here for the same reason as above
   
@@ -137,7 +129,8 @@ program mdmc
   end if    
 
     
-  ! Now finally read in the rest of the main input file from a-to-z
+  ! Now finally read in the rest of the job file and run the 
+  ! simulation specified in the job file 
   
   call startup_handler(trim(filename))
   

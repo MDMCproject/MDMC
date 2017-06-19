@@ -18,7 +18,6 @@ implicit none
   private :: add_rdf_fom_container
 
   type func_list
-    !private
     type (lj_pe_container), pointer :: pt_lj_pe => null()
     type (rdf_fom_container), pointer :: pt_rdf_fom => null()
     type (g_d_rt_fom_container), pointer :: pt_g_d_rt_fom => null()
