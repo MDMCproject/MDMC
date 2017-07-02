@@ -79,7 +79,7 @@ contains
 	  
 	  
     if (print_to_file /= 0) then
-      open(print_to_file, file="output/job_summary.txt")
+      open(print_to_file, file="output/job_log.txt")
     end if
 	  		
     write(print_to_file,*) "In run_mdmc_control"
@@ -110,13 +110,13 @@ contains
     sum_kin_energy = 0.0
     
     do i = 1, c%total_steps_initial_equilibration
-      time_now = c%time_step * i   ! perhaps print this one out 
+      time_now = c%md_delta_t * i   ! perhaps print this one out 
       
       ! do one trajectory of length = 1 where pressure_comp and pot_energy is also
       ! calculated
       
-      !call trajectory_in_phasespace(my_ps, common_pe_list, 1, c%time_step)
-      call trajectory_in_phasespace(my_ps, common_pe_list, 1, c%time_step, & 
+      !call trajectory_in_phasespace(my_ps, common_pe_list, 1, c%md_delta_t)
+      call trajectory_in_phasespace(my_ps, common_pe_list, 1, c%md_delta_t, & 
                                     pressure_comp, pot_energy)
       
       !call md_cal_properties(my_ps, my_props, common_pe_list)
@@ -202,7 +202,7 @@ contains
     
     do j = 1, c%average_over_this_many_rdf
 
-      call trajectory_in_phasespace(my_ps, common_pe_list, c%cal_rdf_at_interval, c%time_step)
+      call trajectory_in_phasespace(my_ps, common_pe_list, c%cal_rdf_at_interval, c%md_delta_t)
       
       call accum_histogram(rdf_cal_histogram, my_ps%str)
       
@@ -275,7 +275,7 @@ contains
       
       do i_md = 1, c%md_steps_repeated_equilibration
 
-        call trajectory_in_phasespace(my_ps, common_pe_list, 1, c%time_step, & 
+        call trajectory_in_phasespace(my_ps, common_pe_list, 1, c%md_delta_t, & 
                                   pressure_comp, pot_energy)
 
         call md_cal_properties(my_ps, my_props, common_pe_list, pressure_comp, pot_energy)       
@@ -341,7 +341,7 @@ contains
       
       do j = 1, c%average_over_this_many_rdf
 
-        call trajectory_in_phasespace(my_ps, common_pe_list, c%cal_rdf_at_interval, c%time_step)
+        call trajectory_in_phasespace(my_ps, common_pe_list, c%cal_rdf_at_interval, c%md_delta_t)
        
         call accum_histogram(rdf_cal_histogram, my_ps%str)
         
@@ -431,7 +431,7 @@ contains
         
     do j = 1, c%average_over_this_many_rdf
 
-      call trajectory_in_phasespace(my_ps, common_pe_list, c%cal_rdf_at_interval, c%time_step)
+      call trajectory_in_phasespace(my_ps, common_pe_list, c%cal_rdf_at_interval, c%md_delta_t)
        
       call accum_histogram(rdf_cal_histogram, my_ps%str)
         

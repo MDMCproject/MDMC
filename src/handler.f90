@@ -167,7 +167,7 @@ contains
             
         case("time-step")       
           call get_value(attributes,"val",read_db,status)
-          setup_md_control_params%time_step = string_to_db(read_db)
+          setup_md_control_params%md_delta_t = string_to_db(read_db)
                
         
         case("calculate-rdf")
@@ -259,18 +259,18 @@ contains
             
         case("time-step")       
           call get_value(attributes,"val",read_db,status)
-          setup_mdmc_control_params%time_step = string_to_db(read_db)
+          setup_mdmc_control_params%md_delta_t = string_to_db(read_db)
           
 !          if (setup_mdmc_control_params%g_d_data_time_step /= 0.0) then
 !            setup_mdmc_control_params%md_per_time_bin = &
 !              nint(setup_mdmc_control_params%g_d_data_time_step / &
-!                   setup_mdmc_control_params%time_step)
+!                   setup_mdmc_control_params%md_delta_t)
             
 !            if (setup_mdmc_control_params%md_per_time_bin == 0) then
 !              setup_mdmc_control_params%md_per_time_bin = 1
 !            end if
             
-!            setup_mdmc_control_params%time_step =  &
+!            setup_mdmc_control_params%md_delta_t =  &
 !              setup_mdmc_control_params%g_d_data_time_step / &
 !              setup_mdmc_control_params%md_per_time_bin
 !          end if

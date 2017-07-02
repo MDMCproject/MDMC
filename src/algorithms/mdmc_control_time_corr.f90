@@ -40,7 +40,8 @@ contains
   
     real(db) :: fom_val, fom_old
 
-    real(db) :: fom_best  ! used for keeping track of best fom
+    real(db) :: fom_best_accepted  ! used for keeping track of best accepted fom
+    real(db) :: fom_best_including_rejected  ! used for keeping track of best fom including rejected    
     type (phasespace) :: my_ps_best ! to store status of best phasespace
 
     type (phasespace) :: my_ps, my_ps_old
@@ -76,7 +77,7 @@ contains
 	  
 	  
     if (print_to_file /= 0) then
-      open(print_to_file, file="output/job_summary.txt")
+      open(print_to_file, file="output/job_log.txt")
     end if
 
 	  		
@@ -95,10 +96,10 @@ contains
                         
     ! initiate time correlation histogram container
     my_time_corr_container = make_time_corr_hist_container(c%r_max, c%bin_length, c%n_time_bin, &
-                             c%md_per_time_bin * c%time_step)
+                             c%md_per_time_bin * c%md_delta_t)
     call clear_time_corr_hist_container(my_time_corr_container)                             
                        
-    my_s_q_time = make_s_q_time(c%q_values, c%md_per_time_bin * c%time_step, c%n_time_bin)
+    my_s_q_time = make_s_q_time(c%q_values, c%md_per_time_bin * c%md_delta_t, c%n_time_bin)
     my_s_q_omega = make_s_q_omega(c%q_values, c%omega_values)
                                          
 ! -------------- initial equilibration ---------------- !
@@ -106,26 +107,26 @@ contains
     sum_kin_energy = 0.0
     
     do i = 1, c%total_steps_initial_equilibration
-      time_now = c%time_step * i   ! perhaps print this one out 
+      time_now = c%md_delta_t * i   ! perhaps print this one out 
       
       ! do one trajectory of length = 1 where pressure_comp and pot_energy is also
       ! calculated
       
-      !call trajectory_in_phasespace(my_ps, common_pe_list, 1, c%time_step)
-      call trajectory_in_phasespace(my_ps, common_pe_list, 1, c%time_step, & 
+      !call trajectory_in_phasespace(my_ps, common_pe_list, 1, c%md_delta_t)
+      call trajectory_in_phasespace(my_ps, common_pe_list, 1, c%md_delta_t, & 
                                     pressure_comp, pot_energy)
       
       !call md_cal_properties(my_ps, my_props, common_pe_list)
       call md_cal_properties(my_ps, my_props, common_pe_list, pressure_comp, pot_energy)
       
-      ! case you want to adject the temperature in the initial stages of the MD simulation
+      ! case you want to adjust the temperature in the initial stages of the MD simulation
       ! (notice c%total_step_temp_cali = 0 if <perform-initial-temperature-calibration> 
       ! element not specified in input file)
 
       if (i < c%total_step_temp_cali) then
         sum_kin_energy = sum_kin_energy + my_props%kin_energy%val
         if (mod(i,c%adjust_temp_at_interval) == 0) then
-          ! see md_gridsearch_control.doc for explanation of the expression below
+          ! see src/algorithms/md_gridsearch_control.doc for explanation of the expression below
           !        
           temp_adjust_factor = sqrt(c%adjust_temp_at_interval * 1.5 * c%temperature / &
               sum_kin_energy * (size(my_ps%str%atoms)-1.0) / size(my_ps%str%atoms))
@@ -198,9 +199,13 @@ contains
 
   density = size(my_ps%str%atoms) / product(my_ps%str%box_edges) ! for printing 
 
-  ! cal 1st FOM and print 1st G_d
+  ! cal 1st time-dependent correlation container - i.e. move phase-space forward
+  ! as required for this and average over 'x' number of these containers as specified in the MDMC job file
   
-  call cal_time_corr_container(my_time_corr_container, my_ps, common_pe_list, c%md_per_time_bin, c%time_step)   
+  call cal_time_corr_container(my_time_corr_container, my_ps, common_pe_list, c%md_per_time_bin, c%md_delta_t)
+  
+  ! from container calculate FOM etc  
+  
   call print_g_d(my_time_corr_container, product(my_ps%str%box_edges), size(my_ps%str%atoms), c%temperature) 
   call cal_s_q_time(my_time_corr_container, my_ps%str, my_s_q_time)
   call print_s_q_time(my_s_q_time, density, c%temperature)
@@ -209,7 +214,6 @@ contains
   !fom_val = func_val(my_time_corr_container, common_fom_list)
   !fom_val = func_val(my_s_q_time, common_fom_list)
   fom_val = func_val(my_s_q_omega, common_fom_list)
-  
   call clear_time_corr_hist_container(my_time_corr_container) ! not sure if necessary!!?? 
   
   write(print_to_file,'(a,f14.5)') "1st FOM = ", fom_val
@@ -228,7 +232,8 @@ contains
 
   ! store best solution so far
   
-  fom_best = fom_val
+  fom_best_accepted = fom_val
+  fom_best_including_rejected = fom_val
   call backup_best_func_params(common_pe_list)
   call shallow_copy_phasespace(my_ps, my_ps_best)      
  
@@ -262,7 +267,7 @@ contains
       
       do i_md = 1, c%md_steps_repeated_equilibration
 
-        call trajectory_in_phasespace(my_ps, common_pe_list, 1, c%time_step, & 
+        call trajectory_in_phasespace(my_ps, common_pe_list, 1, c%md_delta_t, & 
                                   pressure_comp, pot_energy)
 
         call md_cal_properties(my_ps, my_props, common_pe_list, pressure_comp, pot_energy)       
@@ -324,17 +329,14 @@ contains
       end if   
 
 
-      ! cal FOM
+      ! cal time-dependent container, FOM etc
     
-      call cal_time_corr_container(my_time_corr_container, my_ps, common_pe_list, c%md_per_time_bin, c%time_step)   
+      call cal_time_corr_container(my_time_corr_container, my_ps, common_pe_list, c%md_per_time_bin, c%md_delta_t)   
       call cal_s_q_time(my_time_corr_container, my_ps%str, my_s_q_time)
       call cal_s_q_omega(my_s_q_time, my_ps%str, my_s_q_omega)
-      !call print_s_q_omega(my_s_q_omega, density, c%temperature)
-      !call print_s_q_time(my_s_q_time, density, c%temperature)
       !fom_val = func_val(my_time_corr_container, common_fom_list)
       !fom_val = func_val(my_s_q_time, common_fom_list)
       fom_val = func_val(my_s_q_omega, common_fom_list)
-      !call print_g_d(my_time_corr_container, product(my_ps%str%box_edges), size(my_ps%str%atoms), c%temperature)
       call clear_time_corr_hist_container(my_time_corr_container) ! not sure if necessary!!?? 
 
       write(print_to_file,'(a,f14.5)') "FOM = ", fom_val
@@ -344,10 +346,10 @@ contains
       write(print_to_screen, '(a,f14.5)') "Finished cal FOM. Time: ", toc()
       
       
-      ! check if new best fom
+      ! check if new best fom - here whether or not move will be rejected or accepted
       
-      if (fom_val < fom_best) then
-        fom_best = fom_val
+      if (fom_val < fom_best_including_rejected) then
+        fom_best_including_rejected = fom_val
         call backup_best_func_params(common_pe_list)
         call shallow_copy_phasespace(my_ps, my_ps_best)      
       end if
@@ -384,7 +386,17 @@ contains
     
         fom_old = fom_val
         call backup_func_params(common_pe_list)
-        call shallow_copy_phasespace(my_ps, my_ps_old) 
+        call shallow_copy_phasespace(my_ps, my_ps_old)
+        
+        ! Check if new best accepted fom
+        ! Here the best 'accepted' phase-space configuration is not stored
+        ! Perhaps this configuration should be stored also and if different
+        ! from the best overall FOM solution it could be saved at the end of 
+        ! this algorithm 
+      
+        if (fom_val < fom_best_accepted) then
+          fom_best_accepted = fom_val     
+        end if        
         
       else
       
@@ -407,12 +419,14 @@ contains
  ! ---------------- finished mdmc part ------------------------ !    
 
 
-    ! print out best fom
+    ! print out the best solution found. Note my_ps_best has a copy of the phase-space
+    ! and the end of a FOM calculation, not the start. Therefore the re-calculated FOM
+    ! although hopefully very simular will in general be different
     
     call restore_best_func_params(common_pe_list)
     call shallow_copy_phasespace(my_ps_best, my_ps)  
         
-    call cal_time_corr_container(my_time_corr_container, my_ps, common_pe_list, c%md_per_time_bin, c%time_step)   
+    call cal_time_corr_container(my_time_corr_container, my_ps, common_pe_list, c%md_per_time_bin, c%md_delta_t)   
     call cal_s_q_time(my_time_corr_container, my_ps%str, my_s_q_time)
     call print_s_q_time(my_s_q_time, density, c%temperature)
     call cal_s_q_omega(my_s_q_time, my_ps%str, my_s_q_omega)
@@ -423,13 +437,15 @@ contains
     call print_g_d(my_time_corr_container, product(my_ps%str%box_edges), size(my_ps%str%atoms), c%temperature)   
     call clear_time_corr_hist_container(my_time_corr_container) ! not sure if necessary!!?? 
       
-    write(print_to_file,'(a,f14.5)') "BEST FOM = ", fom_val
+    write(print_to_file,'(a,f14.5)') "BEST FOM overall = ", fom_best_including_rejected
+    write(print_to_file,'(a,f14.5)') "BEST FOM overall (re-calculated from different phase-space point) = ", fom_val
+    write(print_to_file,'(a,f14.5)') "BEST FOM (among accepted only) = ", fom_best_accepted    
     write(print_to_file,'(a)') "WITH: "
     call print_all_func_params(print_to_file, common_pe_list)
-    write(print_to_file, '(a,f14.5)') "Finished cal FOM. Time: ", toc()
+    write(print_to_file, '(a,f14.5)') "Finished printing best fom. Time: ", toc()
     write(print_to_file, *) " "
- 
     
+
     print *, ' '
     write(print_to_screen,'(a,f11.2,a)') 'Job took ', toc(), ' seconds to execute.'
 

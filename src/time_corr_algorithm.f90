@@ -60,14 +60,18 @@ implicit none
 
 contains
 
-  ! calculate the average of n_g_r_t_to_average_over g_s_hist(r,t)'s and g_d_hist(r,t)'s
+  ! Calculate the average of n_g_r_t_to_average_over g_s_hist(r,t)'s and g_d_hist(r,t)'s
+  ! This is not start from the phase-space configuration ps, then moving this phase-space
+  ! forward for md_per_time_bin*md_delta_t at a time, which equals a time-bin. Repeat this
+  ! for the total window correlation needs calculating for, and finally repeat this whole
+  ! process n_g_r_t_to_average_over number of times
 
-  subroutine cal_time_corr_container(container, ps, f_list, md_per_time_bin, time_step)
+  subroutine cal_time_corr_container(container, ps, f_list, md_per_time_bin, md_delta_t)
     type (time_corr_hist_container), intent(inout) :: container
     type (phasespace), intent(inout) :: ps
     type (func_list), intent(in) :: f_list
     integer, intent(in) :: md_per_time_bin
-    real(db), intent(in) :: time_step
+    real(db), intent(in) :: md_delta_t
     
     integer n_time_bin
 
@@ -117,7 +121,7 @@ contains
 !      end if
     
     
-      call trajectory_in_phasespace(ps, f_list, md_per_time_bin, time_step)
+      call trajectory_in_phasespace(ps, f_list, md_per_time_bin, md_delta_t)
     end do
      
   end subroutine cal_time_corr_container
@@ -160,9 +164,10 @@ contains
 
 
   ! This function updates the bufs container after the MD has moved the atoms
-  ! along by md_per_time_bin*time_step.
-  ! It returns .true. when enough data have been simulated to calculate the average
-  ! of n_g_r_t_to_average_over g_s_hist(r,t)'s and g_d_hist(r,t)'s. 
+  ! along by md_per_time_bin*md_delta_t. 
+  ! It returns .true. when n_g_r_t_to_average_over fully calculated instances of g_s_hist(r,t) 
+  ! and g_d_hist(r,t) have been calculated and the average of these above 
+  ! been computed
 
   function do_time_correlation(container, str) result(job_done)
     type (time_corr_hist_container), intent(inout) :: container
@@ -283,8 +288,8 @@ contains
   end function do_time_correlation
 
   
-  ! Allocate bufs, which has dimensions n_buffers * number of time bins * number of r bins.
-  ! It also has dimensions n_buffers * n_atoms * ndim.
+  ! Allocate bufs, which has dimensions n_buffers * number of time bins * number of r bins
+  ! and n_buffers * n_atoms * ndim for storing coors at time-0 and at a later time
 
   subroutine allocate_buffer(n_time_bin, n_atoms, r_max, bin_length)
     integer, intent(in) :: n_time_bin, n_atoms

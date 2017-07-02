@@ -43,7 +43,7 @@ contains
     integer :: print_to_screen = 0
 	  
 	  if (print_to_file /= 0) then
-	    open(print_to_file, file="output/job_summary.txt")
+	    open(print_to_file, file="output/job_log.txt")
 	  end if
 	  
 		
@@ -64,13 +64,13 @@ contains
                           
     
     do i = 1, c%step_limit
-      time_now = c%time_step * i   ! perhaps print this one out 
+      time_now = c%md_delta_t * i   ! perhaps print this one out 
       
       ! do one trajectory of length = 1 where pressure_comp and pot_energy is also
       ! calculated
       
-      !call trajectory_in_phasespace(my_ps, common_pe_list, 1, c%time_step)
-      call trajectory_in_phasespace(my_ps, common_pe_list, 1, c%time_step, & 
+      !call trajectory_in_phasespace(my_ps, common_pe_list, 1, c%md_delta_t)
+      call trajectory_in_phasespace(my_ps, common_pe_list, 1, c%md_delta_t, & 
                                     pressure_comp, pot_energy)
       
       !call md_cal_properties(my_ps, my_props, common_pe_list)

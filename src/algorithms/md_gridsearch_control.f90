@@ -61,7 +61,7 @@ contains
     integer :: print_to_screen = 0
 	  
 	  if (print_to_file /= 0) then
-	    open(print_to_file, file="output/job_summary.txt")
+	    open(print_to_file, file="output/job_log.txt")
 	  end if
 	  		
 	  ! specify sigmas to loop over		
@@ -103,13 +103,13 @@ contains
 
 
     do i = 1, c%total_steps_initial_equilibration
-      time_now = c%time_step * i   ! perhaps print this one out 
+      time_now = c%md_delta_t * i   ! perhaps print this one out 
       
       ! do one trajectory of length = 1 where pressure_comp and pot_energy is also
       ! calculated
       
-      !call trajectory_in_phasespace(my_ps, common_pe_list, 1, c%time_step)
-      call trajectory_in_phasespace(my_ps, common_pe_list, 1, c%time_step, & 
+      !call trajectory_in_phasespace(my_ps, common_pe_list, 1, c%md_delta_t)
+      call trajectory_in_phasespace(my_ps, common_pe_list, 1, c%md_delta_t, & 
                                     pressure_comp, pot_energy)
       
       !call md_cal_properties(my_ps, my_props, common_pe_list)
@@ -123,7 +123,7 @@ contains
       if (i < c%total_step_temp_cali) then
         sum_kin_energy = sum_kin_energy + my_props%kin_energy%val
         if (mod(i,c%adjust_temp_at_interval) == 0) then
-          ! see md_gridsearch_control.doc for explanation of the expression below
+          ! see src/algorithms/md_gridsearch_control.doc for explanation of the expression below
           !
           temp_adjust_factor = sqrt( real(c%adjust_temp_at_interval,db) * 1.5 * c%temperature / &
               sum_kin_energy * (size(my_ps%str%atoms)-1.0) / real(size(my_ps%str%atoms),db))
@@ -188,7 +188,7 @@ contains
         
         do i_md = 1, c%md_steps_repeated_equilibration
 
-          call trajectory_in_phasespace(my_ps, common_pe_list, 1, c%time_step, & 
+          call trajectory_in_phasespace(my_ps, common_pe_list, 1, c%md_delta_t, & 
                                     pressure_comp, pot_energy)
 
           call md_cal_properties(my_ps, my_props, common_pe_list, pressure_comp, pot_energy)       
@@ -229,7 +229,7 @@ contains
       do j = 1, c%average_over_this_many_rdf
         
 
-        call trajectory_in_phasespace(my_ps, common_pe_list, c%cal_rdf_at_interval, c%time_step)
+        call trajectory_in_phasespace(my_ps, common_pe_list, c%cal_rdf_at_interval, c%md_delta_t)
 
        
         call accum_histogram(rdf_cal_histogram, my_ps%str)

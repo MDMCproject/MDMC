@@ -9,7 +9,7 @@ implicit none
     integer :: average_over_this_many_step   ! when cal properties find ave,esd over this many MD steps
     
     real(db) :: temperature   ! stored internally in units of 120.279K (=1000/8.314K)
-    real(db) :: time_step     ! stored internally in units of 10e-13seconds
+    real(db) :: md_delta_t     ! stored internally in units of 10e-13seconds
                               
     !logical :: perform_initial_temperature_calibration = .false.
     integer :: total_step_temp_cali = 0    ! the total number of MD steps where the temperature is adjusted
@@ -58,14 +58,14 @@ implicit none
     integer :: mc_steps   ! number of Monte carlo steps  
     
     real(db) :: temperature   ! stored internally in units of 120.279K (=1000/8.314K)
-    real(db) :: time_step     ! stored internally in units of 10e-13seconds
+    real(db) :: md_delta_t     ! MD delta-t, stored internally in units of 10e-13seconds
     real(db) :: temperature_mc   ! used in metropolis
     
-    ! parameters for time correlation run
+    ! Parameters for calculating time correlation
+    ! The time between bins is: md_per_time_bin*md_delta_t
+    ! Correlation is calculated over the time: n_time_bin*md_per_time_bin*md_delta_t
     integer :: n_time_bin    ! number of time bins
-    integer :: md_per_time_bin  ! number of md steps in a time bin. Robert say this one probably always 1 
-    
-    !real(db) :: g_d_data_time_step = 0.0 ! VERY BAD WHAT I AM DOING HERE
+    integer :: md_per_time_bin  ! number of md steps to make up a time bin
     
     real(db), dimension(:), allocatable :: q_values
     real(db), dimension(:), allocatable :: omega_values

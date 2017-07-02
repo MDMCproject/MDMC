@@ -64,7 +64,7 @@ contains
 
   ! this is a 'shallow' copy of phasespace, meaning that the two input
   ! phasespaces are assumed to have exactly the same array sizes and no memory
-  ! allocated (or deallocated)
+  ! is allocated (or deallocated)
 
   subroutine shallow_copy_phasespace(ps_in, ps_out)
     type (phasespace), intent(in) :: ps_in
@@ -119,14 +119,16 @@ contains
   
   end subroutine shallow_copy_phasespace
 
+  
+  ! Do a trajectory in phase-space consisting of n_md time steps each of size delta_t
 
   subroutine trajectory_in_phasespace(ps, pe_list, n_md, delta_t, pressure_comp, pot_energy)
     type (phasespace), intent(inout) :: ps
     type (func_list), intent(in) :: pe_list
     integer, intent(in) :: n_md
     real(db), intent(in) :: delta_t   
- 		real (db), optional, intent(out) :: pressure_comp, pot_energy 
- 		    
+    real (db), optional, intent(out) :: pressure_comp, pot_energy 
+   
     real(db) :: pot_energy_not_pass, delta_t_half
     integer :: i, j, n_tot
     logical :: extra_args
