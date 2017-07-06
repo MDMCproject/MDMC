@@ -142,12 +142,6 @@ contains
           sum_kin_energy = 0.0
         end if
       end if
-     
-      
-
-      ! accumulate the calculated MD property values
-        
-      call md_accum_properties(my_props)
         
         
       ! print out stuff and interval = average_over_this_many_steps

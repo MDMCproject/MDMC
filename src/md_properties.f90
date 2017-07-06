@@ -4,7 +4,6 @@ use phasespace_class
 implicit none
 
   public :: md_cal_properties
-  public :: md_accum_properties
   public :: md_reset_properties
   public :: md_print_properties
   
@@ -43,8 +42,10 @@ contains
   end function md_convert_kin_energy_to_temperature
 
 
-  ! This one does not accumulate
-  ! It populates %kin_energy%val, %tot_energy%val and %pressure%val
+  ! Calculates %kin_energy%val, %tot_energy%val and %pressure%val and rolling 
+  ! averages and standard deviations of these properties. Rolling values are
+  ! reset when md_reset_properties is called
+  
   subroutine md_cal_properties(ps, props, list, pressure_comp, pot_energy)
     type (phasespace), intent(in) :: ps
     type (md_properties), intent(inout) :: props
@@ -62,13 +63,10 @@ contains
       write(*,*) "none of them."
       stop    
     end if  
-  end subroutine md_cal_properties
-
-  
-  ! This one calculates nothing but just accumulates the 'sum' and 'sum2' attributes
-  subroutine md_accum_properties(props)
-    type (md_properties), intent(inout):: props    
-
+    
+    ! Calculating rolling averages and standard deviations of properties. 
+    ! These are reset when md_reset_properties is called
+    
     props%kin_energy%sum = props%kin_energy%sum + props%kin_energy%val
     props%tot_energy%sum = props%tot_energy%sum + props%tot_energy%val
     props%pressure%sum = props%pressure%sum + props%pressure%val
@@ -80,10 +78,24 @@ contains
     props%pressure%sum2 = props%pressure%sum2 + & 
       props%pressure%val*props%pressure%val
       
-    props%n_accum = props%n_accum + 1
-  end subroutine md_accum_properties
+    props%n_accum = props%n_accum + 1    
+    
+    props%kin_energy%ave = props%kin_energy%sum / props%n_accum
+    props%tot_energy%ave = props%tot_energy%sum / props%n_accum
+    props%pressure%ave = props%pressure%sum / props%n_accum
+    
+    props%kin_energy%esd = sqrt(max(props%kin_energy%sum2/props%n_accum - &
+      (props%kin_energy%ave)**2, 0.0))
+    props%tot_energy%esd = sqrt(max(props%tot_energy%sum2/props%n_accum - &
+      (props%tot_energy%ave)**2, 0.0))
+    props%pressure%esd = sqrt(max(props%pressure%sum2/props%n_accum - &
+      (props%pressure%ave)**2, 0.0))
+    
+  end subroutine md_cal_properties
+  
 
-
+  ! Reset values used for calculating rolling averages and standard deviations 
+  
   subroutine md_reset_properties(props)
     type (md_properties), intent(inout) :: props
     
@@ -103,17 +115,6 @@ contains
   subroutine md_print_properties(file_pointer, props)
     type (md_properties), intent(inout) :: props
     integer, intent(in) :: file_pointer   
-
-    props%kin_energy%ave = props%kin_energy%sum / props%n_accum
-    props%tot_energy%ave = props%tot_energy%sum / props%n_accum
-    props%pressure%ave = props%pressure%sum / props%n_accum
-    
-    props%kin_energy%esd = sqrt(max(props%kin_energy%sum2/props%n_accum - &
-      (props%kin_energy%ave)**2, 0.0))
-    props%tot_energy%esd = sqrt(max(props%tot_energy%sum2/props%n_accum - &
-      (props%tot_energy%ave)**2, 0.0))
-    props%pressure%esd = sqrt(max(props%pressure%sum2/props%n_accum - &
-      (props%pressure%ave)**2, 0.0)) 
     
     write(file_pointer, *) " "
     write(file_pointer, '(a,i6)') "Average over this many moves = ", props%n_accum
@@ -127,8 +128,9 @@ contains
   
 !!!!!!!!!!!!!!!!!!!!!!! private functions/subroutines !!!!!!!!!!!!!!!!!!!!!!! 
   
-  ! This one does not accumulate
   ! It populates %kin_energy%val, %tot_energy%val and %pressure%val
+  ! where in current implementation %pressure%val is set to zero!
+  
   subroutine md_cal_properties_not_extra(ps, props, list)
     type (phasespace), intent(in) :: ps
     type (md_properties), intent(inout) :: props
@@ -153,27 +155,26 @@ contains
     
     props%kin_energy%val = 0.5*sum_mass_v2 / n_atoms
     
-!    if (ps%neighb_list%ignore_list == .true.) then
-      pot_energy = func_val(ps%str, list) / n_atoms
-!    else
-!      pot_energy = func_val_nn(ps%str, list, ps%neighb_list) / n_atoms
-!    end if
+    pot_energy = func_val(ps%str, list) / n_atoms
     
     props%tot_energy%val = pot_energy + props%kin_energy%val
     
     
     ! pressure is in units of 16387.72 atm
-    ! the expression below is only valid when using non-periodic boundary conditions
-    !props%pressure%val = (sum_mass_v2-sum(ps%deriv*ps%r)) / &
-    !   (product(ps%str%box_edges)*ndim)
-    ! so if periodic boundary condition in use then put for now 
+    ! the expression below is only valid when using non-periodic boundary conditions:
+    !   props%pressure%val = (sum_mass_v2-sum(ps%deriv*ps%r)) / &
+    !     (product(ps%str%box_edges)*ndim)
+    ! and since for now periodic boundary condition is used then for now: 
+    
     props%pressure%val = 0.0
 
   end subroutine md_cal_properties_not_extra
   
   
-  ! This one does not accumulate
-  ! It populates %kin_energy%val, %tot_energy%val and %pressure%val 
+  ! It populates %kin_energy%val, %tot_energy%val and %pressure%val
+  ! where the it takes the PE=pot_energy and pressure_comp is used for
+  ! calculating a value for %pressure%val
+  
   subroutine md_cal_properties_extra(ps, props, list, pressure_comp, pot_energy)
     type (phasespace), intent(in) :: ps
     type (md_properties), intent(inout) :: props

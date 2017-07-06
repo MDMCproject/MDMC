@@ -212,7 +212,7 @@ contains
           setup_mdmc_control_params%total_steps_initial_equilibration = string_to_int(read_int)  
           
           call get_value(attributes,"average-over",read_int,status)
-          setup_mdmc_control_params%average_over_initial_equilibration = string_to_int(read_int)                
+          setup_mdmc_control_params%average_over_initial_equilibration = string_to_int(read_int)
           
         case("total-step-temp-cali")       
           call get_value(attributes,"number",read_int,status)
@@ -478,7 +478,10 @@ contains
         case("sigma")
           call get_value(attributes,"val",read_db,status)
           number_db = string_to_db(read_db)
-          target_rdf_fom%weight = 1 / (number_db*number_db)  
+          target_rdf_fom%weight = 1 / (number_db*number_db)
+          
+        case("ignore-errors")
+          target_s_qo_fom%ignore_errors = .true.         
           
       end select
     end if
@@ -533,27 +536,27 @@ contains
         end if
          
         if (in_md_control_time_corr == .true. .or. in_mdmc_control_time_corr == .true.) then
-          ! First check and do stuff to prepare the time correlation container and associated
-          ! algorithms
           
-          ! Convert to number of time steps between buffers (note this is only different
-          ! if md_per_time_bin > 1).                    
+          ! Determine the number of time bins between when buffers start to calculate g(r,t), and
+          ! this is the subsequent gap between buffers
+
           n_time_step_between_buffers = nint( dble(n_md_step_between_buffers) &
             / dble(setup_mdmc_control_params%md_per_time_bin) )
 
-          ! Make sure that the number of time bins is an integer number of n_time_step_between_buffers
+          ! For computing g(r,t), one per buffer, it is computationally most efficient if the total number
+          ! of time bins equals a multiple of the time bins between when individual buffers starts
+          ! to calculate g(r,t). 
+          ! Therefore, here, do enforce this adjust n_time_bin accordingly:
+          
           if ( mod(setup_mdmc_control_params%n_time_bin, n_time_step_between_buffers) /= 0) then
+              
             setup_mdmc_control_params%n_time_bin = n_time_step_between_buffers &
               * ceiling(dble(setup_mdmc_control_params%n_time_bin)/dble(n_time_step_between_buffers))
+            
             print *, "n-time-bin adjusted to: ", setup_mdmc_control_params%n_time_bin
           end if      
           
-
-          ! set the private attribute n_buffer in time_corr_container. n_buffer is a pure technical
-          ! parameter which determine in time_corr_algorithm the distance (in number of md step) 
-          ! between when g(r,t)s are calculated
-          call set_n_buffers( setup_mdmc_control_params%n_time_bin/n_time_step_between_buffers ) 
-          
+          ! A sanity check
           
           if (n_time_step_between_buffers > &
               setup_mdmc_control_params%n_time_bin) then
@@ -562,6 +565,11 @@ contains
             write(*,*) "n_time_step_between_buffers > setup_mdmc_control_params%n_time_bin"
             stop
           end if
+              
+          ! Set the private attribute n_buffer in time_corr_container. n_buffer is
+          ! the number of time bins between when g(r,t)s are calculated
+          
+          call set_n_buffers( setup_mdmc_control_params%n_time_bin/n_time_step_between_buffers ) 
           
           
           if (in_mdmc_control_time_corr == .true.) then

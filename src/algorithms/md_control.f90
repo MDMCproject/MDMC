@@ -69,11 +69,9 @@ contains
       ! do one trajectory of length = 1 where pressure_comp and pot_energy is also
       ! calculated
       
-      !call trajectory_in_phasespace(my_ps, common_pe_list, 1, c%md_delta_t)
       call trajectory_in_phasespace(my_ps, common_pe_list, 1, c%md_delta_t, & 
                                     pressure_comp, pot_energy)
       
-      !call md_cal_properties(my_ps, my_props, common_pe_list)
       call md_cal_properties(my_ps, my_props, common_pe_list, pressure_comp, pot_energy)
       
       ! case you want to adject the temperature in the initial stages of the MD simulation
@@ -90,12 +88,6 @@ contains
         end if
       end if
      
-      
-
-      ! accumulate the calculated MD property values
-        
-      call md_accum_properties(my_props)
-        
         
       ! print out stuff and interval = average_over_this_many_steps
         

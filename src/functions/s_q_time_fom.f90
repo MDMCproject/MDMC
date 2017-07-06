@@ -31,7 +31,6 @@ implicit none
     ! real(db) :: density
     
     real(db) :: scale_factor = 1.0
-    !real(db) :: weight = 1.0
     
     character(len=120) :: title = " "
     

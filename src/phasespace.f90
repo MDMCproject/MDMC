@@ -238,7 +238,6 @@ contains
     ! determine initial momenta
     ! momentum_scale = temperature*ndim*(n_tot-1)/sum(ps%inv_mass(:,1))
     momentum_scale = sqrt( temperature*ndim*(n_tot-1)/sum(ps%inv_mass(:,1)) ) / sqrt(3.0)
-    ! write(*,'(a,f12.6)') "momentum_scale ", momentum_scale
     
     
     ! Used to compare with Rapaport C-code

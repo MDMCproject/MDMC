@@ -109,22 +109,26 @@ contains
     do i = 1, c%total_steps_initial_equilibration
       time_now = c%md_delta_t * i   ! perhaps print this one out 
       
-      ! do one trajectory of length = 1 where pressure_comp and pot_energy is also
+      ! Do one trajectory of length = 1 where pressure_comp and pot_energy is also
       ! calculated
       
-      !call trajectory_in_phasespace(my_ps, common_pe_list, 1, c%md_delta_t)
       call trajectory_in_phasespace(my_ps, common_pe_list, 1, c%md_delta_t, & 
                                     pressure_comp, pot_energy)
       
-      !call md_cal_properties(my_ps, my_props, common_pe_list)
+      ! Calculate proproperties from the phase-space configuration like the kinetic energy
+      ! including moving averages of these
+      
       call md_cal_properties(my_ps, my_props, common_pe_list, pressure_comp, pot_energy)
       
-      ! case you want to adjust the temperature in the initial stages of the MD simulation
-      ! (notice c%total_step_temp_cali = 0 if <perform-initial-temperature-calibration> 
-      ! element not specified in input file)
+      ! Optionally adjust the temperature in the initial stage of this first simulation
 
       if (i < c%total_step_temp_cali) then
+        ! Needs the average kin energy for adjusting the temperature.
+        ! This could done more clean (code) by introducing a second instance of my_props
+        ! i.e. not keep track of the 
+          
         sum_kin_energy = sum_kin_energy + my_props%kin_energy%val
+        
         if (mod(i,c%adjust_temp_at_interval) == 0) then
           ! see src/algorithms/md_gridsearch_control.doc for explanation of the expression below
           !        
@@ -134,13 +138,17 @@ contains
           sum_kin_energy = 0.0
         end if
       end if
-     
-     
-      ! accumulate the calculated MD property values
-        
-      call md_accum_properties(my_props)
-        
-        
+      
+      ! The idea is to keep a record of what the average total energy is after the
+      ! temperature calibration and then compare this value at end of the entire
+      ! initial calibration to check if the total energy has not drifted due to 
+      ! numerical errors. Not sure if this is the best point to record this total average
+      
+      if (i == c%total_step_temp_cali) then
+        average_energy_end_of_temp_calibration = my_props.tot_energy.ave 
+      end if      
+
+  
       ! print out stuff at interval = average_over_initial_equilibration
         
       if (mod(i,c%average_over_initial_equilibration) == 0) then 
@@ -153,19 +161,13 @@ contains
           stop
         end if
         
+        ! Reset calculation of rolling averages
+        
         call md_reset_properties(my_props)
+        
         write(*, '(a,i8,a,f12.4,a)') "MD steps = ", i, " MD run-time = ", time_now, "*10e-13"
       end if
       
-      
-      ! Store the average energy at the point when finished the temperature calibration.
-      ! Note this must be done after md_print_properties has been called - since only this
-      ! subfunction alters the my_props.ave value.
-      
-      if (i == c%total_step_temp_cali) then
-        average_energy_end_of_temp_calibration = my_props.tot_energy.ave 
-      end if
-
     end do
     
     write(print_to_file, *) " "
@@ -177,18 +179,24 @@ contains
     !
     ! Note the (2.0/ndim) factor is to convert from dimensionless kin_energy per atom to 
     ! dimensionless temperature
+    !
+    ! First up check the temperature and the end of the simulation is OK
     
     if ( acceptable_temperature((2.0/ndim)*my_props.kin_energy.ave, &
          c%temperature) == .false.) then
          write(print_to_screen, *) "Initial equilibration did not reach equilibrium"
-         write(print_to_screen, *) "Temperature outside acceptable value - STOP"
+         write(print_to_screen, *) "Temperature outside acceptable value"
          stop
     end if   
-    
+
+
+    ! Secondly check that the total energy has not drifted since the temperature
+    ! calibration
+
     if ( acceptable_energy(average_energy_end_of_temp_calibration, &
          my_props.tot_energy.ave) == .false.) then
          write(print_to_screen, *) "Initial equilibration did not reach equilibrium - STOP"
-         write(print_to_screen, *) "Energy outside acceptable value - STOP"
+         write(print_to_screen, *) "Total energy drift is too high since temperature calibration ended"
          stop
     end if     
     
@@ -283,8 +291,6 @@ contains
           end if
         end if        
       
-      
-        call md_accum_properties(my_props)
         
         if (mod(i_md,c%average_over_repeated_equilibration) == 0) then 
           call md_print_properties(print_to_file, my_props)

@@ -135,12 +135,6 @@ contains
           sum_kin_energy = 0.0
         end if
       end if
-     
-      
-
-      ! accumulate the calculated MD property values
-        
-      call md_accum_properties(my_props)
         
         
       ! print out stuff and interval = average_over_this_many_steps
@@ -291,8 +285,6 @@ contains
           end if
         end if        
       
-      
-        call md_accum_properties(my_props)
         
         if (mod(i_md,c%average_over_repeated_equilibration) == 0) then 
           call md_print_properties(print_to_file, my_props)

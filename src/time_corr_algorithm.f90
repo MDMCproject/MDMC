@@ -12,14 +12,19 @@ implicit none
   public :: set_n_g_r_t_to_average_over, set_n_buffers  ! used in handler only
 
   private :: update_act_r 
-  private :: allocate_buffer, reset_buffer
+  private :: allocate_buffer, reset_buffers
   private :: do_time_correlation
 
 
   type buffer
-    ! time_count may be negative, but buffers are only calculated
-    ! for time_count values: 0,1,2,...,N-1, where N equals the XML 
-    ! element <n-time-bin> 
+    ! A time_count may be negative. This is to delay for the calculation
+    ! of g(r,t) for this buffer, which will start when time_count=0. 
+    ! From thereon time_count equal a time bin value: 0,1,2,...,N-1, 
+    ! where N equals the XML element <n-time-bin>. The reason for 
+    ! introducing a delay is to ensure that no two buffers starts 
+    ! calculate g(r,t) from the same point and hence only one buffer 
+    ! can start to be calculated from one given input
+    ! phase-space configuration
     
     integer :: time_count
  
@@ -86,7 +91,7 @@ contains
                            get_time_corr_hist_r_bin(container))
     end if
     
-    call reset_buffer(n_time_bin)
+    call reset_buffers(n_time_bin)
     
     call check_if_time_corr_hist_container_is_allocated(container)
 
@@ -190,9 +195,15 @@ contains
     ! sum over all the buffers
     
     do i_buf = 1, size(bufs)
+        
+      ! get the time count for this buffer          
       tc = bufs(i_buf)%time_count
       
       if (tc == 0) then
+          
+        ! time count is zero for this buffer, 
+        ! hence it marks t=0 for this buffer
+        
         bufs(i_buf)%org_r = str%r
         bufs(i_buf)%act_r = str%r
 
@@ -221,11 +232,13 @@ contains
       end if
       
       
-      ! check if this buffer reached time series end point
+      ! check if this buffer reached the time end point
       
       if (tc + 1 == n_time_bin) then
       
-        ! reset time_count
+        ! Calculation of one g(r,t) complete
+        
+        ! Reset time_count
         
         bufs(i_buf)%time_count = 0
       
@@ -236,7 +249,8 @@ contains
         container%einstein_diffuse_exp = container%einstein_diffuse_exp + bufs(i_buf)%sum_square_diffs
         
         
-        ! sum up G_s(r,t) and G_d(r,t) histograms for each n_time_bin
+        ! For calculating the average over n_g_r_t_to_average_over calculated G_s(r,t) and G_d(r,t) histograms, 
+        ! then for each time bin:
         
         do i_time = 2, n_time_bin
           container%g_s_hists_sum(i_time)%val = container%g_s_hists_sum(i_time)%val + bufs(i_buf)%g_s_hists(i_time)%val
@@ -268,7 +282,7 @@ contains
           end do           
           
           
-          ! finish what needs to be calculated
+          ! finish calculated enough buffers
           
           job_done = .true.
           return
@@ -319,12 +333,21 @@ contains
     
   end subroutine allocate_buffer
    
-
   
-  subroutine reset_buffer(n_time_bin)
+  ! Reset buffers, and only reset what needs to be resetted
+  
+  subroutine reset_buffers(n_time_bin)
     integer, intent(in) :: n_time_bin
   
     integer :: i
+    
+    ! One buffer can start to calculate g(r,t) straight-away, the
+    ! rest are delayed according the the initialisation below.
+    ! Note having a n_buffer > 1 is to attempt to create some 
+    ! better statistical independence between the calculated g(r,t)
+    ! 
+    ! It is check in handler.f90 that n_time_bin is
+    ! a multiple of n_buffers
   
     do i = 0, n_buffers-1
       bufs(i+1)%time_count = - i * n_time_bin / n_buffers
@@ -332,6 +355,6 @@ contains
   
     num_buffs_cal_thus_far = 0
 
-  end subroutine reset_buffer
+  end subroutine reset_buffers
     
 end module time_corr_algorithm_class
