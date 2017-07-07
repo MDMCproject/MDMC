@@ -40,8 +40,8 @@ contains
   
     real(db) :: fom_val, fom_old
 
-    real(db) :: fom_best_accepted  ! used for keeping track of best accepted fom
-    real(db) :: fom_best_including_rejected  ! used for keeping track of best fom including rejected    
+    real(db) :: fom_best_including_rejected  ! used for keeping track of best FOM including rejected
+    real(db) :: fom_best_accepted  ! used for keeping track of best accepted FOM (as a sanity check)
     type (phasespace) :: my_ps_best ! to store status of best phasespace
 
     type (phasespace) :: my_ps, my_ps_old
@@ -175,7 +175,7 @@ contains
     write(print_to_file, *) " "
 
 
-    ! Determine if equilibrium was reached
+    ! Determine if the MD simulation reached an acceptable equilibrium
     !
     ! Note the (2.0/ndim) factor is to convert from dimensionless kin_energy per atom to 
     ! dimensionless temperature
@@ -249,7 +249,7 @@ contains
 
 
 
- ! ---------------------- mdmc part ------------------------ !              
+ ! ---------------------- core mdmc part ------------------------ !              
                
   
     ! save state
@@ -269,7 +269,7 @@ contains
       call move_random_func_params(common_pe_list)
       
 
-      ! do MD equilibration
+      ! do MD simulation
       
       sum_kin_energy = 0.0
       
@@ -289,31 +289,31 @@ contains
             my_ps%p = my_ps%p * temp_adjust_factor
             sum_kin_energy = 0.0
           end if
-        end if        
-      
+        end if    
+        
+        ! store total energy after temperature calibration to later check if
+        ! this energy has drifted too much due to numerical errors
+        
+        if (i_md == c%total_step_temp_cali_repeated) then
+          average_energy_end_of_temp_calibration = my_props.tot_energy.ave 
+        end if      
+        
         
         if (mod(i_md,c%average_over_repeated_equilibration) == 0) then 
           call md_print_properties(print_to_file, my_props)
 
           call md_reset_properties(my_props)
         end if
-        
-        ! Store the average energy at the point when finished the temperature calibration.
-        ! Note this must be done after md_print_properties has been called - since only this
-        ! subfunction alters the my_props.ave value.
-      
-        if (i_md == c%total_step_temp_cali_repeated) then
-          average_energy_end_of_temp_calibration = my_props.tot_energy.ave 
-        end if
               
       end do
          
-      write(print_to_file, '(a,f14.5)') "Finished repeated MD trajectory. Time: ", toc() 
+      write(print_to_file, '(a,f14.5)') "Finished MD simulation within MC loop. Time: ", toc() 
       write(print_to_file, *) " "
-      write(print_to_screen, '(a,f14.5)') "Finished repeated MD trajectory. Time: ", toc()      
+      write(print_to_screen, '(a,f14.5)') "Finished MD simulation within MC loop. Time: ", toc()      
       
 
-      ! Determine if equilibrium was reached
+      ! Determine if the MD simulation reached an acceptable equilibrium.
+      ! If not then reset phase-space and start a new MC cycle
       !
       ! Note the (2.0/ndim) factor is to convert from dimensionless kin_energy per atom to 
       ! dimensionless temperature
@@ -321,8 +321,8 @@ contains
       if ( acceptable_temperature((2.0/ndim)*my_props.kin_energy.ave, &
           c%temperature) == .false. .or. acceptable_energy(average_energy_end_of_temp_calibration, &
           my_props.tot_energy.ave) == .false.) then
-        write(print_to_screen, *) "Did not reach equilibrium in MD run"
-        write(print_to_file, *) "Did not reach equilibrium in MD run"
+        write(print_to_screen, *) "Did not reach equilibrium in MD run within MC loop"
+        write(print_to_file, *) "Did not reach equilibrium in MD run within MC loop"
 
         call xml_NewElement(xf, "failed-md-run")
         call add_xml_attribute_func_params(xf, common_pe_list)
@@ -352,7 +352,10 @@ contains
       write(print_to_screen, '(a,f14.5)') "Finished cal FOM. Time: ", toc()
       
       
-      ! check if new best fom - here whether or not move will be rejected or accepted
+      ! Check if new best FOM
+      ! Here whether or not this parameter move will be rejected or accepted 
+      ! If the new FOM value is lower it should always be accepted, but as a
+      ! sanity check if this is indeed the case by tracking two fom_best...
       
       if (fom_val < fom_best_including_rejected) then
         fom_best_including_rejected = fom_val
@@ -394,11 +397,7 @@ contains
         call backup_func_params(common_pe_list)
         call shallow_copy_phasespace(my_ps, my_ps_old)
         
-        ! Check if new best accepted fom
-        ! Here the best 'accepted' phase-space configuration is not stored
-        ! Perhaps this configuration should be stored also and if different
-        ! from the best overall FOM solution it could be saved at the end of 
-        ! this algorithm 
+        ! For a sanity check later, here keep record of the best accepted FOM found 
       
         if (fom_val < fom_best_accepted) then
           fom_best_accepted = fom_val     
@@ -421,13 +420,24 @@ contains
       end if  
       
     end do
+    
+    ! Another sanity check
+    
+    if ( fom_best_including_rejected /= fom_best_accepted ) then
+         write(print_to_screen, *) "Fundamental error - STOP"
+         write(print_to_screen, *) "The best FOM found among accepted and rejected parameter moves"
+         write(print_to_screen, *) "different from the best FOM found among accepted moves only."
+         write(print_to_screen, *) "Sound not be possible since all FOM found smaller than previous"
+         write(print_to_screen, *) "should always be accepted."
+         stop
+    end if    
      
- ! ---------------- finished mdmc part ------------------------ !    
+ ! ---------------- finished core mdmc part ------------------------ !    
 
 
     ! print out the best solution found. Note my_ps_best has a copy of the phase-space
-    ! and the end of a FOM calculation, not the start. Therefore the re-calculated FOM
-    ! although hopefully very simular will in general be different
+    ! and the end point of that FOM calculation, not the start of it. Therefore the 
+    ! re-calculated FOM although hopefully very simular will in general be different
     
     call restore_best_func_params(common_pe_list)
     call shallow_copy_phasespace(my_ps_best, my_ps)  
@@ -443,10 +453,9 @@ contains
     call print_g_d(my_time_corr_container, product(my_ps%str%box_edges), size(my_ps%str%atoms), c%temperature)   
     call clear_time_corr_hist_container(my_time_corr_container) ! not sure if necessary!!?? 
       
-    write(print_to_file,'(a,f14.5)') "BEST FOM overall = ", fom_best_including_rejected
-    write(print_to_file,'(a,f14.5)') "BEST FOM overall (re-calculated from different phase-space point) = ", fom_val
-    write(print_to_file,'(a,f14.5)') "BEST FOM (among accepted only) = ", fom_best_accepted    
-    write(print_to_file,'(a)') "WITH: "
+    write(print_to_file,'(a,f14.5)') "Best FOM found = ", fom_best_including_rejected
+    write(print_to_file,'(a,f14.5)') "Best FOM found (re-calculated from different phase-space point) = ", fom_val   
+    write(print_to_file,'(a)') "With: "
     call print_all_func_params(print_to_file, common_pe_list)
     write(print_to_file, '(a,f14.5)') "Finished printing best fom. Time: ", toc()
     write(print_to_file, *) " "
@@ -467,6 +476,7 @@ contains
   
   
   ! check to see if temperature is within certain limits of t_target
+  
   function acceptable_temperature(t, t_target) result (yes_or_no)
     real (db), intent(in) :: t, t_target
     logical :: yes_or_no 
@@ -478,7 +488,9 @@ contains
     end if
   end function acceptable_temperature
   
+  
   ! check to see if energy is within certain limits of t_target
+  
   function acceptable_energy(e, e_target) result (yes_or_no)
     real (db), intent(in) :: e, e_target
     logical :: yes_or_no 
