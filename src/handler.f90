@@ -17,6 +17,8 @@ use time_corr_algorithm_class
   private :: begin_element, end_element, pcdata_chunk
   private :: start_document, end_document
   
+  private :: check_when_temperature_cali
+  
   public :: startup_handler
   
   ! The logical variables named 'in_ + something' are used to keep track of when the 
@@ -29,7 +31,7 @@ use time_corr_algorithm_class
   ! mdmc_control - see code below
   logical, private :: in_md_gridsearch_control = .false.
   logical, private  :: in_mdmc_control_time_corr = .false. 
-  logical, private  :: in_md_control_time_corr = .false.  
+  logical, private  :: in_md_control_time_corr = .false.
   
   ! nn_list_r_cut and nn_list_delta_r are the two attributes that are needed to setup
   ! a nearest neighbour list. 
@@ -146,10 +148,7 @@ contains
           
         case("average-over-this-many-step")       
           call get_value(attributes,"number",read_int,status)
-          setup_md_control_params%average_over_this_many_step = string_to_int(read_int)
-          
-        !case("perform-initial-temperature-calibration")
-        !  setup_md_control_params%perform_initial_temperature_calibration = .true.               
+          setup_md_control_params%average_over_this_many_step = string_to_int(read_int)        
           
         case("total-step-temp-cali")       
           call get_value(attributes,"number",read_int,status)
@@ -201,7 +200,8 @@ contains
     end if
 
 
-    ! if in mdmc_control
+    ! If in mdmc_control, md_gridsearch_control, mdmc_control_time_corr or md_control_time_corr.
+    ! All these algorithms store user input in the same container
     
     if (in_mdmc_control .or. in_md_gridsearch_control .or. in_mdmc_control_time_corr &
         .or. in_md_control_time_corr) then
@@ -235,7 +235,7 @@ contains
           setup_mdmc_control_params%md_steps_repeated_equilibration = string_to_int(read_int)
           
           call get_value(attributes,"average-over",read_int,status)
-          setup_mdmc_control_params%average_over_repeated_equilibration = string_to_int(read_int)                        
+          setup_mdmc_control_params%average_over_repeated_equilibration = string_to_int(read_int)
                           
         case("cal-rdf-at-interval")       
           call get_value(attributes,"number",read_int,status)
@@ -245,11 +245,9 @@ contains
           call get_value(attributes,"number",read_int,status)
           setup_mdmc_control_params%average_over_this_many_rdf = string_to_int(read_int)
                                   
-          
         case("mc-steps")       
           call get_value(attributes,"number",read_int,status)
           setup_mdmc_control_params%mc_steps = string_to_int(read_int)            
-          
             
         case("temperature")       
           call get_value(attributes,"val",read_db,status)
@@ -259,53 +257,7 @@ contains
             
         case("time-step")       
           call get_value(attributes,"val",read_db,status)
-          setup_mdmc_control_params%md_delta_t = string_to_db(read_db)
-          
-!          if (setup_mdmc_control_params%g_d_data_time_step /= 0.0) then
-!            setup_mdmc_control_params%md_per_time_bin = &
-!              nint(setup_mdmc_control_params%g_d_data_time_step / &
-!                   setup_mdmc_control_params%md_delta_t)
-            
-!            if (setup_mdmc_control_params%md_per_time_bin == 0) then
-!              setup_mdmc_control_params%md_per_time_bin = 1
-!            end if
-            
-!            setup_mdmc_control_params%md_delta_t =  &
-!              setup_mdmc_control_params%g_d_data_time_step / &
-!              setup_mdmc_control_params%md_per_time_bin
-!          end if
-
-!        case("q-values")       
-!          call get_value(attributes,"start",read_db,status)
-!          l_start = string_to_db(read_db)
-!          call get_value(attributes,"end",read_db,status)
-!          l_end = string_to_db(read_db)
-!          call get_value(attributes,"step",read_db,status)
-!          l_step = string_to_db(read_db)
-          
-!          n = nint((l_end-l_start) / l_step)
-          
-!          allocate(setup_mdmc_control_params%q_values(n+1))
-          
-!          do index = 0, n
-!            setup_mdmc_control_params%q_values(index+1) = l_start + index*l_step
-!          end do
-          
-!        case("omega-values")       
-!          call get_value(attributes,"start",read_db,status)
-!          l_start = string_to_db(read_db)
-!          call get_value(attributes,"end",read_db,status)
-!          l_end = string_to_db(read_db)
-!          call get_value(attributes,"step",read_db,status)
-!          l_step = string_to_db(read_db)
-          
-!          n = nint((l_end-l_start) / l_step)
-          
-!          allocate(setup_mdmc_control_params%omega_values(n+1))
-          
-!          do index = 0, n
-!            setup_mdmc_control_params%omega_values(index+1) = l_start + index*l_step
-!          end do          
+          setup_mdmc_control_params%md_delta_t = string_to_db(read_db)          
           
         case("temperature-mc")       
           call get_value(attributes,"val",read_db,status)
@@ -523,6 +475,33 @@ contains
         in_gpe = .false.        
         
       case("control-object")
+        
+        ! Do checks of MD steps values and temperature calibration values
+        
+        if ( setup_md_control_params%step_limit > 0 ) then
+          call check_when_temperature_cali(setup_md_control_params%step_limit, & 
+                                           setup_md_control_params%total_step_temp_cali, &
+                                           setup_md_control_params%average_over_this_many_step, &
+                                           setup_md_control_params%adjust_temp_at_interval)
+        end if
+        
+        if ( setup_mdmc_control_params%total_steps_initial_equilibration > 0 ) then
+          call check_when_temperature_cali(setup_mdmc_control_params%total_steps_initial_equilibration, & 
+                                           setup_mdmc_control_params%total_step_temp_cali, &
+                                           setup_mdmc_control_params%average_over_initial_equilibration, &
+                                           setup_mdmc_control_params%adjust_temp_at_interval)            
+        end if
+        
+        if ( setup_mdmc_control_params%md_steps_repeated_equilibration > 0 ) then
+          call check_when_temperature_cali(setup_mdmc_control_params%md_steps_repeated_equilibration, & 
+                                           setup_mdmc_control_params%total_step_temp_cali_repeated, &
+                                           setup_mdmc_control_params%average_over_repeated_equilibration, &
+                                           setup_mdmc_control_params%adjust_temp_at_interval_repeated)              
+        end if
+        
+        
+        ! Start running an algorithm 
+          
         if (in_md_control == .true.) then
           call run_md_control(common_config, setup_md_control_params)
         end if
@@ -534,7 +513,11 @@ contains
         if (in_md_gridsearch_control == .true.) then
           call run_md_gridsearch_control(common_config, setup_mdmc_control_params)           
         end if
-         
+        
+        
+        ! Before calling algorithms that compare against dynamical structure factor information
+        ! do the following addition checks and adjustments
+        
         if (in_md_control_time_corr == .true. .or. in_mdmc_control_time_corr == .true.) then
           
           ! Determine the number of time bins between when buffers start to calculate g(r,t), and
@@ -616,5 +599,61 @@ contains
   !END_DOCUMENT
   subroutine end_document()
   end subroutine end_document
+  
+  ! Additional user input check when temperature calibration is first part of 
+  ! a MD simulation 
+  
+  subroutine check_when_temperature_cali(total_steps, temperature_steps, average_over, cali_when)
+    integer, intent(in) :: total_steps
+    integer, intent(in) :: temperature_steps
+    integer, intent(in) :: average_over
+    integer, intent(in) :: cali_when    
+    
+    ! To ensure that no MD steps are vasted then insist
+    
+    if ( mod(total_steps, average_over) /= 0) then        
+      write(*,*) "ERROR in input in job file"
+      write(*,*) "To ensure that no MD steps are vasted then: "      
+      write(*,*) "The total number of steps in MD simulation must be a multiple of "
+      write(*,*) "the average-over XML attribute."
+      stop
+    end if      
+    
+    
+    if ( temperature_steps > 0 ) then
+      return    
+    end if
+    
+    ! To ensure that no MD steps are vasted then insist
+    
+    if ( mod(temperature_steps, cali_when) /= 0) then        
+      write(*,*) "ERROR in input in job file"
+      write(*,*) "To ensure that no MD steps are vasted then: "      
+      write(*,*) "The total number of MD steps temperature calibration must be a multiple of "
+      write(*,*) "the number attribute of the adjust-temp-at-interval-repeated XML element."
+      stop
+    end if            
+    
+    ! Ensure that temperature calibration can fit simulation
+    
+    if ( temperature_steps < total_steps ) then        
+      write(*,*) "ERROR in input in job file"
+      write(*,*) "Number of steps used for temperature calibration must be smaller than "      
+      write(*,*) "the number of steps assigned for the MD simulation."
+      stop
+    end if      
+    
+    ! Required to ensure enough MD steps to check if total energy has drifted since last 
+    ! temperature calibration of velocities
+    
+    if ( mod(total_steps-temperature_steps, average_over) /= 0) then        
+      write(*,*) "ERROR in input in job file"
+      write(*,*) "There must be a gap between end of temperature calibration and end of "      
+      write(*,*) "simulation is a multiple of the average-over XML attribute."
+      stop
+    end if    
+  
+
+  end subroutine check_when_temperature_cali 
 
 end module handler_class

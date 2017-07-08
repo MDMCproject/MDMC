@@ -19,8 +19,7 @@ use s_q_omega_class
   public :: run_mdmc_control_time_corr
   
   private :: acceptable_temperature
-  private :: acceptable_energy  
-  
+  private :: acceptable_energy
 
 contains
 
@@ -500,6 +499,6 @@ contains
     if (abs((e - e_target)/e_target) > 0.1) then
       yes_or_no = .false.
     end if
-  end function acceptable_energy
+  end function acceptable_energy 
 
-end module mdmc_control_time_corr_class
+end module mdmc_control_time_corr_class  

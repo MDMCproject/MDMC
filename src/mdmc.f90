@@ -87,7 +87,8 @@ program mdmc
   end if
   
   
-  ! Similar to above but for the <control-object/q-values> and <control-object/omega-values> elements. 
+  ! Similar to above but for the <control-object/q-values> and <control-object/omega-values> elements.
+  ! As of this writing there is not an option for specifying q and omega values from a data file
   
   call alloc_q_omega_arrays(trim(filename))
 

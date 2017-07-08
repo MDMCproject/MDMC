@@ -37,7 +37,6 @@ implicit none
   type (precal_cos_values), private :: local_precal_cos_values  
   
   
-  
   character(len=16), parameter, private :: filename_prefix = "output/s_q_omega"    
   integer, private :: filname_number = 1    
   
@@ -76,7 +75,6 @@ contains
     s_qo%diff = matmul(s_qt%diff, local_precal_cos_values%val) 
 
   end subroutine cal_s_q_omega
-
 
 
   ! The temperature is assumed to be in dimensionless units.
@@ -228,18 +226,8 @@ contains
           lower_lim = upper_lim  
         end do
       end if
-
-
-!      container%val(1,i_omega) = 0.5 * time_length / pi_value
-!        
-!      do i_t = 1, n_t-1
-!        container%val(i_t+1,i_omega) = cos(omega(i_omega)*i_t*time_length)*time_length / pi_value
-!      end do
-      
-        
     end do
     
-
   end function make_and_cal_precal_cos_values
 
 
@@ -270,8 +258,5 @@ contains
     container%diff = 0
     
   end function make_s_q_omega
-
-
-
 
 end module s_q_omega_class

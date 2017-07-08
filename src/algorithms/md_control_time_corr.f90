@@ -120,16 +120,12 @@ contains
       ! do one trajectory of length = 1 where pressure_comp and pot_energy is also
       ! calculated
       
-      !call trajectory_in_phasespace(my_ps, common_pe_list, 1, c%md_delta_t)
       call trajectory_in_phasespace(my_ps, common_pe_list, 1, c%md_delta_t, & 
                                     pressure_comp, pot_energy)
       
-      !call md_cal_properties(my_ps, my_props, common_pe_list)
       call md_cal_properties(my_ps, my_props, common_pe_list, pressure_comp, pot_energy)
       
-      ! case you want to adjust the temperature in the initial stages of the MD simulation
-      ! (notice c%total_step_temp_cali = 0 if <perform-initial-temperature-calibration> 
-      ! element not specified in input file)
+      ! Optionally adjust the temperature
 
       if (i < c%total_step_temp_cali) then
         sum_kin_energy = sum_kin_energy + my_props%kin_energy%val
@@ -143,7 +139,15 @@ contains
         end if
       end if
         
-        
+      ! The idea is to keep a record of what the average total energy is after the
+      ! temperature calibration and then compare this value at end of the entire
+      ! initial calibration to check if the total energy has not drifted due to 
+      ! numerical errors. Not sure if this is the best point to record this total average
+      
+      if (i == c%total_step_temp_cali) then
+        average_energy_end_of_temp_calibration = my_props.tot_energy.ave 
+      end if
+      
       ! print out stuff and interval = average_over_this_many_steps
         
       if (mod(i,c%average_over_initial_equilibration) == 0) then 
@@ -158,15 +162,6 @@ contains
         
         call md_reset_properties(my_props)
         write(*, '(a,i8,a,f15.5,a)') "MD steps = ", i, " MD run-time = ", time_now, "*10e-13"
-      end if
-      
-      
-      ! Store the average energy at the point when finished the temperature calibration.
-      ! Note this must be done after md_print_properties has been called - since only this
-      ! subfunction alters the my_props.ave value.
-      
-      if (i == c%total_step_temp_cali) then
-        average_energy_end_of_temp_calibration = my_props.tot_energy.ave 
       end if
 
     end do

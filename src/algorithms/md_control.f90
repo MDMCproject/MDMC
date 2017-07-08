@@ -74,9 +74,7 @@ contains
       
       call md_cal_properties(my_ps, my_props, common_pe_list, pressure_comp, pot_energy)
       
-      ! case you want to adject the temperature in the initial stages of the MD simulation
-      ! (notice c%total_step_temp_cali = 0 if <perform-initial-temperature-calibration> 
-      ! element not specified in input file)
+      ! Optionally adjust the temperature
 
       if (i < c%total_step_temp_cali) then
         sum_kin_energy = sum_kin_energy + my_props%kin_energy%val

@@ -14,9 +14,9 @@ use time_corr_algorithm_class
 contains
 
 
-  ! allocate q and omega values for when S(q,omega), S(q) etc
-  ! are calculated. Done it this way rather than directly in 
-  ! handler because of convenience.
+  ! If control-object/q-values and control-object/omega-values exist in job file then populate 
+  ! setup_mdmc_control_params%omega_values and setup_mdmc_control_params%q_values. 
+  ! Done it this way rather than directly in handler because of convenience.
 
   subroutine alloc_q_omega_arrays(filename)
     use flib_sax  
@@ -98,16 +98,10 @@ contains
       step_size = string_to_db(read_db)        
       
       do i = 0, n_step
-       ! print *, q_index, start_value + i*step_size
         setup_mdmc_control_params%q_values(q_index) = start_value + i*step_size
         q_index = q_index + 1
       end do
     end do
-      
-  !  do i = 1, num_q_values
-  !    print *, setup_mdmc_control_params%q_values(i)
-  !  end do  
-      
       
     call close_xmlfile(fxml)  
     call open_xmlfile(trim(filename),fxml,iostat)

@@ -30,7 +30,9 @@ implicit none
 
 contains
 
-  function s_qo_fom_val(s_qo_cal, s_qo_data) result(val)
+    ! Calculated and observed data arrays must have the same dimensions
+
+    function s_qo_fom_val(s_qo_cal, s_qo_data) result(val)
     type (s_q_omega), intent(in) :: s_qo_cal
   	type (s_qo_fom_container), intent(in) :: s_qo_data
     real (db) :: val
@@ -41,6 +43,21 @@ contains
     n_q = size(s_qo_data%q)
     n_omega = size(s_qo_data%omega)
 
+    
+    ! Check if the array dimensions are the same
+    
+    if ( n_q /= size(s_qo_cal%q) .or. &
+         n_omega /= size(s_qo_cal%omega) ) then
+      write(*,*) " "
+      write(*,*) "ERROR in s_qo_fom_val"
+      write(*,*) "mis-match between calculated and observed s(q,omega) data arrays"
+      stop
+    end if    
+    
+         
+    ! Note it is currently allowed to have obs data with 'no data available', a bit 
+    ! like non-a-number data     
+         
     if (s_qo_data%ignore_errors == .true.) then
       do i_o = 1, n_omega     
         do i_q = 1, n_q 

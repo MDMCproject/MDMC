@@ -60,12 +60,12 @@ contains
                                     ! print to screen only
     integer :: print_to_screen = 0
 	  
-	  if (print_to_file /= 0) then
-	    open(print_to_file, file="output/job_log.txt")
-	  end if
+    if (print_to_file /= 0) then
+      open(print_to_file, file="output/job_log.txt")
+    end if
 	  		
-	  ! specify sigmas to loop over		
-	  sigma_search = (/ (2.2+0.4*float(i), i = 0, 5) /)				
+    ! specify sigmas to loop over		
+    sigma_search = (/ (2.2+0.4*float(i), i = 0, 5) /)				
 	  		
 	  		
     write(print_to_file,*) "In run_md_gridsearch_control"
@@ -108,17 +108,13 @@ contains
       ! do one trajectory of length = 1 where pressure_comp and pot_energy is also
       ! calculated
       
-      !call trajectory_in_phasespace(my_ps, common_pe_list, 1, c%md_delta_t)
       call trajectory_in_phasespace(my_ps, common_pe_list, 1, c%md_delta_t, & 
                                     pressure_comp, pot_energy)
       
-      !call md_cal_properties(my_ps, my_props, common_pe_list)
       call md_cal_properties(my_ps, my_props, common_pe_list, pressure_comp, pot_energy)
       
       
-      ! Adjust the temperature in the initial stages of the MD simulation.
-      ! Note that c%total_step_temp_cali = 0 if <perform-initial-temperature-calibration> 
-      ! element not specified in input file)
+      ! Optionally adjust the temperature
 
       if (i < c%total_step_temp_cali) then
         sum_kin_energy = sum_kin_energy + my_props%kin_energy%val
