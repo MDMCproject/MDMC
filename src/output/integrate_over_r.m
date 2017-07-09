@@ -1,5 +1,5 @@
 %% Exact integration over constant g(r)=g_value for all r to r_max
-% see page 27 in MDMC notes
+% see page 27 in my handwritten MDMC notes
 function retval = integrate_over_r(Q, g_value)
   r_max = 21.2;
   n_atom = 1372;

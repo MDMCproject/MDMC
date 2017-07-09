@@ -1,3 +1,6 @@
+% takes a results xml output and plots PE epsilon vs sigma etc of the
+% accepted move to get some insight into correlations etc
+
 function analyseMDMCcorrelation(filename)
 
 [acceptX, acceptFOM, acceptSigma, acceptEpsilon] = analyseMDMCrun(filename);

@@ -1,3 +1,6 @@
+% takes a results xml output and plots the accepted/rejected FOM values
+% and values of the PE parameters
+
 function [acceptX, acceptFOM, acceptSigma, acceptEpsilon, rejectX, rejectFOM, rejectSigma, rejectEpsilon] = analyseMDMCrun(filename)
 
 s = xmlread(filename);
