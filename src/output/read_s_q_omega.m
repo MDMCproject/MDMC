@@ -1,3 +1,5 @@
+% Used to plot MDMC generated s(q,omega) outputs
+
 function s_q_omega_info = read_s_q_omega(filename)
 
 s = xmlread(filename);

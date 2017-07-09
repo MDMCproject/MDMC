@@ -1,3 +1,5 @@
+% Used to plot MDMC generated h_d functions
+
 function h_d_info = read_h_d(filename)
 
 s = xmlread(filename);

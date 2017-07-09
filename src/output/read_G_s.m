@@ -1,7 +1,9 @@
+% Used to plot MDMC generated g_s time correlation functions
+
 function read_G_s(filename)
 % This function reads and plots \tilde{g}^s from a file, assumed
-% to be defined as described in my notes page 29 equation (29), i.e.
-% in theory this function should converge to 1 for large r.
+% to be defined as described in my handwritten notes page 29 equation (29), 
+% i.e. in theory this function should converge to 1 for large r.
 %
 
 s = xmlread(filename);

@@ -1,3 +1,5 @@
+% Used to plot MDMC generated s(q,t) outputs
+
 function s_q_time_info = read_s_q_time(filename)
 
 s = xmlread(filename);

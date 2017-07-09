@@ -1,3 +1,5 @@
+% Used to plot MDMC generated rdf functions
+
 function read_rdf(filename, format)
 
 s = xmlread(filename);

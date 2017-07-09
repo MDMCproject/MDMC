@@ -1,3 +1,5 @@
+% Used to plot MDMC generated g_d time correlation functions
+
 function read_g_d(filename)
 
 s = xmlread(filename);

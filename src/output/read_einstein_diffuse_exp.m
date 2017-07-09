@@ -1,3 +1,6 @@
+% Used to plot the output of the MDMC subroutine 
+% print_einstein_diffuse_exp in time_corr_hist_container.f90
+
 function read_einstein_diffuse_exp(filename, format)
 
 s = xmlread(filename);
@@ -31,8 +34,8 @@ title(char(title_element.item(0).getAttribute('title')))
 subplot(2,1,2)
 
 % to convert from diffusion constant as defined in code and on pages
-% 19b and 19bb in notes then the mean value of squared differences between
-% atoms at t=0 and the atoms at some later t is
+% 19b and 19bb in my handwritten notes then the mean value of squared 
+% differences between atoms at t=0 and the atoms at some later t is
 
 meanSquareDist = D.*t*6;
 
