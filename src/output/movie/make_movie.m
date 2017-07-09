@@ -1,3 +1,12 @@
+% This was created to create a movie of the particular case of how the 
+% atoms move during a creation of the data (MD-moves) for calculation of
+% a time correction container.
+%
+% To use it is currently extremely primitive. You are required to uncomment 
+% MDMC, which you can find by searching for 'movie'.
+%
+% This script may be modified to be used for similar purposes.
+
 function make_movie(filename_in, n_frames)
 filename = 'some text';
 filename = filename_in;

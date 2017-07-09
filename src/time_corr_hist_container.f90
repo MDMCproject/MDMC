@@ -179,7 +179,7 @@ contains
   end function get_time_corr_hist_n_r_bin  
 
 
- ! The temperature is assumed to be in dimensionless units.
+  ! The temperature is assumed to be in dimensionless units.
 
   subroutine print_einstein_diffuse_exp(container, n_atom, density, temperature)
     use flib_wxml
