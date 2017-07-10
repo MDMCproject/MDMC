@@ -1,4 +1,5 @@
-% here it is implicitely assumed that filename2 refers to the data
+% filename1 must be a MDMC generated S(q,omega) file while filename2 is a 
+% xml data file with the columns q, omega, S and error
 
 function s_q_omega_info = diff_s_q_omega(filename1, filename2)
 
