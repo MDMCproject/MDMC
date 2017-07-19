@@ -1,0 +1,12 @@
+# Compiled fortran files
+*.mod
+*.asv
+*.obj
+*.exe
+
+# Compiled matlab files
+*.asv
+
+# Build results
+[Dd]ebug/
+[Rr]elease/
