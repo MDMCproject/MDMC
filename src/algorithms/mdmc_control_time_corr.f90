@@ -213,11 +213,12 @@ contains
   
   ! from container calculate FOM etc  
   
-  call print_g_d(my_time_corr_container, product(my_ps%str%box_edges), size(my_ps%str%atoms), c%temperature) 
+  call print_g_d(my_time_corr_container, product(my_ps%str%box_edges), size(my_ps%str%atoms), &
+                 c%temperature, "output/first_g_d.xml") 
   call cal_s_q_time(my_time_corr_container, my_ps%str, my_s_q_time)
-  call print_s_q_time(my_s_q_time, density, c%temperature)
+  call print_s_q_time(my_s_q_time, density, c%temperature, "output/first_s_q_time.xml")
   call cal_s_q_omega(my_s_q_time, my_ps%str, my_s_q_omega)
-  call print_s_q_omega(my_s_q_omega, density, c%temperature)
+  call print_s_q_omega(my_s_q_omega, density, c%temperature, "output/first_s_q_omega.xml")
   !fom_val = func_val(my_time_corr_container, common_fom_list)
   !fom_val = func_val(my_s_q_time, common_fom_list)
   fom_val = func_val(my_s_q_omega, common_fom_list)
@@ -443,13 +444,14 @@ contains
         
     call cal_time_corr_container(my_time_corr_container, my_ps, common_pe_list, c%md_per_time_bin, c%md_delta_t)   
     call cal_s_q_time(my_time_corr_container, my_ps%str, my_s_q_time)
-    call print_s_q_time(my_s_q_time, density, c%temperature)
+    call print_s_q_time(my_s_q_time, density, c%temperature, "output/best_s_q_time.xml")
     call cal_s_q_omega(my_s_q_time, my_ps%str, my_s_q_omega)
-    call print_s_q_omega(my_s_q_omega, density, c%temperature)
+    call print_s_q_omega(my_s_q_omega, density, c%temperature, "output/best_s_q_omega.xml")
     !fom_val = func_val(my_time_corr_container, common_fom_list)
     !fom_val = func_val(my_s_q_time, common_fom_list)
     fom_val = func_val(my_s_q_omega, common_fom_list)
-    call print_g_d(my_time_corr_container, product(my_ps%str%box_edges), size(my_ps%str%atoms), c%temperature)   
+    call print_g_d(my_time_corr_container, product(my_ps%str%box_edges), size(my_ps%str%atoms), &
+                   c%temperature, "output/best_g_d.xml")   
     call clear_time_corr_hist_container(my_time_corr_container) ! not sure if necessary!!?? 
       
     write(print_to_file,'(a,f14.5)') "Best FOM found = ", fom_best_including_rejected

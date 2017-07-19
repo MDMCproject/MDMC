@@ -138,37 +138,43 @@ contains
   end subroutine cal_s_q_time
 
 
-
+  
   ! The temperature is assumed to be in dimensionless units.
-  ! density should perhaps also be made an optional argument 
+  ! Print S(q,t) to either filename given by name_of_file or
+  ! if this argument is not specified the name given by module 
+  ! attribute filename_prefix + number
 
-  subroutine print_s_q_time(container, density, temperature)
+  subroutine print_s_q_time(container, density, temperature, name_of_file)
     use flib_wxml
     type(s_q_time), intent(in) :: container  
     real(db), intent(in) :: density    
-    real(db), optional, intent(in) :: temperature
+    real(db), intent(in) :: temperature
+    character(len=*), optional, intent(in) :: name_of_file
     
     type (xmlf_t) :: xf
     integer :: i_q, i_t, n_t_bin
     
     character(len=50) :: filename
+
+    if ( present(name_of_file) ) then
+      filename = name_of_file
+    else    
+      if (filname_number < 10) then
+        write(filename, '(i1)') filname_number
+      else if (filname_number < 100) then
+        write(filename, '(i2)') filname_number
+      else if (filname_number < 1000) then
+        write(filename, '(i3)') filname_number
+      else
+        write(*,*) "ERROR: in print_s_q_time"
+        write(*,*) "It is assumed that you did not intend to write"
+        write(*,*) "to disk 1000 S(q,t) xml files!"
+        stop
+      end if
     
-    if (filname_number < 10) then
-      write(filename, '(i1)') filname_number
-    else if (filname_number < 100) then
-      write(filename, '(i2)') filname_number
-    else if (filname_number < 1000) then
-      write(filename, '(i3)') filname_number
-    else
-      write(*,*) "ERROR: in save_rdf"
-      write(*,*) "It is assumed that you did not intend to write"
-      write(*,*) "to disk 1000 rdf xml files!!!!"
-      stop
+      filname_number = filname_number + 1
+      filename = filename_prefix // trim(filename) // ".xml" ! here filename is just a number on rhs
     end if
-    
-    filname_number = filname_number + 1
-    
-    filename = filename_prefix // trim(filename) // ".xml" ! here filename is just a number on rhs
     
     write(*,'(3a)') "Write ", trim(filename), " to disk"
     
@@ -179,14 +185,9 @@ contains
     call xml_NewElement(xf, "s-q-time")
     
     ! notice convert units of temperature from dimensionless to K  
-    if (present(temperature)) then
-      call xml_AddAttribute(xf, "title", "T = " // trim(str(temperature * T_unit, format="(f10.5)")) // &
+    call xml_AddAttribute(xf, "title", "T = " // trim(str(temperature * T_unit, format="(f10.5)")) // &
                                          " K: rho = " // trim(str(density, format="(f10.5)")) &
                                          // " atoms/AA-3")
-    else 
-      call xml_AddAttribute(xf, "title", "rho = " // str(density, format="(f10.5)") &
-                                         // "atoms/AA-3")                                                                        
-    end if
     
     call xml_AddAttribute(xf, "q-units", "AA^-1")
     call xml_AddAttribute(xf, "n-q-points", str(size(container%q), format="(i)") )

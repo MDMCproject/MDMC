@@ -340,15 +340,18 @@ contains
   
   end subroutine print_g_s
 
-
   ! The temperature is assumed to be in dimensionless units.
+  ! Print S(q,t) to either filename given by name_of_file or
+  ! if this argument is not specified the name given by module 
+  ! attribute filename_prefix + number
   !
-  subroutine print_g_d(container, volume, n_atom, temperature)
+  subroutine print_g_d(container, volume, n_atom, temperature, name_of_file)
     use flib_wxml
     type(time_corr_hist_container), intent(inout) :: container  ! inout because volume_prefac modified  
     real(db), intent(in) :: volume 
-    real(db), optional, intent(in) :: temperature
-    integer, optional, intent(in) :: n_atom
+    real(db), intent(in) :: temperature
+    integer, intent(in) :: n_atom
+    character(len=*), optional, intent(in) :: name_of_file    
     
     type (xmlf_t) :: xf
     integer :: i, n_time_bin, n_r_bin, i_bin
@@ -358,22 +361,25 @@ contains
     
     density = n_atom / volume
     
-    if (filname_number3 < 10) then
-      write(filename, '(i1)') filname_number3
-    else if (filname_number3 < 100) then
-      write(filename, '(i2)') filname_number3
-    else if (filname_number3 < 1000) then
-      write(filename, '(i3)') filname_number3
-    else
-      write(*,*) "ERROR: in print_g_d"
-      write(*,*) "It is assumed that you did not intend to write"
-      write(*,*) "to disk 1000 g_d xml files!!!!"
-      stop
+    if ( present(name_of_file) ) then
+      filename = name_of_file
+    else        
+      if (filname_number3 < 10) then
+        write(filename, '(i1)') filname_number3
+      else if (filname_number3 < 100) then
+        write(filename, '(i2)') filname_number3
+      else if (filname_number3 < 1000) then
+        write(filename, '(i3)') filname_number3
+      else
+        write(*,*) "ERROR: in print_g_d"
+        write(*,*) "It is assumed that you did not intend to write"
+        write(*,*) "to disk 1000 g_d xml files!!!!"
+        stop
+      end if
+    
+      filname_number3 = filname_number3 + 1
+      filename = filename_prefix3 // trim(filename) // ".xml"
     end if
-    
-    filname_number3 = filname_number3 + 1
-    
-    filename = filename_prefix3 // trim(filename) // ".xml"
     
     write(*,'(3a)') "Write ", trim(filename), " to disk"
     
@@ -388,16 +394,10 @@ contains
     call xml_NewElement(xf, "G_d-space-time-pair-correlation-function")
     
     ! notice convert units of temperature from dimensionless to K  
-    if (present(temperature)) then
-      call xml_AddAttribute(xf, "title", "T = " // trim(str(temperature * T_unit, format="(f10.5)")) // &
+    call xml_AddAttribute(xf, "title", "T = " // trim(str(temperature * T_unit, format="(f10.5)")) // &
                                          " K")
-      call xml_AddAttribute(xf, "density", str(density, format="(f10.5)"))
-      call xml_AddAttribute(xf, "density-unit", "atoms/AA-3")                                  
-    else 
-      call xml_AddAttribute(xf, "density", str(density, format="(f10.5)"))
-      call xml_AddAttribute(xf, "density-unit", "atoms/AA-3")
-                                         
-    end if
+    call xml_AddAttribute(xf, "density", str(density, format="(f10.5)"))
+    call xml_AddAttribute(xf, "density-unit", "atoms/AA-3")                                  
     
     call xml_AddAttribute(xf, "n-atom", str(n_atom, format="(i)"))
     call xml_AddAttribute(xf, "time-bin", str(container%time_bin, format="(f10.5)"))
@@ -405,7 +405,6 @@ contains
     
     call xml_AddAttribute(xf, "n-time-bin", str(n_time_bin, format="(i)"))
     call xml_AddAttribute(xf, "n-r-bin", str(n_r_bin, format="(i)"))
-    !call xml_AddAttribute(xf, "n-buffer_average-over", str(container%n_accum, format="(i)"))
     
     call xml_AddAttribute(xf, "time-unit", "10^-13 s")
     call xml_AddAttribute(xf, "r-units", "AA")
