@@ -14,8 +14,12 @@ use time_corr_algorithm_class
 contains
 
 
-  ! read G_d(r,t) data from file and store in target_g_d_rt_fom
-
+  ! read g_d(r,t) data from file and store in target_g_d_rt_fom where g_d is assumed equal
+  !
+  !   g_d(r,t) = V*hist_d(r,t)
+  !              --------------------------------
+  !              N(N-1)*volume_of_spherical_shell(r)
+  !
   subroutine make_g_d_rt_fom_container(filename)
     use flib_sax  
     use flib_xpath    

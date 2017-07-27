@@ -249,8 +249,7 @@ contains
         container%einstein_diffuse_exp = container%einstein_diffuse_exp + bufs(i_buf)%sum_square_diffs
         
         
-        ! For calculating the average over n_g_r_t_to_average_over calculated G_s(r,t) and G_d(r,t) histograms, 
-        ! then for each time bin:
+        ! keep track of the sum of histogram values in order to later be able to calculate averages
         
         do i_time = 2, n_time_bin
           container%g_s_hists_sum(i_time)%val = container%g_s_hists_sum(i_time)%val + bufs(i_buf)%g_s_hists(i_time)%val

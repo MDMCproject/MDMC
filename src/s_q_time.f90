@@ -18,8 +18,8 @@ implicit none
   
   type s_q_time
     real(db), dimension(:), allocatable :: q
-    real(db) :: t_bin  ! this number together with the lenght of
-                            ! the time dimension determines the time binning
+    real(db) :: t_bin  ! lenght of a time bin. All time bins are assumed
+                       ! to be of equal lenght
                             
     real(db), dimension(:,:), allocatable :: self   ! dimensions (n_q, n_t_bin)
     real(db), dimension(:,:), allocatable :: diff   ! dimensions (n_q, n_t_bin)
@@ -55,7 +55,18 @@ contains
   end function get_s_q_time_n_t_bin 
 
 
-
+  ! Calculate diff and self intermediate scattering functions as:
+  !
+  ! S_d(q,t) = density * ((N-1)/N) * sum_over_i ( R_i(q) * ((g_d)_i(t)-1) )
+  ! and
+  ! S_s(q,t) = density * (1/N) * sum_over_i ( R_i(q) * ((g_s)_i(t)-1) ) when t>0 other = 1
+  !
+  ! where R_i is calculated by make_and_cal_integrat_over_r_precal()
+  ! and (g_d)_i(t) is the g_d value in the i'th spherical spacial shell
+  ! at time t. N is the number of atoms.
+  ! See also Eq. (23) page 27 in my handwritten notes for S_d
+  ! and Eq. (26a) and (27) page 28 for S_s
+  !
   subroutine cal_s_q_time(g_r_t, str, s_q_t)
     type(time_corr_hist_container), intent(in) :: g_r_t
     type(structure), intent(in) :: str
@@ -96,13 +107,13 @@ contains
     allocate(prefac_s_d(n_r))
     allocate(prefac_s_s(n_r))
     
-    ! This are to turn histogram counts in g functions. See page 29 equations
-    ! (29-30) in my notes
+    ! This are to turn histogram counts into g functions. See page 29 equations
+    ! (29-30) in my handwritten notes
     prefac_s_d =  g_r_t%volume_prefac / (density*(n_atom-1)*g_r_t%n_accum)
     prefac_s_s =  g_r_t%volume_prefac / (density*g_r_t%n_accum)
     
    
-    ! notice the was the calculation below could be done faster
+    ! note he calculation below could be done faster
     
     s_q_t%diff = 0
     s_q_t%self = 0
@@ -247,7 +258,8 @@ contains
 
   ! calculates 4pi/Q * [sin(Qr)/Q^2 - rcos(Qr)/Q] evaluated at r=i*delta_r minus evaluated
   ! at r=(i-1)*delta_r for i=1..Nr, where Nr is the number of r-bins.
-  ! See page 27, equation (24) in my notes
+  ! See page 27, equation (24) in my handwritten notes
+  !
   function make_and_cal_integrat_over_r_precal(n_r, bin_length, q) result(container)
     real(db), dimension(:), intent(in) :: q
     real(db), intent(in) :: bin_length

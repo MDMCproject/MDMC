@@ -42,6 +42,12 @@ implicit none
   
 contains
 
+  ! Calculate dynamical structure factors from intermediate scattering function as
+  !
+  ! S(q,omega) = (1/pi) * int_0^infinity ( cos(omega*t) * S(q,t)) dt
+  !
+  ! where this integral is approximated according to method make_and_cal_precal_cos_values()
+  !
   subroutine cal_s_q_omega(s_qt, str, s_qo)
     type(s_q_time), intent(in) :: s_qt
     type(structure), intent(in) :: str
@@ -81,7 +87,7 @@ contains
   ! Print S(q, omega) to either filename given by name_of_file or
   ! if this argument is not specified the name given by module 
   ! attribute filename_prefix + number
-
+  !
   subroutine print_s_q_omega(container, density, temperature, name_of_file)
     use flib_wxml
     type(s_q_omega), intent(in) :: container  
@@ -182,7 +188,11 @@ contains
   end function is_precal_cos_values_allocated
 
 
-
+  ! Calculate factors to convert S(q,t) to S(q,omega) that is:
+  ! S(q, omega) = precal(t_i)*S(q,t_i))
+  ! where this is an approximation to the fourier integral over time to get to S(q,omega)
+  ! This approximation is here done by using method 2 page 31 in my handwritten notes.
+  ! 
   function make_and_cal_precal_cos_values(n_t, time_length, omega) result(container)
     real(db), dimension(:), intent(in) :: omega
     real(db), intent(in) :: time_length

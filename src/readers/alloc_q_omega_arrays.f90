@@ -153,7 +153,6 @@ contains
     
 
     select case(name)                       
-      !case("G-d")
 	
     end select
 

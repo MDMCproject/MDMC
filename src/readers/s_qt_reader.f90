@@ -33,7 +33,7 @@ contains
     integer :: n_q_points, n_t_bin
     integer :: i, j
     
-    integer :: number_of_SQt  ! counts # of G-d elements
+    integer :: number_of_SQt  ! counts # of SQt elements
     
     ! before reading the rdf data file from a-to-z determine
     ! separately how many g-d elements it contains
@@ -138,7 +138,6 @@ contains
     
 
     select case(name)                       
-      !case("G-d")
 	
     end select
 

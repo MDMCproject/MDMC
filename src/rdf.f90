@@ -16,7 +16,7 @@ implicit none
   ! between (n-bins-1)*bin_length and n_bins*bin_length
   
   type rdf
-    ! Notice bin_length and is e.g. used in cal_rdf
+    ! bin_length is e.g. used in cal_rdf
     ! to make sure that the histogram passed to that function is 
     ! compatable with how g(r) is defined here
     
@@ -65,11 +65,14 @@ contains
     allocate(a_rdf%prefac(n_bins))
     
     
-    ! notice less accurate method of calculating volume elements is used
-    ! see my notes page 19aa
+    ! On pages 19a and 19aa of my handwritten notes I consider different 
+    ! possible choices for defining g(r). Here uses
+    ! 
+    !   g(r_i) = V * hist(r_i) / (n_atoms^2*4*pi*(r_i)^2*dr
     
-    ! 4*pi*r^2*dr = 4*pi*(n-1/2)^2*dr^3 is the volume of spherical shell
-    ! with width dr and center position dr*(n-1/2).
+    ! Calculate prefac = V / (n_atoms^2*4*pi*(r_i)^2*dr
+    ! Note 4*pi*(r_i)^2*dr = 4*pi*(i-1/2)^2*dr^3 
+    ! with width dr and center position r_i=dr*(i-1/2).
 
     temp = volume / (4.0 * pi_value * (n_atoms**2) * bin_length**3 )
     
@@ -101,7 +104,7 @@ contains
 
 
   ! Notice the a_rdf%val array are assumed to represent g(r) at the center
-  ! of each. That means at: 0.5*bin_length, 1.5*bin_length etc......
+  ! of each bin. That is at: 0.5*bin_length, 1.5*bin_length etc......
   ! The temperature is required to passed in dimensional units here.
   
   subroutine save_rdf(a_rdf, temperature, density)

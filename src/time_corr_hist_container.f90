@@ -23,10 +23,9 @@ implicit none
   type time_corr_hist_container
     integer :: n_accum
 
-    real(db) :: time_bin  ! otherwise time-binning not fully defined.
-                          ! time bin not in the sense of MD time step
+    real(db) :: time_bin  ! time bin not in the sense of MD time step
                           ! but time binning of G(r,t)
-                          ! Defined fully when calculating context for this 
+                          ! Defined fully when calculating content for this 
                           ! container
 
     ! dimensions are n_r_bin x n_t_bin
@@ -36,7 +35,7 @@ implicit none
     ! dimension is n_time   
     real(db), dimension(:), allocatable :: einstein_diffuse_exp
   
-    ! dimension is n_r_bin. Store 1/(4*pi*r^2*dr).
+    ! dimension is n_r_bin. Store the inverse volume of the spherical shells.
     real(db), dimension(:), allocatable :: volume_prefac 
     
   end type time_corr_hist_container
@@ -114,13 +113,12 @@ contains
     allocate(container%volume_prefac(n_r_bin))
     
     
-    ! cal volume element as (4*pi/3)*delta_r^3*(i^3 - (i-1)^3), where 
+    ! The exact volume of the i'th spherical shell is (4*pi/3)*delta_r^3*(i^3 - (i-1)^3), where 
     ! i = 1, 2, ... n_r_bin
     
     temp = 3.0 / ( 4.0 * pi_value * r_bin**3 )
     
     do i = 1, n_r_bin
-      !r_i = i - 0.5
       container%volume_prefac(i) = temp / ( i**3-(i-1)**3 )
     end do    
     
@@ -256,10 +254,19 @@ contains
 
 
   ! The temperature is assumed to be in dimensionless units.
-
+  ! Print 
+  !   g_s(r,t) = V*hist_s(r,t)
+  !              --------------------------------
+  !              N*volume_of_spherical_shell(r)
+  ! See also Eq. (30) page 29 in my handwritten notes.
+  !
+  ! Print to either filename given by name_of_file or
+  ! if this argument is not specified the name given by module 
+  ! attribute filename_prefix + number
+  !
   subroutine print_g_s(container, density, temperature)
     use flib_wxml
-    type(time_corr_hist_container), intent(inout) :: container  ! inout because volume_prefac modified
+    type(time_corr_hist_container), intent(in) :: container
     real(db), intent(in) :: density    
     real(db), optional, intent(in) :: temperature
     
@@ -267,6 +274,7 @@ contains
     integer :: i, n_eval_times, n_r_bin, i_bin
     real(db) :: r_bin
     character(len=50) :: filename
+    real(db) :: prefac
     
     if (filname_number2 < 10) then
       write(filename, '(i1)') filname_number2
@@ -316,23 +324,21 @@ contains
     call xml_NewElement(xf, "this-file-was-created")
     call xml_AddAttribute(xf, "when", get_current_date_and_time())
     call xml_EndElement(xf, "this-file-was-created")
-    
-    ! Because of the way this prefactor is defined. This function prints out \tilde{q}^2
-    ! See page 29 equation 30 in my notes.
-    container%volume_prefac = container%volume_prefac / (container%n_accum*density)
 
     do i = 1, n_eval_times    
       do i_bin = 1, n_r_bin
         call xml_NewElement(xf, "G-s")
         call xml_AddAttribute(xf, "r", str((i_bin-0.5)*r_bin, format="(f10.5)"))
         call xml_AddAttribute(xf, "t", str((i-1)*container%time_bin, format="(f10.5)"))
+        
+        ! calculate prefactor: V / ( N*volume_of_spherical_shell(r) )  
+        prefac = container%volume_prefac(i_bin) / (container%n_accum*density)
+        
         call xml_AddAttribute(xf, "G", str(container%g_s_hists_sum(i)%val(i_bin) * &
-                              container%volume_prefac(i_bin), format="(f15.5)"))
+                              prefac, format="(f15.5)"))        
         call xml_EndElement(xf, "G-s")
       end do 
     end do
-    
-    container%volume_prefac = container%volume_prefac * (container%n_accum*density)
     
     call xml_EndElement(xf, "G_s-space-time-pair-correlation-function")
     
@@ -341,13 +347,19 @@ contains
   end subroutine print_g_s
 
   ! The temperature is assumed to be in dimensionless units.
-  ! Print S(q,t) to either filename given by name_of_file or
+  ! Print 
+  !   g_d(r,t) = V*hist_d(r,t)
+  !              --------------------------------
+  !              N(N-1)*volume_of_spherical_shell(r)
+  ! See also Eq. (29) page 29 in my handwritten notes.
+  !
+  ! Print to either filename given by name_of_file or
   ! if this argument is not specified the name given by module 
   ! attribute filename_prefix + number
   !
   subroutine print_g_d(container, volume, n_atom, temperature, name_of_file)
     use flib_wxml
-    type(time_corr_hist_container), intent(inout) :: container  ! inout because volume_prefac modified  
+    type(time_corr_hist_container), intent(in) :: container
     real(db), intent(in) :: volume 
     real(db), intent(in) :: temperature
     integer, intent(in) :: n_atom
@@ -358,6 +370,7 @@ contains
     real(db) :: r_bin
     character(len=50) :: filename
     real(db) :: density
+    real(db) :: prefac    
     
     density = n_atom / volume
     
@@ -413,23 +426,21 @@ contains
     call xml_NewElement(xf, "this-file-was-created")
     call xml_AddAttribute(xf, "when", get_current_date_and_time())
     call xml_EndElement(xf, "this-file-was-created")
-    
-    ! Because of the way this prefactor is defined. This function prints out \tilde{q}^2
-    ! See page 29 equation 29 in my notes.
-    container%volume_prefac = container%volume_prefac / (container%n_accum*density*(n_atom-1))
 
     do i = 1, n_time_bin    
       do i_bin = 1, n_r_bin
         call xml_NewElement(xf, "G-d")
         call xml_AddAttribute(xf, "r", str((i_bin-0.5)*r_bin, format="(f10.5)"))
         call xml_AddAttribute(xf, "t", str((i-1)*container%time_bin, format="(f10.5)"))
+        
+        ! calculate prefactor: V / ( N(N-1)*volume_of_spherical_shell(r) )      
+        prefac = container%volume_prefac(i_bin) / (container%n_accum*density*(n_atom-1))
+        
         call xml_AddAttribute(xf, "G", str(container%g_d_hists_sum(i)%val(i_bin) * &
-                                           container%volume_prefac(i_bin), format="(f15.5)"))
+                                           prefac, format="(f15.5)"))        
         call xml_EndElement(xf, "G-d")
       end do 
     end do
-    
-    container%volume_prefac = container%volume_prefac * (container%n_accum*density*(n_atom-1))
     
     call xml_EndElement(xf, "G_d-space-time-pair-correlation-function")
     
@@ -442,14 +453,14 @@ contains
 
   subroutine print_h_s_hist(container, density, temperature)
     use flib_wxml
-    type(time_corr_hist_container), intent(inout) :: container  ! inout because volume_prefac modified
+    type(time_corr_hist_container), intent(in) :: container
     real(db), intent(in) :: density    
     real(db), optional, intent(in) :: temperature
     
     type (xmlf_t) :: xf
     integer :: i, n_eval_times, n_r_bin, i_bin
     real(db) :: r_bin
-    character(len=50) :: filename
+    character(len=50) :: filename   
     
 !    if (filname_number2 < 10) then
 !      write(filename, '(i1)') filname_number2
@@ -525,7 +536,7 @@ contains
 
   subroutine print_h_d_hist(container, density, temperature)
     use flib_wxml
-    type(time_corr_hist_container), intent(inout) :: container  ! inout because volume_prefac modified
+    type(time_corr_hist_container), intent(in) :: container
     real(db), intent(in) :: density    
     real(db), optional, intent(in) :: temperature
     

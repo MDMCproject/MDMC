@@ -196,17 +196,23 @@ contains
 
   density = size(my_ps%str%atoms) / product(my_ps%str%box_edges) ! for printing
 
-  call cal_time_corr_container(my_time_corr_container, my_ps, common_pe_list, c%md_per_time_bin, c%md_delta_t)   
+  write(print_to_screen, *) "Start calculating space-time histograms"  
+  call cal_time_corr_container(my_time_corr_container, my_ps, common_pe_list, c%md_per_time_bin, c%md_delta_t)
+  write(print_to_screen, *) "Write space-time correlations functions to disk"  
   call print_g_d(my_time_corr_container, product(my_ps%str%box_edges), size(my_ps%str%atoms), c%temperature)
   call print_h_d_hist(my_time_corr_container, density, c%temperature)
   call print_g_s(my_time_corr_container, density, c%temperature)
   call print_h_s_hist(my_time_corr_container, density, c%temperature)
   call print_einstein_diffuse_exp(my_time_corr_container, size(my_ps%str%atoms), density, c%temperature)
-
+  
+  write(print_to_screen, *) "Start calculating intermediate scattering function" 
   call cal_s_q_time(my_time_corr_container, my_ps%str, my_s_q_time)
+  write(print_to_screen, *) "Write intermediate scattering function to disk" 
   call print_s_q_time(my_s_q_time, density, c%temperature)
   
+  write(print_to_screen, *) "Start calculating dynamical structure factor function"   
   call cal_s_q_omega(my_s_q_time, my_ps%str, my_s_q_omega)
+  write(print_to_screen, *) "Write dynamical structure factors to disk"   
   call print_s_q_omega(my_s_q_omega, density, c%temperature)  
  
  ! -------- end time correlation -------------------------- !
