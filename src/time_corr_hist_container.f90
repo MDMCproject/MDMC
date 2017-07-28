@@ -29,6 +29,8 @@ implicit none
                           ! container
 
     ! dimensions are n_r_bin x n_t_bin
+    ! store the self and diff summed up histogram values which will be
+    ! used to calculate self and diff space-time pair correlation values
     type (histogram_cutdown), dimension(:), allocatable :: g_s_hists_sum
     type (histogram_cutdown), dimension(:), allocatable :: g_d_hists_sum    
     
@@ -254,7 +256,7 @@ contains
 
 
   ! The temperature is assumed to be in dimensionless units.
-  ! Print 
+  ! Print the self part of the space-time pair correlation function defined here as:
   !   g_s(r,t) = V*hist_s(r,t)
   !              --------------------------------
   !              N*volume_of_spherical_shell(r)
@@ -263,6 +265,12 @@ contains
   ! Print to either filename given by name_of_file or
   ! if this argument is not specified the name given by module 
   ! attribute filename_prefix + number
+  !
+  ! g_s values would probably more sensibly be saved as g-s elements instead
+  ! of G-s elements where these are related by G-s=density*g-s. These qualities
+  ! appears to be inconsistently used in the literature and where this would
+  ! become relevant maybe better (in addition) add attribute specifying the specific 
+  ! the mathetical formula used. 
   !
   subroutine print_g_s(container, density, temperature)
     use flib_wxml
@@ -347,7 +355,7 @@ contains
   end subroutine print_g_s
 
   ! The temperature is assumed to be in dimensionless units.
-  ! Print 
+  ! Print the diff part of the space-time pair correlation function defined here as:
   !   g_d(r,t) = V*hist_d(r,t)
   !              --------------------------------
   !              N(N-1)*volume_of_spherical_shell(r)
@@ -356,6 +364,12 @@ contains
   ! Print to either filename given by name_of_file or
   ! if this argument is not specified the name given by module 
   ! attribute filename_prefix + number
+  !
+  ! g_d values would probably more sensibly be saved as g-d elements instead
+  ! of G-d elements where these are related by G-d=density*g-d. These qualities
+  ! appears to be inconsistently used in the literature and where this would
+  ! become relevant maybe better (in addition) add attribute specifying the specific 
+  ! the mathetical formula used.   
   !
   subroutine print_g_d(container, volume, n_atom, temperature, name_of_file)
     use flib_wxml
