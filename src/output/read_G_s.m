@@ -1,4 +1,5 @@
-% Used to plot MDMC generated g_s time correlation functions
+% Used to plot MDMC generated normalised g_s space-time pair correlation 
+% functions
 
 function read_G_s(filename)
 % This function reads and plots \tilde{g}^s from a file, assumed

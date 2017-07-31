@@ -256,21 +256,24 @@ contains
 
 
   ! The temperature is assumed to be in dimensionless units.
-  ! Print the self part of the space-time pair correlation function defined here as:
-  !   g_s(r,t) = V*hist_s(r,t)
+  ! Print the "normalised" self part of the space-time pair correlation function defined here as:
+  !   (g^norm)_s(r,t) = V*hist_s(r,t)
   !              --------------------------------
   !              N*volume_of_spherical_shell(r)
   ! See also Eq. (30) page 29 in my handwritten notes.
+  !
+  ! (g^norm)_s has the property that (g^norm)_s(r,t)->1 when t->infinity and r->infinity.
+  ! It is used for calculation purposes but is also useful when plotting since it can then
+  ! easily be checked if this function behaves correctly in this limit.
+  ! It relation to the distinct part is: g^norm_s = N * g_s.
   !
   ! Print to either filename given by name_of_file or
   ! if this argument is not specified the name given by module 
   ! attribute filename_prefix + number
   !
-  ! g_s values would probably more sensibly be saved as g-s elements instead
-  ! of G-s elements where these are related by G-s=density*g-s. These qualities
-  ! appears to be inconsistently used in the literature and where this would
-  ! become relevant maybe better (in addition) add attribute specifying the specific 
-  ! the mathetical formula used. 
+  ! TODO: g_s values would probably more sensibly be saved as named g-s elements instead
+  ! of G-s elements where these are related by G-s=density*g-s, or alternatively
+  ! could add attribute specifying the specific the mathetical formula used.  
   !
   subroutine print_g_s(container, density, temperature)
     use flib_wxml
@@ -355,21 +358,24 @@ contains
   end subroutine print_g_s
 
   ! The temperature is assumed to be in dimensionless units.
-  ! Print the diff part of the space-time pair correlation function defined here as:
-  !   g_d(r,t) = V*hist_d(r,t)
+  ! Print the "normalised" distinct part of the space-time pair correlation function defined here as:
+  !   (g^norm)_d(r,t) = V*hist_d(r,t)
   !              --------------------------------
   !              N(N-1)*volume_of_spherical_shell(r)
   ! See also Eq. (29) page 29 in my handwritten notes.
+  !
+  ! (g^norm)_d has the property that (g^norm)_d(r,t)->1 when t->infinity and r->infinity.
+  ! It is used for calculation purposes but is also useful when plotting since it can then
+  ! easily be checked if this function behaves correctly in this limit.
+  ! It relation to the distinct part is: g^norm_d = N * g_d / (N-1).
   !
   ! Print to either filename given by name_of_file or
   ! if this argument is not specified the name given by module 
   ! attribute filename_prefix + number
   !
-  ! g_d values would probably more sensibly be saved as g-d elements instead
-  ! of G-d elements where these are related by G-d=density*g-d. These qualities
-  ! appears to be inconsistently used in the literature and where this would
-  ! become relevant maybe better (in addition) add attribute specifying the specific 
-  ! the mathetical formula used.   
+  ! TODO: g_d values would probably more sensibly be saved as named g-d elements instead
+  ! of G-d elements where these are related by G-d=density*g-d, or alternatively
+  ! could add attribute specifying the specific the mathetical formula used.   
   !
   subroutine print_g_d(container, volume, n_atom, temperature, name_of_file)
     use flib_wxml

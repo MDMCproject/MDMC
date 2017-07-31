@@ -1,4 +1,10 @@
-% Used to plot MDMC generated g_d time correlation functions
+% Used to plot MDMC generated g_d space-time pair correlation functions. 
+% As of this writing MDMC outputs the "normalised" version of this function
+% which has the property that (g^norm)_d(r,t) -> 1 when t->infinity and
+% r->infinity. Note (g^norm)_d(r,t) = N * g_d(r,t) / (N-1).
+%
+% Note the space-time correlation function is related to the space-time
+% pair correlation function by G_d = rho * g_d, where rho is N/V.
 
 function read_g_d(filename)
 
@@ -45,5 +51,5 @@ end
 surf(r, t, G_d')
 xlabel('r [AA]')
 ylabel('t [10\^-13 s]')
-zlabel('G\_d (r,t)')
+zlabel('"normalised" g_d (r,t)')
 title(char(top_element.item(0).getAttribute('title')))
