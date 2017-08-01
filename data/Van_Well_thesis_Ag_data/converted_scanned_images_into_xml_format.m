@@ -1,4 +1,22 @@
-% read in 1st column
+% Converting argon data in van Well's thesis to XML input file suitable 
+% to be read the MDMC software
+%
+% The units in van Well's thesis:
+%                                S(q,omega) [ps]
+%                                omega [ps^-1]
+%                                q [nm-1]
+%
+% Units of MDMC software:
+%
+%                                S(q,omega) [0.1ps]=[10^-13s]
+%                                omega [ps^-1]=[(10^-13s)^-1]=[10^13s^-1]
+%                                q [AA-1]=[10^-10m]
+%
+
+
+% Read in 1st S(q, omega) column from Table V pages 41-42 in thesis 
+% Format in Table for S(q,omega) value: 0.0694(27) where (27) is error 
+% and this value needs to be multiplied by 0.0001.
 
 fid = fopen('table_V_column1.txt','r');
 
@@ -72,7 +90,6 @@ while 1
   sigma_S_Q_Omega_3(i_q, i_omega) = str2num(dummy((fisse_begin(1)+1):(fisse(1)-1)))*0.0001;
   
   for i_q = 2 : 8
-    %kus = str2num(dummy((fisse(i_q-1)+2):(fisse(i_q-1)+2+5)))
     S_Q_Omega_3(i_q, i_omega) = str2num(dummy((fisse(i_q-1)+2):(fisse(i_q-1)+2+5)));
     sigma_S_Q_Omega_3(i_q, i_omega) = str2num(dummy((fisse_begin(i_q)+1):(fisse(i_q)-1)))*0.0001;
   end
