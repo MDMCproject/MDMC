@@ -1,10 +1,21 @@
-! FOM function which compare 'data' g_d(r,t) with calculated g_d(r,t) where
+! FOM function which compare "normalised" g_d(r,t) data with calculated g_d(r,t) equivalent where
 !
-!   g_d(r,t) = V*hist_d(r,t)
-!              --------------------------------
-!              N(N-1)*volume_of_spherical_shell(r)
+!   (g^norm)_d(r,t) =           V*hist_d(r,t)
+!                     --------------------------------
+!                     N(N-1)*volume_of_spherical_shell(r)
 !
 ! See also Eq. (29) page 30 in my handwritten notes
+!
+! g_d(r,t) is the distinct part of the space-time pair correlation function
+! and is related very simply the space-time correlation function G_d(r,t)
+! (also called van Hove correlation function) as G_d(r,t) = rho * g_d(r,t) 
+! where rho is V/N i.e. the density. 
+!
+! (g^norm)_d(r,t) = N * g_d(r,t) / (N-1) which has the visual convenient 
+! property that -> 1 when t->infinity and r->infinity
+!
+! In practice not sure if you would ever have real data with this format,
+! but this FOM may be useful nevertheless for some cases
 
 module g_d_rt_fom_class
 use various_constants_class

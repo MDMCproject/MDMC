@@ -1,3 +1,20 @@
+! FOM function which compares g(r) data with calculated g(r) equivalent.
+!
+! g(r) the radial distribution function, also called the pair distribution function
+! and pair correlation function in the literature.
+!
+! One defintion of g(r) is that it equals the distinct part of the space-time pair correlation 
+! function g_d(r,t) when t=0; the _d is dropped when only interested in structural information. 
+!
+! g(r) is calculated as
+!
+!   g(r) =  V*hist(r)
+!           --------------------------------
+!           N^2 * volume_of_spherical_shell(r)
+!
+! See also Eq. (6) page 19aa in my handwritten notes
+!    
+    
 module rdf_fom_class
 use various_constants_class
 use structure_class

@@ -1,3 +1,15 @@
+! FOM function which compare dynamical structure factor S(q,omega) data 
+! with calculated S(q,omega) equivalent where
+!
+!   S(q,omega) = 1/(2*pi) * integral ( exp(i*q*r-omega*t)*G(r,t)*dr*dt )
+!
+! G(r,t) is the space-time correlation function (van Hove correlation function). It
+! assumes here units of AA^-3. Time is measured in units of 10^-13s=0.1ps and 
+! therefore the unit of S(q,omega) is assumed to 0.1ps. A unit of time is
+! also a unit of inverse frequency. Further the unit of q is AA^-1 and unit
+! of omega 1/(0.1ps).
+!
+    
 module s_q_omega_fom_class
 use various_constants_class
 use structure_class

@@ -1,3 +1,13 @@
+! FOM function which compare intermediate scattering function S(q,t) data 
+! with calculated S(q,t) equivalent where
+!
+!   S(q,t) = integral ( exp(i*q*r)*G(r,t)*dr )
+!
+! G(r,t) is the space-time correlation function (van Hove correlation function). It
+! assumes here units of AA^-3, and it follows that S(q,t) is dimensionless. 
+! Time is measured in units of 10^-13s=0.1ps and q is AA^-1.
+!
+    
 module s_q_time_fom_class
 use various_constants_class
 use structure_class
