@@ -119,7 +119,7 @@ omega = [omega 11:1:20];
 omega = omega / 10.0;  % to convert from 1/ps to 1/[10^-13 s]
 
 
-% create symmetried van Well data (i.e. as van Well's presents his data)
+% create symmetrised van Well data (i.e. as van Well's presents his data)
 
 docNode = com.mathworks.xml.XMLUtils.createDocument('s-q-omega');
 docRootNode = docNode.getDocumentElement;
@@ -153,7 +153,7 @@ xmlFileName = 'Well_s_q_omega_Ag_data.xml';
 xmlwrite(xmlFileName,docNode);
 clear docNode;
 
-% create unsymmetried van Well data
+% create unsymmetrised van Well data
 
 kB_T = 10.3408; % at t=120K
 omega_convertion = 6.582; % i.e. omega = 1*10^13 s^-1   translate to   hbar*omega = 6.582 meV
@@ -167,7 +167,7 @@ docRootNode_un.setAttribute('omega-unit' , '1/[10^-13 s]');
 docRootNode_un.setAttribute('S-unit' , '0.1ps');
 thisElement_un = docNode_un.createElement('description');
 thisElement_un.appendChild... 
-    (docNode_un.createTextNode(['Un-symmetried copy of data from A. A. Van Well thesis.' ...
+    (docNode_un.createTextNode(['Un-symmetrised copy of data from A. A. Van Well thesis.' ...
     ' Table V page 41-2. Ag S(Q,Omega) data.']));
 docRootNode_un.appendChild(thisElement_un); 
 for j = 1 : length(omega)
@@ -186,7 +186,7 @@ for j = 1 : length(omega)
 end
  
 % Save un-symmetries data
-xmlFileName_un = 'Well_s_q_omega_Ag_data_unsymmetried.xml';
+xmlFileName_un = 'Well_s_q_omega_Ag_data_unsymmetrised.xml';
 xmlwrite(xmlFileName_un,docNode_un);
 
 
@@ -204,14 +204,14 @@ for i = 1 : length(q)
    S_Q_Omega_un(i,:) = S_Q_Omega(i,:) .* exp(0.5*omega*omega_convertion/kB_T);
 end
 surf(q,omega, S_Q_Omega_un')
-title('un-symmetried S(q,\omega )')
+title('un-symmetrised S(q,\omega )')
 xlabel('q [AA^{-1}]')
 ylabel('\omega  [10^{13} s^{-1}]')
 zlabel('[10^{-13} s]')
 
 subplot(1,3,3)
 surf(q,omega, S_Q_Omega_un' - S_Q_Omega')
-title('unsymmetried S(q,\omega ) - S(q,\omega )')
+title('unsymmetrised S(q,\omega ) - S(q,\omega )')
 xlabel('q [AA^{-1}]')
 ylabel('\omega  [10^{13} s^{-1}]')
 zlabel('[10^{-13} s]')
