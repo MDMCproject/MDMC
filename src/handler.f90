@@ -128,11 +128,25 @@ contains
     ! if in use-near-neighbour-method
     if (in_use_near_neighbour_method) then
       select case(name)
-        case("delta-r")       
+        case("delta-r")
+          ! check unit
+          call get_value(attributes,"units",units,status)
+          if (units /= "AA") then
+            write(*,*) "ERROR, unit of delta-r must be in AA"
+            stop
+          end if 
+
           call get_value(attributes,"val",read_db,status)
           nn_list_delta_r = string_to_db(read_db)
           
-        case("r-cut")       
+        case("r-cut")
+          ! check unit
+          call get_value(attributes,"units",units,status)
+          if (units /= "AA") then
+            write(*,*) "ERROR, unit of r-cut must be in AA"
+            stop            
+          end if
+          
           call get_value(attributes,"val",read_db,status)
           nn_list_r_cut = string_to_db(read_db)      
       end select
@@ -159,20 +173,39 @@ contains
           setup_md_control_params%adjust_temp_at_interval = string_to_int(read_int)
             
         case("temperature")       
+          ! check unit
+          call get_value(attributes,"units",units,status)
+          if (units /= "Kelvin") then
+            write(*,*) "ERROR, unit of temperature must be in Kelvin"
+            stop            
+          end if            
+            
+          ! read temperature and convert it to internal temperature unit
           call get_value(attributes,"val",read_db,status)
-          
-          ! to convert to dimensionless units
           setup_md_control_params%temperature = string_to_db(read_db) / T_unit
             
         case("time-step")       
+          ! check unit
+          call get_value(attributes,"units",units,status)
+          if (units /= "10e-13s") then
+            write(*,*) "ERROR, unit of time-step must be in 10e-13s"
+            stop            
+          end if 
+          
           call get_value(attributes,"val",read_db,status)
           setup_md_control_params%md_delta_t = string_to_db(read_db)
-               
         
         case("calculate-rdf")
           setup_md_control_params%calculate_rdf = .true.   
         
-        case("r-max")       
+        case("r-max")
+          ! check unit
+          call get_value(attributes,"units",units,status)
+          if (units /= "AA") then
+            write(*,*) "ERROR, unit of r-max must be in AA"
+            stop            
+          end if
+          
           call get_value(attributes,"val",read_db,status)
           
           ! it is assumed for now that r-max should be smaller than L/2 here
@@ -184,7 +217,14 @@ contains
           
           setup_md_control_params%r_max = number_db    
           
-        case("bin-length")       
+        case("bin-length")
+          ! check unit
+          call get_value(attributes,"units",units,status)
+          if (units /= "AA") then
+            write(*,*) "ERROR, unit of bin-length must be in AA"
+            stop            
+          end if
+          
           call get_value(attributes,"val",read_db,status)
           setup_md_control_params%bin_length = string_to_db(read_db)                                           
                           
@@ -252,7 +292,7 @@ contains
         case("temperature")       
           call get_value(attributes,"val",read_db,status)
           
-          ! to convert to dimensionless units
+          ! read and to convert to internal temperature units
           setup_mdmc_control_params%temperature = string_to_db(read_db) / T_unit           
             
         case("time-step")       
@@ -319,6 +359,13 @@ contains
           call add_function(common_pe_list, target_lj_pe)
           
         case("sigma")
+          ! check unit
+          call get_value(attributes,"units",units,status)
+          if (units /= "AA") then
+            write(*,*) "ERROR, unit of sigma must be in AA"
+            stop            
+          end if
+          
           call get_value(attributes,"val",read_db,status)
           call add_func_param(target_lj_pe%params, "sigma", string_to_db(read_db))
           
@@ -345,6 +392,13 @@ contains
           end if
           
         case("epsilon")
+          ! check unit
+          call get_value(attributes,"units",units,status)
+          if (units /= "KJ/mole") then
+            write(*,*) "ERROR, unit of epsilon must be in KJ/mole"
+            stop            
+          end if
+          
           call get_value(attributes,"val",read_db,status)
           call add_func_param(target_lj_pe%params, "epsilon", string_to_db(read_db))
            
@@ -370,8 +424,14 @@ contains
           
           
         case("r-cut")
+          ! check unit
+          call get_value(attributes,"units",units,status)
+          if (units /= "AA") then
+            write(*,*) "ERROR, unit of r-cut must be in AA"
+            stop            
+          end if
+          
           call get_value(attributes,"val",read_db,status)
-
           call add_func_param(target_lj_pe%params, "r-cut", string_to_db(read_db))      
           
       end select

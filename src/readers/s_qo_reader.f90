@@ -14,6 +14,7 @@ use time_corr_algorithm_class
 contains
 
   ! read S(q,omega) data from file and store in target_s_qo_fom
+  ! Units are assumed to S-unit="0.1ps"="10^-13s" omega-unit="1/[10^-13 s]" q-unit="AA^-1"
   !
   subroutine make_s_qo_fom_container(filename)
     use flib_sax  

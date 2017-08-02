@@ -180,6 +180,7 @@ contains
     character(len=40) :: read_db
     character(len=40) :: control_object_name, read_number_atoms
     integer :: number_atoms
+    character(len=40) :: units
     
     character(len=120) :: filename
 
@@ -188,6 +189,13 @@ contains
         call get_value(attributes,"title", common_config%str%title, status)
         
       case("box-edges")
+        ! check unit
+        call get_value(attributes,"units",units,status)
+        if (units /= "AA") then
+          write(*,*) "ERROR, unit of box-edges must be in AA"
+          stop            
+        end if
+          
         call get_value(attributes,"x", read_db,status)
         common_config%str%box_edges(1) = string_to_db(read_db)
 
@@ -199,6 +207,13 @@ contains
         
     
       case("atomArray")
+        ! check unit
+        call get_value(attributes,"units",units,status)
+        if (units /= "AA") then
+          write(*,*) "ERROR, unit of atomArray must be in AA"
+          stop            
+        end if
+          
         call get_value(attributes,"number", read_number_atoms,status)
         
         if (status /= 0) then

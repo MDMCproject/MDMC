@@ -10,7 +10,7 @@ implicit none
   integer, parameter :: ndim = 3
   
   
-  ! this code work does it calculations assuming:
+  ! this code does it calculations assuming:
   !
   !   m_unit = 1 AMU = 10^-3 KG/MOL
   !   r_unit = 10^-10 METER

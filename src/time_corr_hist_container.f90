@@ -367,7 +367,7 @@ contains
   ! (g^norm)_d has the property that (g^norm)_d(r,t)->1 when t->infinity and r->infinity.
   ! It is used for calculation purposes but is also useful when plotting since it can then
   ! easily be checked if this function behaves correctly in this limit.
-  ! It relation to the distinct part is: g^norm_d = N * g_d / (N-1).
+  ! Its relationship to the "unnormalised" distinct part is: g^norm_d = N * g_d / (N-1).
   !
   ! Print to either filename given by name_of_file or
   ! if this argument is not specified the name given by module 

@@ -14,12 +14,24 @@ use time_corr_algorithm_class
 contains
 
 
-  ! read g_d(r,t) data from file and store in target_g_d_rt_fom where g_d is assumed equal
+  ! read the "normalised" distinct part of the space-time pair correlation function g_d(r,t) data 
+  ! from file and store in target_g_d_rt_fom where g_d is assumed equal
   !
-  !   g_d(r,t) = V*hist_d(r,t)
+  !   (g^norm)_d(r,t) = V*hist_d(r,t)
   !              --------------------------------
   !              N(N-1)*volume_of_spherical_shell(r)
   !
+  ! Units are assumed to be time-unit="10^-13 s" and r-units="AA"
+  ! (g^norm)_d is per its definition dimensionless
+  !
+  ! (g^norm)_d has the property that (g^norm)_d(r,t)->1 when t->infinity and r->infinity.
+  ! Its relationship to the "unnormalised" distinct part is: g^norm_d = N * g_d / (N-1).
+  !
+  ! TODO: g_d values would probably more sensibly be required to be loaded as named g-d elements instead
+  ! of G-d elements where these are related by G-d=density*g-d. Capital G(r,t) here refer
+  ! to the space-time correlation function also called van Hove correlation function and
+  ! time-dependent correlation function
+  
   subroutine make_g_d_rt_fom_container(filename)
     use flib_sax  
     use flib_xpath    
@@ -54,8 +66,6 @@ contains
     if (iostat /= 0) stop "No bin-length attribute in g_d data file."
     r_bin = string_to_db(read_db)   
     
-    !print *, "r_bin = ", r_bin
-    
     call get_value(structure_attributes,"density",read_db,status=iostat)
     if (iostat /= 0) stop "No density attribute in g_d data file."
     target_g_d_rt_fom%density = string_to_db(read_db)  
@@ -63,12 +73,7 @@ contains
     call get_value(structure_attributes,"n-atom",read_int,status=iostat)
     if (iostat /= 0) stop "No n-atom attribute in g_d data file."
     target_g_d_rt_fom%n_atom = string_to_int(read_int)
-        
-    !print *, target_g_d_rt_fom%n_atom   
-        
-    !stop    
-        
-     
+             
     
     ! count first g_d element
     

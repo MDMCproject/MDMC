@@ -98,7 +98,8 @@ contains
           if (units == "atom/AA3") then
             density = string_to_db(read_db)
           else
-            ! convert other units to atom/AA3 somehow
+            write(*,*) "ERROR, unit of density currently must be in atom/AA3"
+            stop            
           end if
           
         case("number-of-unit-cells")

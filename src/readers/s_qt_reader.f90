@@ -14,6 +14,8 @@ use time_corr_algorithm_class
 contains
 
   ! read S(q,t) data from file and store in target_s_qt_fom
+  ! Units are assumed to be: q-units="AA^-1" time-unit="10^-13 s"
+  ! S(q,t) is per definition dimensionless 
   !
   subroutine make_s_qt_fom_container(filename)
     use flib_sax  
