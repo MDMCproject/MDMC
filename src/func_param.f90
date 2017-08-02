@@ -96,6 +96,7 @@ contains
     
     do i = 1, params%number_of_items
       if (params%p(i)%fixed == .false.) then
+          ! get a random number between 0 and 1
 	      call random_number(ran_num)  
   	    
         params%p(i)%val = params%p(i)%val + params%p(i)%max_move*(ran_num-0.5)

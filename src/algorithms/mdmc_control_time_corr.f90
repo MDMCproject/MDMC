@@ -374,6 +374,7 @@ contains
           ! new parameters accepted
         accept_parameters = .true.    
       else
+        ! get random number between 0 and 1
         call random_number(ran_num)
           
         if(exp(- delta_fom / c%temperature_mc) > ran_num) then

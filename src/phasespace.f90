@@ -258,7 +258,7 @@ contains
     ! assign random velocities
 
     do i = 1, n_tot
-      ! generate random numbers not in predictable sequence
+      ! generate random number between 0 and 1
       call random_number(ps%p(i,:))
       
       ps%p(i,:) = ps%p(i,:) * momentum_scale / sqrt(sum(ps%p(i,:)*ps%p(i,:)))

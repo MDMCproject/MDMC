@@ -1,7 +1,7 @@
 ! FOM function which compare dynamical structure factor S(q,omega) data 
 ! with calculated S(q,omega) equivalent where
 !
-!   S(q,omega) = 1/(2*pi) * integral ( exp(i*q*r-omega*t)*G(r,t)*dr*dt )
+!   S(q,omega) = 1/(2*pi) * integral ( exp(i*[q*r-omega*t])*G(r,t)*dr*dt )
 !
 ! G(r,t) is the space-time correlation function (van Hove correlation function). It
 ! assumes here units of AA^-3. Time is measured in units of 10^-13s=0.1ps and 
