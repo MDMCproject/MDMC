@@ -1,40 +1,22 @@
 <job>
-<!--
-  <structure filename="../tests/recover_CCL4_FQ/CCl4_rmc++.xml"> </structure>
--->
 
-  <!-- When the attribute what-init-structure-to-build is defined the 
-       x-direction box edge length is:
-              nx*(density[atom/AA3])^(-1/3)           when simple-cubic
-              4^1/3 * nx*(density[atom/AA3])^(-1/3)   when fcc 
-              
-       Notice the density of liquid Ar at P=1atm and T=85K is 
-       rho = 1.41g/cm^3 = 0.02125atoms/AA3        
-       -->
+  <!-- Define structure from file -->
+  <!--
+  <structure filename="some_structure.xml"> </structure>
+  -->
+
+  <!-- Alternatively build structure in code -->
   <structure what-init-structure-to-build="simple-cubic">
     <title>Liquid Ar</title>
     <density units="atom/AA3" val="0.02125" />
     <number-of-unit-cells nx="8" ny ="8" nz="8" />
   </structure>
   
-  <!-- To not use nearest neighbour method include element below.
-      Notice Rapaport recomment delta-r values around 1.2AA.
-      Further if r-cut+delta-r > 'smallest box edge'/2 then
-      set r-cut = 'smallest box edge'/2 - delta-r 
-      -->    
+  <!-- Optionally use nearest neighbour method in MD simulations -->   
   <use-near-neighbour-method>
     <r-cut units="AA" val="3.821983" />   
     <delta-r units="AA" val="1.362" />            
-  </use-near-neighbour-method>  
-  
-  
-  <constraints>
-    <fnc-constraint filename="fnc.xml"></fnc-constraint>
-    <cutoff-constraint />
-    <coordination-constraint />
-    <soft-cutoff-constraint /> 
-  </constraints>
-  
+  </use-near-neighbour-method>    
   
   <fom>
     <rdf-fom>
@@ -56,7 +38,6 @@
            -->
       <r-cut units="AA" val="3.821983" />  
     </lj-potential>
-    <!-- <lookup-data-potential /> -->
   </gpe>
   
   <control-object name="md_gridsearch_control">
@@ -64,12 +45,7 @@
     <temperature units="Kelvin" val="85.0" />
     <time-step units="10e-13s" val="0.05" />  
 
-    <!-- Specify stuff with is done only once
-    
-         The average-over attribute of the total-steps-initial-equilibration
-         element specifies how many steps to average over when calculating
-         MD properties 
-         -->
+    <!-- Controlling the initial MD calibration -->
     <total-steps-initial-equilibration number="15000" average-over="1000" />
     <perform-initial-temperature-calibration>
       <total-step-temp-cali number="8000" />
@@ -80,8 +56,7 @@
     <mc-steps number="5" /> 
     <temperature-mc val="0.2" />    
     
-    <!-- specify stuff which is repeated mc-steps times 
-         -->
+    <!-- Controlling MD simulations between steps -->
     <md-steps-repeated-equilibration number="10000" average-over="1000" />
     <perform-repeated-temperature-calibration>
       <total-step-temp-cali-repeated number="5000" />
