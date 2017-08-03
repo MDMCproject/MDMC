@@ -1,0 +1,111 @@
+<job>
+
+  <!-- Define structure from file -->
+  <!--
+  <structure filename="some_structure.xml"> </structure>
+  -->
+
+  <!-- Alternatively build structure in code -->
+  <structure what-init-structure-to-build="fcc">
+    <title>Liquid Ar</title>
+    <density units="atom/AA3" val="0.0176" />
+    <number-of-unit-cells nx="6" ny ="6" nz="6" />
+  </structure>
+  
+  <!-- Optionally use nearest neighbour method in MD simulations -->    
+  <use-near-neighbour-method>
+    <r-cut units="AA" val="7.491" />   
+    <delta-r units="AA" val="1.364" />            
+  </use-near-neighbour-method>  
+  
+  <fom>
+    <!-- <g-d-rt-fom>
+      <data-file filename="data/argon/example_mdmc_generated_g_d_data.xml" />
+      <r-cut units="AA" min="0.0" max="10000.0" />
+      <t-cut units="AA" min="0.0" max="10000.0" />
+      <scale-factor val="1.0" />
+      <sigma val="1.0" />
+    </g-d-rt-fom>  
+    <s-qt-fom>
+      <data-file filename="data/argon/example_mdmc_generated_s_qt_data.xml" />
+      <scale-factor val="1.0" />
+    </s-qt-fom>  -->
+    <s-qo-fom>
+      <data-file filename="data/argon/Well_s_q_omega_Ag_data_unsymmetrised.xml" />
+      <scale-factor val="1.0" />
+      <ignore-errors />  <!-- If data contains errors ignore these -->
+    </s-qo-fom>
+  </fom> 
+  
+  <gpe>
+    <lj-potential>
+      <sigma units="AA" val="4.0" fixed="no" min="1.0" max="6.0" max-move="0.2" />
+      <epsilon units="KJ/mole" val="1.5"  fixed="no" min="0.2" max="5.0" max-move="0.2" /> 
+      
+      <!-- you can argue whether r-cut below is a property of this potentially,
+           but for now you can optionally specify an r-cut value here, which
+           simply put the potential to zero for all r values higher than r-cut 
+           -->
+      <r-cut units="AA" val="100.0" />  
+    </lj-potential>
+  </gpe>
+  
+  <control-object name="mdmc_control_time_corr">
+  
+    <!-- Set time-step and target temperature for MD simulation -->
+    <temperature units="Kelvin" val="120.0" />
+    <time-step units="10e-13s" val="0.1075" />
+
+    <!-- Currently you are required to specify the points where data
+         were measured and these must match those of the date!
+         Apologies for the inconvenience of this -->
+    <q-values>
+      <q start="0.42" step="0.42" n-step="2" />
+      <q start="1.62" step="0.3" n-step="2" />
+      <q start="2.58" step="0.42" n-step="2" />
+      <q start="3.9" step="10000.0" n-step="0" />
+    </q-values>
+
+    <omega-values>
+      <omega start="0.0" step="0.02" n-step="10" />
+      <omega start="0.25" step="0.05" n-step="15" />
+      <omega start="1.1" step="0.1" n-step="9" />
+    </omega-values>
+    
+    <!-- Controlling the initial MD calibration -->
+    <total-steps-initial-equilibration number="50000" average-over="1000" />
+    <perform-initial-temperature-calibration>
+      <total-step-temp-cali number="40000" />
+      <adjust-temp-at-interval number="2000" />
+    </perform-initial-temperature-calibration>
+
+    <!-- Define how g(r,t) is calculated -->
+    <time-correlation>
+      <n-g-r-t-to-average-over number="20" />    <!-- Number of complete g(r,t)s to average over -->
+      <n-md-step-between-buffers number="100" />  <!-- how long between calculated g(r,t)s to better make calculated g(r,t) statistically independent -->
+      <md-per-time-bin number="7" />  <!-- Nummber of MD steps which make up a time bin -->
+      <n-time-bin number="250" /> <!-- Number of time bins -->
+    </time-correlation>
+
+    <mc-steps number="200" />
+    <temperature-mc val="1" />
+
+    <!-- Controlling MD simulations between MC steps -->
+    <md-steps-repeated-equilibration number="50000" average-over="1000" />
+    <perform-repeated-temperature-calibration>
+      <total-step-temp-cali-repeated number="40000" />
+      <adjust-temp-at-interval-repeated number="1000" />
+    </perform-repeated-temperature-calibration>
+    
+    <!-- for printing out radial distribution function -->
+    <calculate-rdf>
+      <!-- <cal-rdf-at-interval number="50" />
+      <average-over-this-many-rdf number="200" />
+      -->
+      <r-max units="AA" val="50.0" />
+      <bin-length units="AA" val="0.2" />
+    </calculate-rdf>    
+        
+  </control-object>
+
+</job>

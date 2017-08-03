@@ -1,44 +1,26 @@
 <job>
-<!--
-  <structure filename="../tests/recover_CCL4_FQ/CCl4_rmc++.xml"> </structure>
--->
 
-  <!-- When the attribute what-init-structure-to-build is defined the 
-       x-direction box edge length is:
-              nx*(density[atom/AA3])^(-1/3)           when simple-cubic
-              4^1/3 * nx*(density[atom/AA3])^(-1/3)   when fcc 
-              
-       Notice the density of liquid Ar at P=1atm and T=85K is 
-       rho = 1.41g/cm^3 = 0.02125 atoms/AA3        
-       -->
+  <!-- Define structure from file -->
+  <!--
+  <structure filename="some_structure.xml"> </structure>
+  -->
+
+  <!-- Alternatively build structure in code -->
   <structure what-init-structure-to-build="simple-cubic">
     <title>Liquid Ar</title>
     <density units="atom/AA3" val="0.020265" />
     <number-of-unit-cells nx="6" ny ="6" nz="6" />
   </structure>
   
-  <!-- To not use nearest neighbour method include element below.
-      Notice Rapaport recomment delta-r values around 1.2AA.
-      Further if r-cut+delta-r > 'smallest box edge'/2 then
-      set r-cut = 'smallest box edge'/2 - delta-r 
-      -->    
+  <!-- Optionally use nearest neighbour method in MD simulations -->    
   <use-near-neighbour-method>
     <r-cut units="AA" val="7.491" />   
     <delta-r units="AA" val="1.364" />            
   </use-near-neighbour-method>  
   
-  
-  <constraints>
-    <fnc-constraint filename="fnc.xml"></fnc-constraint>
-    <cutoff-constraint />
-    <coordination-constraint />
-    <soft-cutoff-constraint /> 
-  </constraints>
-  
-  
   <fom>
     <rdf-fom>
-      <rdf-data filename="../data/Argon_liquid_P1atm/xml_copy_of_robert_Ar.xml" />
+      <rdf-data filename="data/argon/xml_copy_of_robert_Ar.xml" />
       <r-max units="AA" val="10.0" />
       <scale-factor val="1.0" />
       <sigma val="1.0" />
@@ -50,17 +32,12 @@
       <sigma units="AA" val="3.7"             fixed="no" min="1.0" max="6.0" max-move="0.1" />
       <epsilon units="KJ/mole" val="2.0"  fixed="no" min="0.2" max="5.0" max-move="0.1" />
 
-      <!-- Ag values are: sigma units="AA" val="3.405"
-                          epsilon units="KJ/mole" val="0.9960172"
-           -->
-
       <!-- you can argue whether r-cut here is a property of this potentially,
            but for now you can optionally specify an r-cut value here, which
            simply put the potential to zero for all r values higher than r-cut 
            -->
       <r-cut units="AA" val="100.0" />  
     </lj-potential>
-    <!-- <lookup-data-potential /> -->
   </gpe>
   
   <control-object name="mdmc_control">
@@ -68,29 +45,23 @@
     <temperature units="Kelvin" val="85.0" />
     <time-step units="10e-13s" val="0.1075" />  
 
-    <!-- Specify stuff with is done only once
-    
-         The average-over attribute of the total-steps-initial-equilibration
-         element specifies how many steps to average over when calculating
-         MD properties 
-         -->
+    <!-- Controlling the initial MD calibration -->
     <total-steps-initial-equilibration number="8000" average-over="1000" />
     <perform-initial-temperature-calibration>
       <total-step-temp-cali number="4000" />
       <adjust-temp-at-interval number="200" />
     </perform-initial-temperature-calibration>
     
-    
     <mc-steps number="2" /> 
     <temperature-mc val="0.005" />    
     
-    <!-- specify stuff which is repeated mc-steps times 
-         -->
+    <!-- Controlling MD simulations between MC steps -->
     <md-steps-repeated-equilibration number="6000" average-over="1000" />
     <perform-repeated-temperature-calibration>
       <total-step-temp-cali-repeated number="3000" />
       <adjust-temp-at-interval-repeated number="200" />
     </perform-repeated-temperature-calibration>
+    
     <calculate-rdf>
       <cal-rdf-at-interval number="50" />
       <average-over-this-many-rdf number="20" />  
