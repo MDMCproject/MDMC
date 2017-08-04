@@ -20,7 +20,7 @@
   
   <fom>
     <rdf-fom>
-      <rdf-data filename="data/argon/xml_copy_of_robert_Ar.xml" />
+      <rdf-data filename="../data/Argon_liquid_P1atm/xml_copy_of_robert_Ar.xml" />
       <r-max units="AA" val="10.0" />
       <scale-factor val="1.0" />
       <sigma val="1.0" />

@@ -31,7 +31,7 @@
       <scale-factor val="1.0" />
     </s-qt-fom>  -->
     <s-qo-fom>
-      <data-file filename="data/argon/Well_s_q_omega_Ag_data_unsymmetrised.xml" />
+      <data-file filename="../data/Van_Well_thesis_Ag_data/Well_s_q_omega_Ag_data_unsymmetrised.xml" />
       <scale-factor val="1.0" />
       <ignore-errors />  <!-- If data contains errors ignore these -->
     </s-qo-fom>
