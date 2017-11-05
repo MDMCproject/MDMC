@@ -1,3 +1,7 @@
+! Histogram container for storing g(r,t).
+! It is assumed that the atomic system is isotropic and bins
+! in r represent spherical shells
+    
 module time_corr_hist_container_class
 use various_constants_class
 use structure_class
@@ -19,25 +23,26 @@ implicit none
             get_time_corr_hist_n_time_bin, get_time_corr_hist_n_r_bin
   
 
-
   type time_corr_hist_container
     integer :: n_accum
 
     real(db) :: time_bin  ! time bin not in the sense of MD time step
-                          ! but time binning of G(r,t)
-                          ! Defined fully when calculating content for this 
-                          ! container
+                          ! but time binning of g(r,t)
 
-    ! dimensions are n_r_bin x n_t_bin
+    ! dimension is n_r_bin x n_time_bin
     ! store the self and diff summed up histogram values which will be
     ! used to calculate self and diff space-time pair correlation values
+    
     type (histogram_cutdown), dimension(:), allocatable :: g_s_hists_sum
     type (histogram_cutdown), dimension(:), allocatable :: g_d_hists_sum    
     
-    ! dimension is n_time   
+    ! dimension is n_time_bin
+
     real(db), dimension(:), allocatable :: einstein_diffuse_exp
   
-    ! dimension is n_r_bin. Store the inverse volume of the spherical shells.
+    ! dimension is n_r_bin.
+    ! Store the inverse volume of the spherical shells.
+
     real(db), dimension(:), allocatable :: volume_prefac 
     
   end type time_corr_hist_container
@@ -65,7 +70,8 @@ contains
     end if  
   end subroutine check_if_time_corr_hist_container_is_allocated
 
-
+  ! Resetting variables to zero that are used for accumulating info
+  !
   subroutine clear_time_corr_hist_container(container)
     type(time_corr_hist_container), intent(inout) :: container
     
@@ -84,8 +90,10 @@ contains
   end subroutine clear_time_corr_hist_container
   
   
-  ! notice time_bin determines the time binnning
-
+  ! Creates a container for calculating g(r,t)
+  ! The r-binning is calculated from r_max and r_bin
+  ! The time binning from n_time_bin and time_bin
+  !
   function make_time_corr_hist_container(r_max, r_bin, n_time_bin, time_bin) result(container)
     real(db), intent(in) :: r_max, r_bin, time_bin
     integer, intent(in) :: n_time_bin
@@ -108,12 +116,9 @@ contains
       container%g_d_hists_sum(i) = make_histogram_cutdown(r_max, r_bin)
     end do
     
-    
     n_r_bin = size(container%g_s_hists_sum(1)%val)
     
-    
     allocate(container%volume_prefac(n_r_bin))
-    
     
     ! The exact volume of the i'th spherical shell is (4*pi/3)*delta_r^3*(i^3 - (i-1)^3), where 
     ! i = 1, 2, ... n_r_bin
@@ -172,15 +177,12 @@ contains
     call check_if_time_corr_hist_container_is_allocated(container)     
 
     n_r_bin = size(container%g_s_hists_sum(1)%val)
-    
-    !print *, "fiss3"
-    !print *,  n_r_bin
-  
+
   end function get_time_corr_hist_n_r_bin  
 
 
   ! The temperature is assumed to be in dimensionless units.
-
+  !
   subroutine print_einstein_diffuse_exp(container, n_atom, density, temperature)
     use flib_wxml
     type(time_corr_hist_container), intent(in) :: container
@@ -217,7 +219,8 @@ contains
     call xml_AddXMLDeclaration(xf, "UTF-8")
     call xml_NewElement(xf, "einstein-diffuse-exp")
     
-    ! notice convert units of temperature from dimensionless to K  
+    ! notice convert units of temperature from dimensionless to K
+    
     if (present(temperature) .and. present(density)) then
       call xml_AddAttribute(xf, "title", "T = " // trim(str(temperature * T_unit, format="(f10.5)")) // &
                                          " K: density = " // trim(str(density, format="(f10.5)")) &
@@ -235,7 +238,6 @@ contains
         
     call xml_AddAttribute(xf, "time-unit", "10^-13 s")
     call xml_AddAttribute(xf, "diffuse-units", "10^13 AA^2 s^-1")
-    
     
     call xml_NewElement(xf, "this-file-was-created")
     call xml_AddAttribute(xf, "when", get_current_date_and_time())
@@ -306,7 +308,6 @@ contains
     
     write(*,'(3a)') "Write ", trim(filename), " to disk"
     
-    
     n_eval_times = size(container%einstein_diffuse_exp)    
     n_r_bin = size(container%g_s_hists_sum(1)%val)
     r_bin = container%g_s_hists_sum(1)%bin_length
@@ -330,7 +331,6 @@ contains
     
     call xml_AddAttribute(xf, "time-unit", "10^-13 s")
     call xml_AddAttribute(xf, "r-units", "AA")
-    
     
     call xml_NewElement(xf, "this-file-was-created")
     call xml_AddAttribute(xf, "when", get_current_date_and_time())
@@ -356,6 +356,7 @@ contains
     call xml_Close(xf)    
   
   end subroutine print_g_s
+
 
   ! The temperature is assumed to be in dimensionless units.
   ! Print the "normalised" distinct part of the space-time pair correlation function defined here as:
@@ -415,8 +416,7 @@ contains
     end if
     
     write(*,'(3a)') "Write ", trim(filename), " to disk"
-    
-    
+        
     n_time_bin = size(container%einstein_diffuse_exp)    
     n_r_bin = size(container%g_s_hists_sum(1)%val)
     r_bin = container%g_s_hists_sum(1)%bin_length
@@ -426,7 +426,8 @@ contains
     call xml_AddXMLDeclaration(xf, "UTF-8")
     call xml_NewElement(xf, "G_d-space-time-pair-correlation-function")
     
-    ! notice convert units of temperature from dimensionless to K  
+    ! notice convert units of temperature from dimensionless to K
+
     call xml_AddAttribute(xf, "title", "T = " // trim(str(temperature * T_unit, format="(f10.5)")) // &
                                          " K")
     call xml_AddAttribute(xf, "density", str(density, format="(f10.5)"))
@@ -442,7 +443,6 @@ contains
     call xml_AddAttribute(xf, "time-unit", "10^-13 s")
     call xml_AddAttribute(xf, "r-units", "AA")
     
-    
     call xml_NewElement(xf, "this-file-was-created")
     call xml_AddAttribute(xf, "when", get_current_date_and_time())
     call xml_EndElement(xf, "this-file-was-created")
@@ -453,7 +453,8 @@ contains
         call xml_AddAttribute(xf, "r", str((i_bin-0.5)*r_bin, format="(f10.5)"))
         call xml_AddAttribute(xf, "t", str((i-1)*container%time_bin, format="(f10.5)"))
         
-        ! calculate prefactor: V / ( N(N-1)*volume_of_spherical_shell(r) )      
+        ! calculate prefactor: V / ( N(N-1)*volume_of_spherical_shell(r) )
+
         prefac = container%volume_prefac(i_bin) / (container%n_accum*density*(n_atom-1))
         
         call xml_AddAttribute(xf, "G", str(container%g_d_hists_sum(i)%val(i_bin) * &
@@ -470,7 +471,7 @@ contains
 
 
   ! Printing out normalised version (i.e. divided by n_accum) of h_s
-
+  !
   subroutine print_h_s_hist(container, density, temperature)
     use flib_wxml
     type(time_corr_hist_container), intent(in) :: container
@@ -482,27 +483,9 @@ contains
     real(db) :: r_bin
     character(len=50) :: filename   
     
-!    if (filname_number2 < 10) then
-!      write(filename, '(i1)') filname_number2
-!    else if (filname_number2 < 100) then
-!      write(filename, '(i2)') filname_number2
-!    else if (filname_number2 < 1000) then
-!      write(filename, '(i3)') filname_number2
-!    else
-!      write(*,*) "ERROR: in save_rdf"
-!      write(*,*) "It is assumed that you did not intend to write"
-!      write(*,*) "to disk 1000 rdf xml files!!!!"
-!      stop
-!    end if
-!    
-!    filname_number2 = filname_number2 + 1
-!    
-!    filename = filename_prefix2 // trim(filename) // ".xml"  ! here filename is just a number on rhs
-    
     filename = "output/h_s_histogram.xml"
     
     write(*,'(3a)') "Write ", trim(filename), " to disk"
-    
     
     n_eval_times = size(container%einstein_diffuse_exp)    
     n_r_bin = size(container%g_s_hists_sum(1)%val)
@@ -513,7 +496,8 @@ contains
     call xml_AddXMLDeclaration(xf, "UTF-8")
     call xml_NewElement(xf, "normalised-h-s-histogram")
     
-    ! notice convert units of temperature from dimensionless to K  
+    ! notice convert units of temperature from dimensionless to K
+
     if (present(temperature)) then
       call xml_AddAttribute(xf, "title", "T = " // trim(str(temperature * T_unit, format="(f10.5)")) // &
                                          " K: density = " // trim(str(density, format="(f10.5)")) &
@@ -527,13 +511,11 @@ contains
     
     call xml_AddAttribute(xf, "time-unit", "10^-13 s")
     call xml_AddAttribute(xf, "r-units", "AA")
-    
-    
+        
     call xml_NewElement(xf, "this-file-was-created")
     call xml_AddAttribute(xf, "when", get_current_date_and_time())
     call xml_EndElement(xf, "this-file-was-created")
     
-
     do i = 1, n_eval_times    
       do i_bin = 1, n_r_bin
         call xml_NewElement(xf, "h-s")
@@ -553,7 +535,7 @@ contains
 
 
   ! Printing out normalised version (i.e. divided by n_accum) of h_d 
-
+  !
   subroutine print_h_d_hist(container, density, temperature)
     use flib_wxml
     type(time_corr_hist_container), intent(in) :: container
@@ -565,27 +547,9 @@ contains
     real(db) :: r_bin
     character(len=50) :: filename
     
-!    if (filname_number2 < 10) then
-!      write(filename, '(i1)') filname_number2
-!    else if (filname_number2 < 100) then
-!      write(filename, '(i2)') filname_number2
-!    else if (filname_number2 < 1000) then
-!      write(filename, '(i3)') filname_number2
-!    else
-!      write(*,*) "ERROR: in save_rdf"
-!      write(*,*) "It is assumed that you did not intend to write"
-!      write(*,*) "to disk 1000 rdf xml files!!!!"
-!      stop
-!    end if
-!    
-!    filname_number2 = filname_number2 + 1
-!    
-!    filename = filename_prefix2 // trim(filename) // ".xml"  ! here filename is just a number on rhs
-    
     filename = "output/h_d_histogram.xml"
     
     write(*,'(3a)') "Write ", trim(filename), " to disk"
-    
     
     n_eval_times = size(container%einstein_diffuse_exp)    
     n_r_bin = size(container%g_d_hists_sum(1)%val)
@@ -611,12 +575,10 @@ contains
     call xml_AddAttribute(xf, "time-unit", "10^-13 s")
     call xml_AddAttribute(xf, "r-units", "AA")
     
-    
     call xml_NewElement(xf, "this-file-was-created")
     call xml_AddAttribute(xf, "when", get_current_date_and_time())
     call xml_EndElement(xf, "this-file-was-created")
     
-
     do i = 1, n_eval_times    
       do i_bin = 1, n_r_bin
         call xml_NewElement(xf, "h-d")
