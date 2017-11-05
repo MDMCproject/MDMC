@@ -60,46 +60,39 @@ contains
     logical :: accept_parameters ! for metropolis
     
     type (xmlf_t) :: xf
-
-
     call xml_OpenFile("output/mdmc_results.xml", xf, indent=.true.)
-    
     call xml_AddXMLDeclaration(xf, "UTF-8")
     call xml_NewElement(xf, "mdmc-control-results")
-
     call xml_AddAttribute(xf, "title", "rho = " // str(density, format="(f10.5)") &
                                          // "atoms/AA-3")
-    
     call xml_NewElement(xf, "this-file-was-created")
     call xml_AddAttribute(xf, "when", get_current_date_and_time())
     call xml_EndElement(xf, "this-file-was-created")
 	  
-	  
     if (print_to_file /= 0) then
       open(print_to_file, file="output/job_log.txt")
     end if
-
-	  		
+		
     write(print_to_file,*) "In run_mdmc_control_time_corr"
 
     call tic
 
-    ! initiate phasespace
+    ! prepare phasespaces
     
     my_ps = make_phasespace(a_config%str, c%temperature)
-    
     my_ps_old = copy_phasespace(my_ps)
-    
     my_ps_best = copy_phasespace(my_ps)
-                        
-                        
-    ! initiate time correlation histogram container
+
+    ! prepare various other containers
+
     my_time_corr_container = make_time_corr_hist_container(c%r_max, c%bin_length, c%n_time_bin, &
-                             c%md_per_time_bin * c%md_delta_t)
-    call clear_time_corr_hist_container(my_time_corr_container)                             
-                       
+                             c%md_per_time_bin * c%md_delta_t)                       
     my_s_q_time = make_s_q_time(c%q_values, c%md_per_time_bin * c%md_delta_t, c%n_time_bin)
     my_s_q_omega = make_s_q_omega(c%q_values, c%omega_values)
+    
+    ! Setting various variables that will be accumulated to zero
+    
+    call clear_time_corr_hist_container(my_time_corr_container)
                                          
 ! -------------- initial equilibration ---------------- !
 
@@ -130,7 +123,7 @@ contains
         
         if (mod(i,c%adjust_temp_at_interval) == 0) then
           ! see src/algorithms/md_gridsearch_control.doc for explanation of the expression below
-          !        
+
           temp_adjust_factor = sqrt(c%adjust_temp_at_interval * 1.5 * c%temperature / &
               sum_kin_energy * (size(my_ps%str%atoms)-1.0) / size(my_ps%str%atoms))
           my_ps%p = my_ps%p * temp_adjust_factor
@@ -182,7 +175,7 @@ contains
     ! First up check the temperature and the end of the simulation is OK
     
     if ( acceptable_temperature((2.0/ndim)*my_props.kin_energy.ave, &
-         c%temperature) == .false.) then
+         c%temperature, 0.2d+0) == .false.) then
          write(print_to_screen, *) "Initial equilibration did not reach equilibrium"
          write(print_to_screen, *) "Temperature outside acceptable value"
          stop
@@ -193,7 +186,7 @@ contains
     ! calibration
 
     if ( acceptable_energy(average_energy_end_of_temp_calibration, &
-         my_props.tot_energy.ave) == .false.) then
+         my_props.tot_energy.ave, 0.1d+0) == .false.) then
          write(print_to_screen, *) "Initial equilibration did not reach equilibrium - STOP"
          write(print_to_screen, *) "Total energy drift is too high since temperature calibration ended"
          stop
@@ -219,10 +212,8 @@ contains
   call print_s_q_time(my_s_q_time, density, c%temperature, "output/first_s_q_time.xml")
   call cal_s_q_omega(my_s_q_time, my_ps%str, my_s_q_omega)
   call print_s_q_omega(my_s_q_omega, density, c%temperature, "output/first_s_q_omega.xml")
-  !fom_val = func_val(my_time_corr_container, common_fom_list)
-  !fom_val = func_val(my_s_q_time, common_fom_list)
   fom_val = func_val(my_s_q_omega, common_fom_list)
-  call clear_time_corr_hist_container(my_time_corr_container) ! not sure if necessary!!?? 
+  call clear_time_corr_hist_container(my_time_corr_container)
   
   write(print_to_file,'(a,f14.5)') "1st FOM = ", fom_val
   write(print_to_file, '(a,f14.5)') "Finished cal 1st FOM. Time: ", toc()
@@ -236,7 +227,6 @@ contains
   call add_xml_attribute_func_params(xf, common_pe_list)
   call xml_AddAttribute(xf, "val", str(fom_val, format="(f14.5)"))
   call xml_EndElement(xf, "accept")    
-
 
   ! store best solution so far
   
@@ -257,18 +247,15 @@ contains
     fom_old = fom_val
     call backup_func_params(common_pe_list)
     call shallow_copy_phasespace(my_ps, my_ps_old)       
-      
-              
+                    
     do i = 1, c%mc_steps
 
       write (print_to_screen, *) "Begin MC step number ", i
-      
       write (print_to_file, *) "Begin MC step number ", i
       write (print_to_file, *) " "
 
       call move_random_func_params(common_pe_list)
       
-
       ! do MD simulation
       
       sum_kin_energy = 0.0
@@ -280,7 +267,8 @@ contains
 
         call md_cal_properties(my_ps, my_props, common_pe_list, pressure_comp, pot_energy)       
       
-      
+        ! As for initial MD simulation here also optionally adjust the temperature
+        
         if (i_md < c%total_step_temp_cali_repeated) then
           sum_kin_energy = sum_kin_energy + my_props%kin_energy%val
           if (mod(i_md,c%adjust_temp_at_interval_repeated) == 0) then
@@ -297,7 +285,6 @@ contains
         if (i_md == c%total_step_temp_cali_repeated) then
           average_energy_end_of_temp_calibration = my_props.tot_energy.ave 
         end if      
-        
         
         if (mod(i_md,c%average_over_repeated_equilibration) == 0) then 
           call md_print_properties(print_to_file, my_props)
@@ -317,13 +304,18 @@ contains
       !
       ! Note the (2.0/ndim) factor is to convert from dimensionless kin_energy per atom to 
       ! dimensionless temperature
+      !
+      ! Check temperature OK and if energy has been drifting too much
       
       if ( acceptable_temperature((2.0/ndim)*my_props.kin_energy.ave, &
-          c%temperature) == .false. .or. acceptable_energy(average_energy_end_of_temp_calibration, &
-          my_props.tot_energy.ave) == .false.) then
+          c%temperature, 0.2d+0) == .false. .or. acceptable_energy(average_energy_end_of_temp_calibration, &
+          my_props.tot_energy.ave, 0.1d+0) == .false.) then
         write(print_to_screen, *) "Did not reach equilibrium in MD run within MC loop"
         write(print_to_file, *) "Did not reach equilibrium in MD run within MC loop"
 
+        ! print out to mdmc_results.xml that that MD simulation failed to reach
+        ! equilibrium for this PE parameter values choice
+        
         call xml_NewElement(xf, "failed-md-run")
         call add_xml_attribute_func_params(xf, common_pe_list)
         call xml_EndElement(xf, "failed-md-run")   
@@ -334,16 +326,13 @@ contains
         cycle
       end if   
 
-
       ! cal time-dependent container, FOM etc
     
       call cal_time_corr_container(my_time_corr_container, my_ps, common_pe_list, c%md_per_time_bin, c%md_delta_t)   
       call cal_s_q_time(my_time_corr_container, my_ps%str, my_s_q_time)
       call cal_s_q_omega(my_s_q_time, my_ps%str, my_s_q_omega)
-      !fom_val = func_val(my_time_corr_container, common_fom_list)
-      !fom_val = func_val(my_s_q_time, common_fom_list)
       fom_val = func_val(my_s_q_omega, common_fom_list)
-      call clear_time_corr_hist_container(my_time_corr_container) ! not sure if necessary!!?? 
+      call clear_time_corr_hist_container(my_time_corr_container)
 
       write(print_to_file,'(a,f14.5)') "FOM = ", fom_val
       write(print_to_file, '(a,f14.5)') "Finished cal FOM. Time: ", toc()
@@ -448,12 +437,10 @@ contains
     call print_s_q_time(my_s_q_time, density, c%temperature, "output/best_s_q_time.xml")
     call cal_s_q_omega(my_s_q_time, my_ps%str, my_s_q_omega)
     call print_s_q_omega(my_s_q_omega, density, c%temperature, "output/best_s_q_omega.xml")
-    !fom_val = func_val(my_time_corr_container, common_fom_list)
-    !fom_val = func_val(my_s_q_time, common_fom_list)
     fom_val = func_val(my_s_q_omega, common_fom_list)
     call print_g_d(my_time_corr_container, product(my_ps%str%box_edges), size(my_ps%str%atoms), &
                    c%temperature, "output/best_g_d.xml")   
-    call clear_time_corr_hist_container(my_time_corr_container) ! not sure if necessary!!?? 
+    call clear_time_corr_hist_container(my_time_corr_container)
       
     write(print_to_file,'(a,f14.5)') "Best FOM found = ", fom_best_including_rejected
     write(print_to_file,'(a,f14.5)') "Best FOM found (re-calculated from different phase-space point) = ", fom_val   
@@ -462,11 +449,9 @@ contains
     write(print_to_file, '(a,f14.5)') "Finished printing best fom. Time: ", toc()
     write(print_to_file, *) " "
     
-
     print *, ' '
     write(print_to_screen,'(a,f11.2,a)') 'Job took ', toc(), ' seconds to execute.'
 
-    
     if (print_to_file /= 0) then
 	    close(print_to_file)
     end if    
@@ -477,29 +462,29 @@ contains
   end subroutine run_mdmc_control_time_corr
   
   
-  ! check to see if temperature is within certain limits of t_target
-  
-  function acceptable_temperature(t, t_target) result (yes_or_no)
-    real (db), intent(in) :: t, t_target
+  ! check to see if temperature is within percentage (where 1 is 100%) of t_target
+  !
+  function acceptable_temperature(t, t_target, percentage) result (yes_or_no)
+    real (db), intent(in) :: t, t_target, percentage
     logical :: yes_or_no 
     
     yes_or_no = .true.
     
-    if (abs((t - t_target)/t_target) > 0.2) then
+    if (abs((t - t_target)/t_target) > percentage) then
       yes_or_no = .false.
     end if
   end function acceptable_temperature
   
   
-  ! check to see if energy is within certain limits of t_target
-  
-  function acceptable_energy(e, e_target) result (yes_or_no)
-    real (db), intent(in) :: e, e_target
+  ! check to see if energy is within percentage (where 1 is 100%) of e_target
+  !
+  function acceptable_energy(e, e_target, percentage) result (yes_or_no)
+    real (db), intent(in) :: e, e_target, percentage
     logical :: yes_or_no 
     
     yes_or_no = .true.
     
-    if (abs((e - e_target)/e_target) > 0.1) then
+    if (abs((e - e_target)/e_target) > percentage) then
       yes_or_no = .false.
     end if
   end function acceptable_energy 
