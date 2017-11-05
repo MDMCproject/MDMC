@@ -123,31 +123,7 @@ contains
     ! here keep on calling do_time_correlation until enough buffers have 
     ! been calculated
     
-    do while (do_time_correlation(container, ps%str) == .false.)
-    
-! TO PRINT OUT FOR MOVIE - UNCOMMENT STUFF BELOW    
-!      if (filename_number < 500) then
-!      
-!        filename = ""
-!        if (filename_number < 10) then
-!          write(filename, '(i1)') filename_number
-!        else if (filename_number < 100) then
-!          write(filename, '(i2)') filename_number
-!        else if (filename_number < 1000) then
-!          write(filename, '(i3)') filename_number
-!        else
-!          write(*,*) "ERROR: in cal_full_time_correlation"
-!          stop
-!        end if
-!        
-!        filename = md_prefix // trim(filename) // ".xml"
-!        filename_number = filename_number + 1
-!    
-!        call save_structure(ps%str, filename)
-!      
-!      end if
-    
-    
+    do while (do_time_correlation(container, ps%str) == .false.)    
       call trajectory_in_phasespace(ps, f_list, md_per_time_bin, md_delta_t)
     end do
      

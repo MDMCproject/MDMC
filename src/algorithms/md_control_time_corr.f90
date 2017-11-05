@@ -103,11 +103,7 @@ contains
     ! to cal and print out s_q_time and s_q_omega
     
     my_s_q_time = make_s_q_time(c%q_values, c%md_per_time_bin * c%md_delta_t, c%n_time_bin)
-    my_s_q_omega = make_s_q_omega(c%q_values, c%omega_values)
-    
-    ! save raw structure
-    
-    !call save_structure(my_ps%str, "output/movie/raw_structure.xml")                                           
+    my_s_q_omega = make_s_q_omega(c%q_values, c%omega_values)                                         
                         
                
 ! -------------- initial equilibration ---------------- !
