@@ -10,6 +10,7 @@ implicit none
 
   public :: cal_time_corr_container
   public :: set_n_g_r_t_to_average_over, set_n_buffers  ! used in handler only
+  public :: get_n_g_r_t_to_average_over ! used in handler only
 
   private :: update_act_r 
   private :: allocate_buffer, reset_buffers
@@ -132,13 +133,11 @@ contains
   end subroutine cal_time_corr_container
 
 
-
   subroutine set_n_buffers(n)
     integer, intent(in) :: n
     
     n_buffers = n
   end subroutine set_n_buffers
-
 
 
   subroutine set_n_g_r_t_to_average_over(n)
@@ -147,6 +146,12 @@ contains
     n_g_r_t_to_average_over = n
   end subroutine set_n_g_r_t_to_average_over
 
+  
+  function get_n_g_r_t_to_average_over() result(n)
+    integer :: n
+    
+    n = n_g_r_t_to_average_over
+  end function get_n_g_r_t_to_average_over
   
   
   ! update act_r to str%r but without wrap-around

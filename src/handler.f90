@@ -46,6 +46,7 @@ use time_corr_algorithm_class
   integer, dimension(ndim), private :: n_param
   
   integer, private :: n_md_step_between_buffers  ! number of md steps between buffers
+  integer, private :: n_buffers  ! number of buffers
   
 contains
   
@@ -208,11 +209,15 @@ contains
           
           call get_value(attributes,"val",read_db,status)
           
-          ! it is assumed for now that r-max should be smaller than L/2 here
+          ! it is assumed for now that r-max should be smaller than half
+          ! the shortest box edge
           
           number_db = string_to_db(read_db)
           if (number_db > minval(common_config%str%box_edges)/2.05) then
             number_db = minval(common_config%str%box_edges)/2.05
+            print *, "Job file input r-max adjusted to be less than half of the shortest box edge."            
+            write(*,'(a,f10.4)') " r-max adjusted to: ", number_db
+            write(*, *) " "
           end if
           
           setup_md_control_params%r_max = number_db    
@@ -306,14 +311,18 @@ contains
           
         ! r-max and bin-length are here only used when wanting to save g(r) to file
           
-        case("r-max")       
+        case("r-max")
           call get_value(attributes,"val",read_db,status)
           
-          ! it is assumed for now that r-max should be smaller than L/2 here
+          ! it is assumed for now that r-max should be smaller than half
+          ! the shortest box edge
           
           number_db = string_to_db(read_db)
           if (number_db > minval(common_config%str%box_edges)/2.05) then
             number_db = minval(common_config%str%box_edges)/2.05
+            print *, "Job file input r-max adjusted to be less than half of the shortest box edge."            
+            write(*,'(a,f10.4)') " r-max adjusted to: ", number_db
+            write(*, *) " "
           end if
           
           setup_mdmc_control_params%r_max = number_db    
@@ -323,19 +332,19 @@ contains
           setup_mdmc_control_params%bin_length = string_to_db(read_db)        
           
           
-        ! time correlation stuff  
+        ! time correlation stuff, i.e. that contained within the <time-correlation> element
           
         case("n-md-step-between-buffers")       
+          ! This parameter is used to add a time delay between
+          ! buffers, where one buffer calculates one g(r,t). See also the
+          ! comments elsewhere in this file where n_md_step_between_buffers is used
           call get_value(attributes,"number",read_int,status)
-          
-          ! This parameter is used to calculate n_buffers just
-          ! before the execution of the control element
           n_md_step_between_buffers = string_to_int(read_int);                   
-           
+
         case("n-time-bin")       
           call get_value(attributes,"number",read_int,status)
           setup_mdmc_control_params%n_time_bin = string_to_int(read_int)
-          
+
         case("n-g-r-t-to-average-over")       
           call get_value(attributes,"number",read_int,status)
           
@@ -525,7 +534,7 @@ contains
   subroutine end_element(name)
     character(len=*), intent(in)   :: name
 
-    integer :: n_time_step_between_buffers
+    integer :: n_time_bin_between_buffers
 
     select case(name)
       case("constraints")
@@ -580,39 +589,67 @@ contains
         
         if (in_md_control_time_corr == .true. .or. in_mdmc_control_time_corr == .true.) then
           
-          ! Determine the number of time bins between when buffers start to calculate g(r,t), and
-          ! this is the subsequent gap between buffers
-
-          n_time_step_between_buffers = nint( dble(n_md_step_between_buffers) &
-            / dble(setup_mdmc_control_params%md_per_time_bin) )
-
-          ! For computing g(r,t), one per buffer, it is computationally most efficient if the total number
-          ! of time bins equals a multiple of the time bins between when individual buffers starts
-          ! to calculate g(r,t). 
-          ! Therefore, here, do enforce this adjust n_time_bin accordingly:
+          ! Within a 'buffer' a full g(r,t) is calculated.
+          ! A time bin for g(r,t) has the length: MD time step * md_per_time_bin.
+          ! Determine the number of time bins to use between when buffers individual 
+          ! buffers.
           
-          if ( mod(setup_mdmc_control_params%n_time_bin, n_time_step_between_buffers) /= 0) then
-              
-            setup_mdmc_control_params%n_time_bin = n_time_step_between_buffers &
-              * ceiling(dble(setup_mdmc_control_params%n_time_bin)/dble(n_time_step_between_buffers))
-            
-            print *, "n-time-bin adjusted to: ", setup_mdmc_control_params%n_time_bin
+          if (n_md_step_between_buffers > setup_mdmc_control_params%md_per_time_bin * &
+                                          setup_mdmc_control_params%n_time_bin) then
+            n_md_step_between_buffers = setup_mdmc_control_params%md_per_time_bin * setup_mdmc_control_params%n_time_bin
+            print *, "Job file input n-md-step-between-buffers too large."
+            print *, "Must to smaller than or equal to md-per-time-bin * n-time-bin."
+            print *, "n-md-step-between-buffers adjusted to: ", n_md_step_between_buffers
+            print *, " "
+          end if
+
+          n_time_bin_between_buffers = nint( dble(n_md_step_between_buffers) &
+            / dble(setup_mdmc_control_params%md_per_time_bin) )
+                    
+          print *, "Number of time bins between buffers for calculating g(r,t) = ", n_time_bin_between_buffers
+          print *, " "
+
+          ! For computing g(r,t), one per buffer, it is computationally most efficient if the number
+          ! of time bins used for calculating a g(r,t) is a multiple of the time bins between when 
+          ! individual buffers starts 
+          ! Therefore, adjust n_time_bin:
+          
+          if ( mod(setup_mdmc_control_params%n_time_bin, n_time_bin_between_buffers) /= 0) then
+            setup_mdmc_control_params%n_time_bin = n_time_bin_between_buffers &
+              * ceiling(dble(setup_mdmc_control_params%n_time_bin)/dble(n_time_bin_between_buffers))           
+            print *, "Job file n-time-bin adjusted to be a multiple of"
+            print *, "md-per-time-bin * n-md-step-between-buffers."
+            print *, "Job file n-time-bin adjusted to: ", setup_mdmc_control_params%n_time_bin
+            print *, " "
           end if      
           
-          ! A sanity check
+          ! A sanity check of the above code
           
-          if (n_time_step_between_buffers > &
+          if (n_time_bin_between_buffers > &
               setup_mdmc_control_params%n_time_bin) then
             write(*,*) " "
             write(*,*) "ERROR in handler.f90"
-            write(*,*) "n_time_step_between_buffers > setup_mdmc_control_params%n_time_bin"
+            write(*,*) "n_time_bin_between_buffers > setup_mdmc_control_params%n_time_bin"
             stop
+          end if
+    
+          ! Further it is a waste of memory (and computation) if the number of buffers
+          ! larger than the number of g(r,t) that needs calculating, which is n-g-r-t-to-average-over
+          ! TODO: adjust this automatically for the user instead
+          
+          n_buffers = setup_mdmc_control_params%n_time_bin/n_time_bin_between_buffers
+          if (n_buffers > get_n_g_r_t_to_average_over()) then
+            write(*,*) " "
+            write(*,*) "In Job file please increase n-md-step-between-buffers or n-g-r-t-to-average-over"
+            write(*,*) "otherwise when g(r,t) more buffers are created than needed."
+            write(*,*) "That is more buffers than n-g-r-t-to-average-over which is inefficient."
+            stop            
           end if
               
           ! Set the private attribute n_buffer in time_corr_container. n_buffer is
           ! the number of time bins between when g(r,t)s are calculated
           
-          call set_n_buffers( setup_mdmc_control_params%n_time_bin/n_time_step_between_buffers ) 
+          call set_n_buffers( n_buffers )
           
           
           if (in_mdmc_control_time_corr == .true.) then
