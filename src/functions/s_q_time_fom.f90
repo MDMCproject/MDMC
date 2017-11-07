@@ -40,7 +40,7 @@ implicit none
     ! integer :: n_atom 
     ! real(db) :: density
     
-    real(db) :: scale_factor = 1.0
+    real(db) :: scale_factor = 1.0 ! apply scale factor to calculated data
     
     character(len=120) :: title = " "
     

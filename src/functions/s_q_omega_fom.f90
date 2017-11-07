@@ -28,7 +28,7 @@ implicit none
     real(db), dimension(:), allocatable :: q 
     real(db), dimension(:), allocatable :: omega
 
-    real(db) :: scale_factor = 1.0
+    real(db) :: scale_factor = 1.0 ! apply scale factor to calculated data
     
     ! optional set to true to ignore data esds when calculating this fom
     logical :: ignore_errors = .false.    

@@ -35,8 +35,8 @@ implicit none
     
     type (rdf) :: rdf_cal
     
-    real(db) :: scale_factor = 1.0
-    real(db) :: weight = 1.0
+    real(db) :: scale_factor = 1.0 ! apply scale factor to calculated data
+    real(db) :: weight = 1.0 ! For scaling entire FOM
     
     character(len=120) :: title = " "
     

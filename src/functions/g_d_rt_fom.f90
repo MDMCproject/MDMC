@@ -91,8 +91,8 @@ contains
     
     prefac = time_corr%volume_prefac / (time_corr%n_accum*g_d_data%density*(g_d_data%n_atom-1))
 
-    do i_t = 1, g_d_data%n_t_bin  !g_d_data%t_cut(1), g_d_data%t_cut(2)    
-      do i_r = 1, g_d_data%n_r_bin !g_d_data%r_cut(1), g_d_data%r_cut(2)
+    do i_t = 1, g_d_data%n_t_bin   
+      do i_r = 1, g_d_data%n_r_bin
          g_d_cal = time_corr%g_d_hists_sum(i_t)%val(i_r)*prefac(i_r)
          val = val + (g_d_data%obs(i_r, i_t) - g_d_cal)**2
       end do 
