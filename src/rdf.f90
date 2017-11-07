@@ -20,7 +20,7 @@ implicit none
     ! to make sure that the histogram passed to that function is 
     ! compatable with how g(r) is defined here
     
-    real(db) :: bin_length  
+    real(db) :: bin_length = 0.0
     
     
     ! Notice the val values are always to be the g(r) values at the
@@ -36,13 +36,6 @@ implicit none
 
 contains
 
-  ! this function 
-  
-  subroutine binning_conversion()
-  
-  end subroutine binning_conversion
-
-
   function make_rdf(volume, n_atoms, n_bins, bin_length) result(a_rdf)
     real(db), intent(in) :: volume, bin_length
     integer, intent(in) :: n_atoms, n_bins
@@ -53,17 +46,14 @@ contains
     
     a_rdf%bin_length = bin_length
  
- 
     ! make val attribute
     
     allocate(a_rdf%val(n_bins))
     a_rdf%val = 0.0
  
- 
     ! make prefac attribute
     
     allocate(a_rdf%prefac(n_bins))
-    
     
     ! On pages 19a and 19aa of my handwritten notes I consider different 
     ! possible choices for defining g(r). Here uses
@@ -83,16 +73,16 @@ contains
   
   end function make_rdf
   
-  
-  
+
+  ! Convert a histogram or accumulated histogram into an rdf by applying the 
+  ! prefactors calculated in make_rdf. Here assumed output rdf and input hist 
+  ! have the same pre-allocated array sizes
+  !
   subroutine cal_rdf(a_rdf, hist)
     type (rdf), intent(inout) :: a_rdf
     type (histogram), intent(in) :: hist
     
-    ! check that histogram has the same format as that required to calculate
-    ! the rdf
-    
-    ! PUT CODE IN HERE LATER 
+    ! TODO: check that histogram has the same size as that of the rdf
     
     if (hist%n_accum > 0) then
       a_rdf%val = a_rdf%prefac * hist%sum / hist%n_accum

@@ -29,7 +29,10 @@ implicit none
   type rdf_fom_container
     type (rdf) :: rdf_data
     
-    ! Notice the size of rdf_cal%val <= the size of rdf_data%val 
+    ! The size of rdf_cal%val is assumed <= the size of rdf_data%val
+    ! Allocate this array in this container to avoid 
+    ! allocating/deallocating an array like this in rdf_fom_val_histogram
+    
     type (rdf) :: rdf_cal
     
     real(db) :: scale_factor = 1.0
@@ -41,6 +44,7 @@ implicit none
     type (func_params) :: params
   end type rdf_fom_container
 
+  
   interface rdf_fom_val
     module procedure rdf_fom_val_structure
     module procedure rdf_fom_val_histogram
@@ -75,7 +79,6 @@ contains
     real(db) :: n_bin  
    
     n_bin = size(c%rdf_cal%val)
-    
     
     call cal_rdf(c%rdf_cal, hist) 
     

@@ -339,7 +339,7 @@ contains
           ! buffers, where one buffer calculates one g(r,t). See also the
           ! comments elsewhere in this file where n_md_step_between_buffers is used
           call get_value(attributes,"number",read_int,status)
-          n_md_step_between_buffers = string_to_int(read_int);                   
+          n_md_step_between_buffers = string_to_int(read_int);                 
 
         case("n-time-bin")       
           call get_value(attributes,"number",read_int,status)
@@ -499,7 +499,11 @@ contains
               size(common_config%str%atoms), size_of_rdf_cal_val_array, &
               target_rdf_fom%rdf_data%bin_length)       
  
-          ! set stuff which enable user to create histogram suitable for calculating rdf
+          ! set array size and bin lenght used for the cal rdf array in
+          ! setup_mdmc_control_params. setup_mdmc_control_params is used by a number
+          ! of algorithm
+          ! TODO: There shouldn't been any need for setting these on setup_mdmc_control_params
+          !       since it should be possible to read these from target_rdf_fom directly
           
           setup_mdmc_control_params%n_r_bin_cal = size_of_rdf_cal_val_array
           setup_mdmc_control_params%bin_length_cal = target_rdf_fom%rdf_data%bin_length      

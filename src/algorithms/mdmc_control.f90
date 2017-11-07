@@ -1,3 +1,5 @@
+! MDMC algorithm for comparing against g(r) supplied in the job file FOM <rdf-fom> element
+
 module mdmc_control_class
 use configuration_class
 use function_class
@@ -42,16 +44,19 @@ contains
     type (md_properties) :: my_props
     real(db) :: pressure_comp = 0.0, pot_energy = 0.0
     
+    ! g(r) histogram which uses the binning of the data and the <r-max>
+    ! of the <rdf-fom> element in the job file
     
-    ! For printing out calculated rdf. Notice that the binning of 
-    ! the rdf_printout_histogram is controlled by sub XML elements 
-    ! of <control-object> and independent of the binning of any data
+    type (histogram) :: rdf_cal_histogram   
+    
+    ! Arrays for printing out a calculated rdf. The binning of this array
+    ! may be different for array used for comparing with the data. 
+    ! The binning here is controlled by <r-max> and <bin-length>
+    ! of the <calculate-rdf> element in the job file
     
     type (rdf) :: rdf_printout
     type (histogram) :: rdf_printout_histogram 
-    type (histogram) :: rdf_cal_histogram
 
-	
     integer :: print_to_file = 555
     integer :: print_to_screen = 0
     
@@ -61,22 +66,14 @@ contains
     
     type (xmlf_t) :: xf
 
-
-    call xml_OpenFile("output/mdmc_results.xml", xf, indent=.true.)
-    
+    call xml_OpenFile("output/mdmc_results.xml", xf, indent=.true.)    
     call xml_AddXMLDeclaration(xf, "UTF-8")
     call xml_NewElement(xf, "mdmc-control-results")
-
     call xml_AddAttribute(xf, "title", "rho = " // str(density, format="(f10.5)") &
                                          // "atoms/AA-3")
-    
     call xml_NewElement(xf, "this-file-was-created")
     call xml_AddAttribute(xf, "when", get_current_date_and_time())
     call xml_EndElement(xf, "this-file-was-created")
-
-
-	
-	  
 	  
     if (print_to_file /= 0) then
       open(print_to_file, file="output/job_log.txt")
@@ -86,25 +83,25 @@ contains
 
     call tic
 
-
-    ! allocate phase-spaces
+    ! prepare phase-spaces
     
     my_ps = make_phasespace(a_config%str, c%temperature)    
     my_ps_old = copy_phasespace(my_ps)
     my_ps_best = copy_phasespace(my_ps)
-                        
-                        
-    ! to print out g(r) to file (notice this printing out is not part
-    ! of the MDMC algorithm and may be removed later)
+                         
+    ! prepare histogram used for comparing with the data, binned according
+    ! to the binning of the data and the job file <r-max> element of <rdf-data> 
+    
+    rdf_cal_histogram = make_histogram(c%n_r_bin_cal, c%bin_length_cal)
+    
+    ! prepare containers used for printing g(r) where the binning from 
+    ! job file element <calculate-rdf> is used
     
     rdf_printout_histogram = make_histogram(c%r_max, c%bin_length)
-    rdf_cal_histogram = make_histogram(c%n_r_bin_cal, c%bin_length_cal)
     rdf_printout = make_rdf(product(a_config%str%box_edges), size(a_config%str%atoms), &
                        floor(c%r_max/c%bin_length), c%bin_length)                    
-                                               
-                                               
-                        
-               
+
+
 ! -------------- initial equilibration ---------------- !
 
     sum_kin_energy = 0.0
