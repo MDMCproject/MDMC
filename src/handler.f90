@@ -464,29 +464,43 @@ contains
           call add_function(common_fom_list, target_s_qo_fom)   
                               
         case("r-max")
+          ! Within the job file and within the <rdf-fom> element 
+          ! it is required that the <rdf-data> element is positioned above 
+          ! the <r-max> element. That is that the rdf-data has been read
+          ! and processed at this point.
+          ! TODO: fix this so this is no longer required (see related xmlf90 comments in mdmc.f90)
+          
+          if (target_rdf_fom%rdf_data%bin_length == 0.0) then
+            print *, " "
+            print *, "Within the job file and within the <rdf-fom> element"
+            print *, "it is required that the <rdf-data> element is positioned"
+            print *, "above the <r-max> element"
+            stop
+          end if
+            
           call get_value(attributes,"val",read_db,status)
-          number_db = string_to_db(read_db) 
+          number_db = string_to_db(read_db)           
+
+          ! Set the size of the calculated rdf to be <r-max> divided the data bin lenght
           
-          ! It is assumed here that rdf-data is positioned
-          ! above r-max in rdf-fom
-          ! Note prefer floor() rather than nint() perhaps - not
-          ! that important.
+          size_of_rdf_cal_val_array = floor(number_db/target_rdf_fom%rdf_data%bin_length) 
           
-          size_of_rdf_cal_val_array = floor(number_db/target_rdf_fom%rdf_data%bin_length)
-          
-          
-          ! this number cannot be larger the number of data points
+          ! this number is here restricted to be smaller than or equal to the number of 
+          ! data points. This is done to avoid wasting time calculating g(r) for points
+          ! for which no data are available
           
           if (size_of_rdf_cal_val_array > size(target_rdf_fom%rdf_data%val)) then
             size_of_rdf_cal_val_array = size(target_rdf_fom%rdf_data%val)
           end if
           
-          ! Allocate space for dummy rdf_cal attribute
+          ! Allocate space for rdf_cal
+          
           target_rdf_fom%rdf_cal = make_rdf(product(common_config%str%box_edges), &
               size(common_config%str%atoms), size_of_rdf_cal_val_array, &
               target_rdf_fom%rdf_data%bin_length)       
  
           ! set stuff which enable user to create histogram suitable for calculating rdf
+          
           setup_mdmc_control_params%n_r_bin_cal = size_of_rdf_cal_val_array
           setup_mdmc_control_params%bin_length_cal = target_rdf_fom%rdf_data%bin_length      
           
