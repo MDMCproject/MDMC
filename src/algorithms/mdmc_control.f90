@@ -50,9 +50,11 @@ contains
     type (histogram) :: rdf_cal_histogram   
     
     ! Arrays for printing out a calculated rdf. The binning of this array
-    ! may be different for array used for comparing with the data. 
+    ! may be different from the array used for comparing with the data. 
     ! The binning here is controlled by <r-max> and <bin-length>
-    ! of the <calculate-rdf> element in the job file
+    ! of the <calculate-rdf> element in the job file.
+    ! Optional feature allowing the user to write out alternative 
+    ! binning that of the data
     
     type (rdf) :: rdf_printout
     type (histogram) :: rdf_printout_histogram 
@@ -138,7 +140,7 @@ contains
         average_energy_end_of_temp_calibration = my_props.tot_energy.ave 
       end if      
         
-      ! print out stuff and interval = average_over_this_many_steps
+      ! print out stuff at interval = average_over_this_many_steps
         
       if (mod(i,c%average_over_initial_equilibration) == 0) then 
         call md_print_properties(print_to_file, my_props)
@@ -188,22 +190,21 @@ contains
  ! ---------------  finished initial equilibration -------------- !      
  
  
- 
  ! ----------- calculate first FOM ------------- !        
     
+    ! cal average rdfs
+    
     do j = 1, c%average_over_this_many_rdf
-
-      call trajectory_in_phasespace(my_ps, common_pe_list, c%cal_rdf_at_interval, c%md_delta_t)
-      
+      call trajectory_in_phasespace(my_ps, common_pe_list, c%cal_rdf_at_interval, c%md_delta_t) 
       call accum_histogram(rdf_cal_histogram, my_ps%str)
       
-      ! to print out rdf
+      ! and the rdf used for printing
       
       call accum_histogram(rdf_printout_histogram, my_ps%str)
-      
     end do 
     
-    !! print also out what the param values are
+    ! cal FOM and info
+    
     fom_val = func_val(rdf_cal_histogram, common_fom_list)
     call clear_histogram(rdf_cal_histogram)
     write(print_to_file,'(a,f12.4)') "1st FOM = ", fom_val
@@ -211,21 +212,17 @@ contains
     write(print_to_file, *) " "
     write(print_to_screen, '(a,f12.4)') "Finished cal 1st FOM. Time: ", toc()
     
-    
     call xml_NewElement(xf, "accept")
     call add_xml_attribute_func_params(xf, common_pe_list)
     call xml_AddAttribute(xf, "val", str(fom_val, format="(f10.5)"))
     call xml_EndElement(xf, "accept")    
 
-
-    ! to print out rdf 
-      
-    call cal_rdf(rdf_printout, rdf_printout_histogram)
-            
+    ! Save rdf to file
+    
+    call cal_rdf(rdf_printout, rdf_printout_histogram)        
     density = size(my_ps%str%atoms) / product(my_ps%str%box_edges)
     call save_rdf(rdf_printout, c%temperature, density)
     call clear_histogram(rdf_printout_histogram)
-
 
     ! store best solution so far
     
@@ -233,44 +230,33 @@ contains
     call backup_best_func_params(common_pe_list)
     call shallow_copy_phasespace(my_ps, my_ps_best)
 
-
-
  ! ----------- finished calculating first FOM ------------- !
 
 
-
-
  ! ---------------------- mdmc part ------------------------ !              
-               
-  
+                 
     ! save state
     
     fom_old = fom_val
     call backup_func_params(common_pe_list)
     call shallow_copy_phasespace(my_ps, my_ps_old)       
       
-              
     do i = 1, c%mc_steps
-
       write (print_to_screen, *) "Begin MC step number ", i
-      
       write (print_to_file, *) "Begin MC step number ", i
       write (print_to_file, *) " "
 
       call move_random_func_params(common_pe_list)
       
-
       ! do MD equilibration
       
       sum_kin_energy = 0.0
-      
       do i_md = 1, c%md_steps_repeated_equilibration
 
         call trajectory_in_phasespace(my_ps, common_pe_list, 1, c%md_delta_t, & 
                                   pressure_comp, pot_energy)
 
         call md_cal_properties(my_ps, my_props, common_pe_list, pressure_comp, pot_energy)       
-      
       
         if (i_md < c%total_step_temp_cali_repeated) then
           sum_kin_energy = sum_kin_energy + my_props%kin_energy%val
@@ -298,7 +284,6 @@ contains
       write(print_to_file, *) " "
       write(print_to_screen, '(a,f12.4)') "Finished repeated MD trajectory. Time: ", toc()      
       
-
       ! Determine if equilibrium was reached
       !
       ! Note the (2.0/ndim) factor is to convert from dimensionless kin_energy per atom to 
@@ -321,24 +306,21 @@ contains
       end if   
 
 
-      ! cal averaged rdf and FOM
-      
-      do j = 1, c%average_over_this_many_rdf
+      ! cal averaged rdf
 
+      do j = 1, c%average_over_this_many_rdf
         call trajectory_in_phasespace(my_ps, common_pe_list, c%cal_rdf_at_interval, c%md_delta_t)
-       
         call accum_histogram(rdf_cal_histogram, my_ps%str)
-        
       end do 
       
-      ! print also out what the param values are
+      ! cal FOM print info
+      
       fom_val = func_val(rdf_cal_histogram, common_fom_list)
       call clear_histogram(rdf_cal_histogram)
       write(print_to_file,'(a,f12.4)') "FOM = ", fom_val
       write(print_to_file, '(a,f12.4)') "Finished cal FOM. Time: ", toc()
       write(print_to_file, *) " "
       write(print_to_screen, '(a,f12.4)') "Finished cal FOM. Time: ", toc()
-      
       
       ! check if new best fom
       
@@ -348,7 +330,6 @@ contains
         call shallow_copy_phasespace(my_ps, my_ps_best)      
       end if
      
-      
       ! Metropolis check
 
       delta_fom = fom_val - fom_old
@@ -356,84 +337,82 @@ contains
       accept_parameters = .false.
 
       if(delta_fom <= 0.0) then
-          ! new parameters accepted
+        ! accept new parameters
+        
         accept_parameters = .true.    
       else
+        ! perhaps accept new parameters
+        
         call random_number(ran_num)
           
         if(exp(- delta_fom / c%temperature_mc) > ran_num) then
           accept_parameters = .true.
         end if
       end if
- 
-        
-      if (accept_parameters) then
-      
+    
+      if (accept_parameters) then      
         call xml_NewElement(xf, "accept")
         call add_xml_attribute_func_params(xf, common_pe_list)
         call xml_AddAttribute(xf, "val", str(fom_val, format="(f10.5)"))
         call xml_EndElement(xf, "accept")       
-     
       
         ! save state
     
         fom_old = fom_val
         call backup_func_params(common_pe_list)
         call shallow_copy_phasespace(my_ps, my_ps_old) 
-        
       else
-      
         call xml_NewElement(xf, "rejected")
         call add_xml_attribute_func_params(xf, common_pe_list)
         call xml_AddAttribute(xf, "val", str(fom_val, format="(f10.5)"))
         call xml_EndElement(xf, "rejected")
         
-        
         ! restore state
     
         call restore_func_params(common_pe_list)
-        call shallow_copy_phasespace(my_ps_old, my_ps)          
-              
+        call shallow_copy_phasespace(my_ps_old, my_ps)                
       end if  
       
     end do
      
  ! ---------------- finished mdmc part ------------------------ !      
      
-    
-     
     ! print out rdf for best fom
     
     call restore_best_func_params(common_pe_list)
     call shallow_copy_phasespace(my_ps_best, my_ps)
         
+    ! Optionally print out multiple best FOM solutions
+    
     do i = 1, 5    
+      
+      ! cal average rdfs
+      
+      do j = 1, c%average_over_this_many_rdf
+        call trajectory_in_phasespace(my_ps, common_pe_list, c%cal_rdf_at_interval, c%md_delta_t)
+        call accum_histogram(rdf_cal_histogram, my_ps%str)
         
-    do j = 1, c%average_over_this_many_rdf
+        ! and the rdf used for printing
+        
+        call accum_histogram(rdf_printout_histogram, my_ps%str)  
+      end do 
+      
+      ! cal FOM and print info
+      
+      fom_val = func_val(rdf_cal_histogram, common_fom_list)
+      call clear_histogram(rdf_cal_histogram)
+      write(print_to_file,'(a,f12.4)') "BEST FOM = ", fom_val
+      write(print_to_file,'(a)') "WITH: "
+      call print_all_func_params(print_to_file, common_pe_list)
+      write(print_to_file, '(a,f12.4)') "Finished cal FOM. Time: ", toc()
+      write(print_to_file, *) " "
+      
+      ! Save rdf to file
 
-      call trajectory_in_phasespace(my_ps, common_pe_list, c%cal_rdf_at_interval, c%md_delta_t)
-       
-      call accum_histogram(rdf_cal_histogram, my_ps%str)
-        
-      ! to print out rdf
-        
-      call accum_histogram(rdf_printout_histogram, my_ps%str)
-        
-    end do 
-      
-    fom_val = func_val(rdf_cal_histogram, common_fom_list)
-    call clear_histogram(rdf_cal_histogram)
-    write(print_to_file,'(a,f12.4)') "BEST FOM = ", fom_val
-    write(print_to_file,'(a)') "WITH: "
-    call print_all_func_params(print_to_file, common_pe_list)
-    write(print_to_file, '(a,f12.4)') "Finished cal FOM. Time: ", toc()
-    write(print_to_file, *) " "
-      
-    call cal_rdf(rdf_printout, rdf_printout_histogram)
-            
-    density = size(my_ps%str%atoms) / product(my_ps%str%box_edges)
-    call save_rdf(rdf_printout, c%temperature, density)
-    call clear_histogram(rdf_printout_histogram)
+      call cal_rdf(rdf_printout, rdf_printout_histogram)      
+      density = size(my_ps%str%atoms) / product(my_ps%str%box_edges)
+      call save_rdf(rdf_printout, c%temperature, density)
+      call clear_histogram(rdf_printout_histogram)
     
     end do   
                       
@@ -444,10 +423,9 @@ contains
     
     if (print_to_file /= 0) then
 	    close(print_to_file)
-	  end if    
-	  
-	  
-	  call xml_EndElement(xf, "mdmc-control-results")
+    end if    
+	    
+    call xml_EndElement(xf, "mdmc-control-results")
     call xml_Close(xf)
     
   end subroutine run_mdmc_control
