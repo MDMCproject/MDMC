@@ -36,7 +36,6 @@
     <temperature units="Kelvin" val="120.0" />
     <time-step units="10e-13s" val="0.1075" />
 
-    
     <q-values>
       <q start="0.4" step="0.2" n-step="10" />
     </q-values>
@@ -51,21 +50,20 @@
       <adjust-temp-at-interval number="1000" />
     </perform-initial-temperature-calibration>
     
-	<!-- determine how space-time correlations containers are
-	     calculated following the initial simulation, which can
-		 then be used to calculated space-time pair correlations,
-		 intermediate scattering function etc. -->
+    <!-- determine how space-time correlations containers are
+	       calculated following the initial simulation, which can
+         then be used to calculated space-time pair correlations,
+         intermediate scattering function etc. -->
+    <!-- Define how g(r,t) is calculated and also the time binning of g(r,t) -->
     <time-correlation> 
       <n-g-r-t-to-average-over number="2" />  <!-- Number of complete g(r,t)s to average over -->
-      <n-md-step-between-buffers number="10" /> <!-- how long between calculated g(r,t)s to better make calculated g(r,t) statistically independent -->      
-      <md-per-time-bin number="1" />  <!-- Nummber of MD steps which make up a time bin -->
       <n-time-bin number="100" /> <!-- Number of time bins -->
+      <md-per-time-bin number="1" /> <!-- Number of MD steps which makes up a time bin -->
+      <n-md-step-between-buffers number="10" /> <!-- how long between calculated buffers (g(r,t)s) to reduce correlation between these -->      
     </time-correlation>
-    
-    <calculate-rdf>
-      <cal-rdf-at-interval number="50" />
-      <average-over-this-many-rdf number="20" />  
-      
+
+    <!-- Here define the r binning of g(r,t) -->
+    <calculate-rdf>      
       <r-max units="AA" val="10000.0" />
       <bin-length units="AA" val="0.2" /> 
     </calculate-rdf>    

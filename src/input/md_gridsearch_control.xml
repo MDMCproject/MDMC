@@ -52,7 +52,6 @@
       <adjust-temp-at-interval number="200" />
     </perform-initial-temperature-calibration>
     
-    
     <mc-steps number="5" /> 
     <temperature-mc val="0.2" />    
     
@@ -62,11 +61,16 @@
       <total-step-temp-cali-repeated number="5000" />
       <adjust-temp-at-interval-repeated number="200" />
     </perform-repeated-temperature-calibration>
+    
+    <!-- Control how RDF is calculated -->
+    <!-- The r-binning of the RDF used in comparing with the data are determined from <rdf-fom> -->
+    <!-- Here specify also the r-binning used for saving RDF to file, which can be different from 
+         the r-binning used for the data -->
     <calculate-rdf>
-      <cal-rdf-at-interval number="50" />
-      <average-over-this-many-rdf number="20" />  
-      
-      <!-- These are only used here when wanting to save g(r) to file -->
+      <cal-rdf-at-interval number="50" /> <!-- How many MD steps before the next RDF is calculated -->
+      <average-over-this-many-rdf number="20" /> <!-- How many RDFs to average over to reduce statistical noise -->
+
+      <!-- Specify r-binning used for saving RDF to file -->
       <r-max units="AA" val="20.0" />
       <bin-length units="AA" val="0.05" /> 
     </calculate-rdf>    

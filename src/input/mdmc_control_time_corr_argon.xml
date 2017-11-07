@@ -52,13 +52,8 @@
   
   <control-object name="mdmc_control_time_corr">
   
-    <!-- Set time-step and target temperature for MD simulation -->
-    <temperature units="Kelvin" val="120.0" />
-    <time-step units="10e-13s" val="0.1075" />
-
-    <!-- Currently you are required to specify the points where data
-         were measured and these must match those of the date!
-         Apologies for the inconvenience of this -->
+    <!-- Currently you are required to specify the q and omega values where data
+         were measured. Apologies for the inconvenience of this -->
     <q-values>
       <q start="0.42" step="0.42" n-step="2" />
       <q start="1.62" step="0.3" n-step="2" />
@@ -72,6 +67,10 @@
       <omega start="1.1" step="0.1" n-step="9" />
     </omega-values>
     
+    <!-- Set time-step and target temperature for MD simulation -->
+    <temperature units="Kelvin" val="120.0" />
+    <time-step units="10e-13s" val="0.1075" />   
+    
     <!-- Controlling the initial MD calibration -->
     <total-steps-initial-equilibration number="50000" average-over="1000" />
     <perform-initial-temperature-calibration>
@@ -79,14 +78,8 @@
       <adjust-temp-at-interval number="2000" />
     </perform-initial-temperature-calibration>
 
-    <!-- Define how g(r,t) is calculated -->
-    <time-correlation>
-      <n-g-r-t-to-average-over number="20" />    <!-- Number of complete g(r,t)s to average over -->
-      <n-md-step-between-buffers number="100" />  <!-- how long between calculated g(r,t)s to better make calculated g(r,t) statistically independent -->
-      <md-per-time-bin number="7" />  <!-- Nummber of MD steps which make up a time bin -->
-      <n-time-bin number="250" /> <!-- Number of time bins -->
-    </time-correlation>
-
+    <!-- Controlling the MC (Monte-Carlo). How many MC steps (cycles)
+         and temperature-mc controls the acceptance rate -->
     <mc-steps number="200" />
     <temperature-mc val="1" />
 
@@ -97,11 +90,16 @@
       <adjust-temp-at-interval-repeated number="1000" />
     </perform-repeated-temperature-calibration>
     
-    <!-- for printing out radial distribution function -->
+    <!-- Define how g(r,t) is calculated and also the time binning of g(r,t) -->
+    <time-correlation>
+      <n-g-r-t-to-average-over number="20" />    <!-- Number of g(r,t)s to average over to reduce statistical noise -->
+      <n-time-bin number="250" /> <!-- Number of time bins -->
+      <md-per-time-bin number="7" /> <!-- Number of MD steps which makes up a time bin -->
+      <n-md-step-between-buffers number="100" />  <!-- how long between calculated buffers (g(r,t)s) to reduce correlation between these -->
+    </time-correlation>    
+    
+    <!-- Here define the r binning of g(r,t) -->
     <calculate-rdf>
-      <!-- <cal-rdf-at-interval number="50" />
-      <average-over-this-many-rdf number="200" />
-      -->
       <r-max units="AA" val="50.0" />
       <bin-length units="AA" val="0.2" />
     </calculate-rdf>    
