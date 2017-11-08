@@ -10,14 +10,12 @@ use time_corr_algorithm_class
   private :: begin_element, end_element, pcdata_chunk
   private :: start_document, end_document                               
 
-
 contains
 
 
   ! If control-object/q-values and control-object/omega-values exist in job file then populate 
   ! setup_mdmc_control_params%omega_values and setup_mdmc_control_params%q_values. 
-  ! Done it this way rather than directly in handler because of convenience.
-
+  !
   subroutine alloc_q_omega_arrays(filename)
     use flib_sax  
     use flib_xpath    
@@ -36,18 +34,14 @@ contains
     integer :: q_index, omega_index
     integer :: i
     
-
-    
     integer :: num_q_values = 0  ! Count the number of q values before allocating q array
     integer :: num_omega_values = 0  ! Count the number of omega values before allocating omega array
     integer :: n_step
     
-    
     call open_xmlfile(trim(filename),fxml,iostat)
     if (iostat /= 0) stop "Cannot open file which is suppose to contain q and omega values."
     
-    
-    ! count number of q-values
+    ! count the number of q-values
          
     do
       call get_node(fxml, path="//job/control-object/q-values/q", &
@@ -60,7 +54,6 @@ contains
       
     call close_xmlfile(fxml)  
     call open_xmlfile(trim(filename),fxml,iostat)
-    
     
     ! check for omega-values
                             
@@ -75,7 +68,6 @@ contains
       
     call close_xmlfile(fxml)  
     call open_xmlfile(trim(filename),fxml,iostat)
-    
     
     ! allocate q and omega arrays
     
@@ -106,7 +98,6 @@ contains
     call close_xmlfile(fxml)  
     call open_xmlfile(trim(filename),fxml,iostat)
     
-    
     ! read in omega-values
          
     omega_index = 1
@@ -130,18 +121,18 @@ contains
       
     call close_xmlfile(fxml)  
 
-
   end subroutine alloc_q_omega_arrays
 
-  
-  
-  !START_DOCUMENT
+    
+  ! START_DOCUMENT
+  !
   subroutine start_document()
     use flib_sax
   end subroutine start_document
 
 
   ! BEGIN_ELEMENT
+  !
   subroutine begin_element(name,attributes)
     use flib_sax  
     character(len=*), intent(in)   :: name
@@ -151,16 +142,15 @@ contains
     real(db) :: number_db, number_db2
     character(len=40) :: read_db, read_int    
     
-
     select case(name)                       
 	
     end select
-
 
   end subroutine begin_element
 
 
   ! PCDATA_CHUNK
+  !
   subroutine pcdata_chunk(chunk)
     use flib_sax
     character(len=*), intent(in) :: chunk
@@ -169,6 +159,7 @@ contains
 
 
   ! END_ELEMENT
+  !
   subroutine end_element(name)
     use flib_sax  
     character(len=*), intent(in)   :: name
@@ -176,7 +167,8 @@ contains
   end subroutine end_element
 
 
-  !END_DOCUMENT
+  ! END_DOCUMENT
+  !
   subroutine end_document()
     use flib_sax  
   end subroutine end_document

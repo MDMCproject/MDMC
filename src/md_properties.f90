@@ -24,16 +24,15 @@ implicit none
     
     ! this one in theory should be in type property but
     ! since in the code the below the properties are 
-    ! all accumulated in one go I have moved it down for
-    ! now
+    ! all accumulated in one go I have moved it down for now
+    
     integer :: n_accum = 0
   end type md_properties
 
 contains
 
-
   ! Convert the average kin_energy value to a temperature in Kelvin
-  
+  !
   function md_convert_kin_energy_to_temperature(kin_energy) result (val)
     real (db), intent(in) :: kin_energy  
     real (db) :: val
@@ -45,7 +44,7 @@ contains
   ! Calculates %kin_energy%val, %tot_energy%val and %pressure%val and rolling 
   ! averages and standard deviations of these properties. Rolling values are
   ! reset when md_reset_properties is called
-  
+  !
   subroutine md_cal_properties(ps, props, list, pressure_comp, pot_energy)
     type (phasespace), intent(in) :: ps
     type (md_properties), intent(inout) :: props
@@ -53,6 +52,7 @@ contains
  		real (db), optional, intent(in) :: pressure_comp, pot_energy    
    
     ! test for optional arguments
+    
     if (present(pressure_comp) .and. present(pot_energy)) then
       call md_cal_properties_extra(ps, props, list, pressure_comp, pot_energy)
     else if (present(pressure_comp)==.false. .and. present(pot_energy)==.false.) then
@@ -95,7 +95,7 @@ contains
   
 
   ! Reset values used for calculating rolling averages and standard deviations 
-  
+  !
   subroutine md_reset_properties(props)
     type (md_properties), intent(inout) :: props
     
@@ -108,7 +108,6 @@ contains
     props%pressure%sum2 = 0.0
     
     props%n_accum = 0   
-
   end subroutine md_reset_properties
   
   
@@ -126,11 +125,9 @@ contains
   end subroutine md_print_properties
   
   
-!!!!!!!!!!!!!!!!!!!!!!! private functions/subroutines !!!!!!!!!!!!!!!!!!!!!!! 
-  
   ! It populates %kin_energy%val, %tot_energy%val and %pressure%val
-  ! where in current implementation %pressure%val is set to zero!
-  
+  ! where in current implementation %pressure%val is set to zero
+  !
   subroutine md_cal_properties_not_extra(ps, props, list)
     type (phasespace), intent(in) :: ps
     type (md_properties), intent(inout) :: props
@@ -158,8 +155,7 @@ contains
     pot_energy = func_val(ps%str, list) / n_atoms
     
     props%tot_energy%val = pot_energy + props%kin_energy%val
-    
-    
+      
     ! pressure is in units of 16387.72 atm
     ! the expression below is only valid when using non-periodic boundary conditions:
     !   props%pressure%val = (sum_mass_v2-sum(ps%deriv*ps%r)) / &
@@ -174,7 +170,7 @@ contains
   ! It populates %kin_energy%val, %tot_energy%val and %pressure%val
   ! where the it takes the PE=pot_energy and pressure_comp is used for
   ! calculating a value for %pressure%val
-  
+  !
   subroutine md_cal_properties_extra(ps, props, list, pressure_comp, pot_energy)
     type (phasespace), intent(in) :: ps
     type (md_properties), intent(inout) :: props
@@ -183,7 +179,6 @@ contains
     
     real(db) :: sum_mass_v2
     integer :: n_atoms
-   
     
     n_atoms = size(ps%str%atoms)
     
@@ -200,9 +195,7 @@ contains
     ! number by n_atoms and divide by Avogadro's number
     
     props%kin_energy%val = 0.5*sum_mass_v2 / n_atoms
-    
     props%tot_energy%val = pot_energy / n_atoms + props%kin_energy%val
-    
     
     ! pressure is in units of 16387.72 atm
     

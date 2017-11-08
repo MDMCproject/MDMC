@@ -33,9 +33,7 @@ implicit none
   
   private precal_cos_values
   
-  
   type (precal_cos_values), private :: local_precal_cos_values  
-  
   
   character(len=16), parameter, private :: filename_prefix = "output/s_q_omega"    
   integer, private :: filname_number = 1    
@@ -61,8 +59,7 @@ contains
        
     call check_if_s_q_time_allocated(s_qt)
     call check_if_s_q_omega_allocated(s_qo)
-    
-    
+      
     ! Has local_precal_cos_values been allocated and populated
     ! Notice should also compare the omega array in that container with 
     ! omega array in the s_q_omega container  
@@ -74,7 +71,6 @@ contains
         n_t, s_qt%t_bin, s_qo%omega)
     end if
   
-
     ! calculate S(Q,omega)
   
     s_qo%self = matmul(s_qt%self, local_precal_cos_values%val)
@@ -121,27 +117,23 @@ contains
     end if
     
     write(*,'(3a)') "Write ", trim(filename), " to disk"
-    
-    
+      
     call xml_OpenFile(filename, xf, indent=.true.)
-    
     call xml_AddXMLDeclaration(xf, "UTF-8")
     call xml_NewElement(xf, "s-q-omega")
     
-    ! notice convert units of temperature from dimensionless to K  
+    ! notice convert units of temperature from dimensionless to K
+    
     call xml_AddAttribute(xf, "title", "T = " // trim(str(temperature * T_unit, format="(f10.5)")) // &
                                          " K: rho = " // trim(str(density, format="(f10.5)")) &
                                          // " atoms/AA-3")
-
     call xml_AddAttribute(xf, "n-omega-points", str(size(container%omega), format="(i)") )
     call xml_AddAttribute(xf, "n-q-points", str(size(container%q), format="(i)") )
     call xml_AddAttribute(xf, "q-units", "AA^-1")
     call xml_AddAttribute(xf, "omega-unit", "1/[10^-13 s]")        
-    
     call xml_NewElement(xf, "this-file-was-created")
     call xml_AddAttribute(xf, "when", get_current_date_and_time())
     call xml_EndElement(xf, "this-file-was-created")  
-    
     
     n_omega = size(container%self, 2)
 
@@ -157,7 +149,6 @@ contains
     end do
     
     call xml_EndElement(xf, "s-q-omega")
-    
     call xml_Close(xf)    
   
   end subroutine print_s_q_omega
@@ -210,7 +201,6 @@ contains
     
     allocate(container%val(n_t, n_omega)) 
     
-    
     do i_omega = 1, n_omega
       ! when calculating integral this way (method 2 in my notes page 31)
       ! I need to calculate omega=0 separately
@@ -241,9 +231,6 @@ contains
     
   end function make_and_cal_precal_cos_values
 
-
-
-  ! t_bin and n_time are needed to pass on the time-binning info to this container
 
   function make_s_q_omega(q, omega) result(container)
     real(db), dimension(:), intent(in) :: q

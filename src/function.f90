@@ -8,7 +8,6 @@ use g_d_rt_fom_class
 use s_q_time_fom_class
 use s_q_omega_fom_class
 
-
 implicit none
 
   public :: func_val
@@ -49,7 +48,8 @@ contains
     
     list%pt_lj_pe => pe_target
   end subroutine add_lj_pe_container
-    
+
+  
   subroutine add_rdf_fom_container(list, fom_target)
     type (func_list), intent(inout) :: list
     type (rdf_fom_container), target, intent(in) :: fom_target
@@ -57,6 +57,7 @@ contains
     list%pt_rdf_fom => fom_target
   end subroutine add_rdf_fom_container  
 
+  
   subroutine add_g_d_rt_fom_container(list, fom_target)
     type (func_list), intent(inout) :: list
     type (g_d_rt_fom_container), target, intent(in) :: fom_target
@@ -64,12 +65,14 @@ contains
     list%pt_g_d_rt_fom => fom_target
   end subroutine add_g_d_rt_fom_container  
   
+  
   subroutine add_s_qt_fom_container(list, fom_target)
     type (func_list), intent(inout) :: list
     type (s_qt_fom_container), target, intent(in) :: fom_target
     
     list%pt_s_qt_fom => fom_target
   end subroutine add_s_qt_fom_container    
+  
   
   subroutine add_s_qo_fom_container(list, fom_target)
     type (func_list), intent(inout) :: list
@@ -94,6 +97,7 @@ contains
     end if
   end function func_val_structure
 
+  
   function func_val_histogram(hist, list) result (val)
     type (histogram), intent(in) :: hist
     type (func_list), intent(inout) :: list
@@ -109,6 +113,7 @@ contains
       stop
     end if
   end function func_val_histogram  
+  
   
   function func_val_time_corr(time_corr, list) result (val)
     type (time_corr_hist_container), intent(in) :: time_corr
@@ -128,6 +133,7 @@ contains
       stop
     end if
   end function func_val_time_corr
+  
   
   function func_val_s_q_time(sqtime, list) result (val)
     type (s_q_time), intent(in) :: sqtime
@@ -151,6 +157,7 @@ contains
     end if
   end function func_val_s_q_time  
  
+  
   function func_val_s_q_omega(s_qo, list) result (val)
     type (s_q_omega), intent(in) :: s_qo
     type (func_list), intent(inout) :: list
@@ -197,6 +204,5 @@ contains
     end if 
  		
   end subroutine func_deriv
-
-      
+    
 end module function_class

@@ -4,17 +4,14 @@ use structure_class
 
 implicit none
 
-
   public :: make_histogram_cutdown
   public :: cal_g_s_histogram, cal_g_d_histogram 
   public :: cal_g_s_histogram_no_wrap_around 
 
-
   type histogram_cutdown
     real(db) :: bin_length   
     integer, dimension(:), allocatable :: val
-  end type histogram_cutdown
-  
+  end type histogram_cutdown  
 
 contains
 
@@ -26,8 +23,10 @@ contains
     allocate(hist%val(floor(r_max/bin_length)))
   end function make_histogram_cutdown
 
+  
   ! return sum of squared differences
   ! Applies periodic boundary wrap-around for act_r
+  !
   function cal_g_s_histogram(g_s_hist, org_r, act_r, box_edges) result(rr_sum)
     type (histogram_cutdown), intent(inout) :: g_s_hist
     real(db), dimension(:,:), intent(in) :: org_r, act_r
@@ -40,7 +39,6 @@ contains
     integer :: which_bin    ! where which_bin=1 is the first bin: [0:bin_length]
     real (db) :: rr
     real (db), dimension(ndim) :: diff_vec   
-		
 		
     r_max = g_s_hist%bin_length * size(g_s_hist%val)
     rr_max = r_max * r_max
@@ -57,8 +55,7 @@ contains
       ! to the execution speed 
           
       call apply_boundary_condition_to_vector_expensive(diff_vec, box_edges)
-      
-                
+                  
       rr = sum(diff_vec*diff_vec)
       
       if (rr < rr_max) then
@@ -66,8 +63,7 @@ contains
         g_s_hist%val(which_bin) = g_s_hist%val(which_bin) + 1
       end if
       
-      rr_sum = rr_sum + rr
-  		  
+      rr_sum = rr_sum + rr  
     end do      
   
   end function cal_g_s_histogram
@@ -75,6 +71,7 @@ contains
 
   ! same as cal_g_s_histogram but no wrap-around
   ! used for calculating g_s that do not suffer from periodic boundary effect...
+  !
   function cal_g_s_histogram_no_wrap_around(g_s_hist, org_r, act_r, box_edges) result(rr_sum)
     type (histogram_cutdown), intent(inout) :: g_s_hist
     real(db), dimension(:,:), intent(in) :: org_r, act_r
@@ -87,7 +84,6 @@ contains
     integer :: which_bin    ! where which_bin=1 is the first bin: [0:bin_length]
     real (db) :: rr
     real (db), dimension(ndim) :: diff_vec   
-		
 		
     r_max = g_s_hist%bin_length * size(g_s_hist%val)
     rr_max = r_max * r_max
@@ -102,10 +98,7 @@ contains
  
       ! The command below does not actually seem to make that much difference
       ! to the execution speed 
-          
-      !call apply_boundary_condition_to_vector_expensive(diff_vec, box_edges)
-      
-                
+                    
       rr = sum(diff_vec*diff_vec)
       
       if (rr < rr_max) then
@@ -114,7 +107,6 @@ contains
       end if
       
       rr_sum = rr_sum + rr
-  		  
     end do      
   
   end function cal_g_s_histogram_no_wrap_around
@@ -132,7 +124,6 @@ contains
     integer :: which_bin    ! where which_bin=1 is the first bin: [0:bin_length]
     real (db) :: rr
     real (db), dimension(ndim) :: diff_vec   
-		
 		
     r_max = g_d_hist%bin_length * size(g_d_hist%val)
     rr_max = r_max * r_max
@@ -152,7 +143,6 @@ contains
           
           call apply_boundary_condition_to_vector_expensive(diff_vec, box_edges)
           
-      
           rr = sum(diff_vec*diff_vec)
       
           if (rr < rr_max) then

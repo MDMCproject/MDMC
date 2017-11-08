@@ -4,21 +4,20 @@ use structure_reader_class
 
   implicit none
   
-  
   private :: begin_element, end_element, pcdata_chunk
   private :: start_document, end_document
   
   public :: handler_structure_part
-  
 
   logical, private  :: in_structure = .false. 
   
   ! both to be passed to make_simple_cubic_structure or make_fcc_structure
+  
   real(db), private :: density   
   integer, dimension(ndim), private :: unitcells_xyz
                                              
-  
   character(len=99), private :: what_init_structure_to_build
+  
 contains
   
   subroutine handler_structure_part(filename)
@@ -43,11 +42,13 @@ contains
 
 
   ! START_DOCUMENT
+  !
   subroutine start_document()
   end subroutine start_document
 
 
   ! BEGIN_ELEMENT
+  !
   subroutine begin_element(name,attributes)
     character(len=*), intent(in)   :: name
     type(dictionary_t), intent(in) :: attributes
@@ -58,7 +59,6 @@ contains
     character(len=40) :: units
     character(len=120) :: filename
 
-   ! write(*,*) name
     select case(trim(name))
       case("structure")
         call get_value(attributes,"filename",filename,status)
@@ -68,8 +68,7 @@ contains
           stop
         else
           in_structure = .true.
-          
-          
+                    
           ! which initial structure to create
           
           call get_value(attributes,"what-init-structure-to-build", &
@@ -77,12 +76,9 @@ contains
           if (status /= 0) then
             write (*,*) "ERROR Initial structure type not specified in input file"
             stop
-          end if
-            
+          end if  
         end if
-	
     end select
-
 
     ! if in structure
     
@@ -90,9 +86,11 @@ contains
       select case(name)
         case("density")          
           ! read density value into read_dp(1)
+          
           call get_value(attributes,"val",read_db,status)
           
           ! read units
+          
           call get_value(attributes,"units",units,status)
 
           if (units == "atom/AA3") then
@@ -104,6 +102,7 @@ contains
           
         case("number-of-unit-cells")
           ! check that the number of attributes of this element equals ndim
+          
           number_int = number_of_entries(attributes)
           if (number_int /= ndim) then
             write(*,'(a,i2)') "ndim ", ndim
@@ -113,6 +112,7 @@ contains
           end if
           
           ! read number of atoms into read_int(1)
+          
           call get_value(attributes,"nx",read_int,status)         
           unitcells_xyz(1) = string_to_int(read_int)
           if (ndim > 1) then
@@ -132,6 +132,7 @@ contains
 
 
   ! PCDATA_CHUNK
+  !
   subroutine pcdata_chunk(chunk)
     character(len=*), intent(in) :: chunk
 
@@ -139,6 +140,7 @@ contains
 
 
   ! END_ELEMENT
+  !
   subroutine end_element(name)
     character(len=*), intent(in)   :: name
   
@@ -161,7 +163,8 @@ contains
   end subroutine end_element
 
 
-  !END_DOCUMENT
+  ! END_DOCUMENT
+  !
   subroutine end_document()
   end subroutine end_document
 

@@ -10,7 +10,6 @@ use time_corr_algorithm_class
   private :: begin_element, end_element, pcdata_chunk
   private :: start_document, end_document                               
 
-
 contains
 
   ! read S(q,t) data from file and store in target_s_qt_fom
@@ -43,15 +42,12 @@ contains
     call open_xmlfile(trim(filename),fxml,iostat)
     if (iostat /= 0) stop "Cannot open S(q,t) data file."
     
-    
     ! get r_bin, density and number of atoms
     
     call get_node(fxml, path="//s-q-time", attributes=structure_attributes, status=iostat)       
     call get_value(structure_attributes,"time-bin",read_db,status=iostat)
     if (iostat /= 0) stop "No time-bin attribute in S(q,t) data file."
     t_bin = string_to_db(read_db)   
-    
-    !print *, "r_bin = ", r_bin
     
     call get_value(structure_attributes,"n-time-bin",read_int,status=iostat)
     if (iostat /= 0) stop "No n-time-bin attribute in S(q,t) data file."
@@ -60,7 +56,6 @@ contains
     call get_value(structure_attributes,"n-q-points",read_int,status=iostat)
     if (iostat /= 0) stop "No n-q-points attribute in S(q,t) data file."
     n_q_points = string_to_int(read_int)
-        
     
     ! count SQt elements and populate q array
     
@@ -85,50 +80,41 @@ contains
       stop "Number of data point in S(q,t) inconsistent"
     end if
     
-    
     target_s_qt_fom%n_t_bin = n_t_bin
     target_s_qt_fom%t_bin = t_bin
 
-
     allocate(target_s_qt_fom%obs(n_q_points, n_t_bin))
-  
-  
+    
     call close_xmlfile(fxml)  
     
-
     call open_xmlfile(trim(filename),fxml,iostat)
-    
     
     ! finally populate obs data note here this equals S-self+S-diff !!
     
     do j = 1, n_t_bin
-      do i = 1, n_q_points
-      
+      do i = 1, n_q_points  
         call get_node(fxml, path="//s-q-time/SQt", attributes=structure_attributes, status=iostat) 
-        
         call get_value(structure_attributes,"S-self",read_db,status=iostat)
         target_s_qt_fom%obs(i, j) = string_to_db(read_db)       
-          
         call get_value(structure_attributes,"S-diff",read_db,status=iostat)
         target_s_qt_fom%obs(i, j) = target_s_qt_fom%obs(i, j) + string_to_db(read_db)          
-        
       end do
     end do
 
-    
     call close_xmlfile(fxml)                             
 
   end subroutine make_s_qt_fom_container
 
-  
-  
-  !START_DOCUMENT
+    
+  ! START_DOCUMENT
+  !
   subroutine start_document()
     use flib_sax
   end subroutine start_document
 
 
   ! BEGIN_ELEMENT
+  !
   subroutine begin_element(name,attributes)
     use flib_sax  
     character(len=*), intent(in)   :: name
@@ -138,16 +124,15 @@ contains
     real(db) :: number_db, number_db2
     character(len=40) :: read_db, read_int    
     
-
     select case(name)                       
 	
     end select
-
 
   end subroutine begin_element
 
 
   ! PCDATA_CHUNK
+  !
   subroutine pcdata_chunk(chunk)
     use flib_sax
     character(len=*), intent(in) :: chunk
@@ -156,6 +141,7 @@ contains
 
 
   ! END_ELEMENT
+  !
   subroutine end_element(name)
     use flib_sax  
     character(len=*), intent(in)   :: name
@@ -163,7 +149,8 @@ contains
   end subroutine end_element
 
 
-  !END_DOCUMENT
+  ! END_DOCUMENT
+  !
   subroutine end_document()
     use flib_sax  
   end subroutine end_document

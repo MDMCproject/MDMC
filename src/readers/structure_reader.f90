@@ -3,7 +3,6 @@ use common_block_class, only : common_config
 use various_constants_class
 use converters_class
 
-
   implicit none
   
   private :: begin_element, end_element, pcdata_chunk
@@ -20,7 +19,6 @@ contains
     type(xml_t) :: fxml
     integer     :: iostat
 
-
     call open_xmlfile(filename,fxml,iostat)
     if (iostat /= 0) stop "Cannot open file."
 
@@ -31,7 +29,6 @@ contains
                  start_document=start_document, &
                  end_document=end_document)
 
-    
     call close_xmlfile(fxml)                             
 
   end subroutine make_structure
@@ -42,7 +39,7 @@ contains
   ! is only the case when unitcells_xyz(1:3) contains three identical integers
   ! for the number of unit cells in the x,y and z directions. 
   ! Further the resulting structure is returned with its center at the origin.
-  
+  !
   subroutine make_simple_cubic_structure(density, unitcells_xyz)
     real(db), intent(in) :: density
     integer, dimension(ndim) :: unitcells_xyz
@@ -52,18 +49,15 @@ contains
     
     integer :: n = 1, nx, ny, nz, n_tot
     
-    
     ! calculate box edges and gap between atoms
 
     edges = unitcells_xyz / density**(1.0_db/3.0_db)
     common_config%str%box_edges = edges
     
-    
     ! make the gap between atoms the same in x, y, and z. This means the
     ! returning structure is locally simple cubic
          
     gap = edges / unitcells_xyz       
-    
     
     n_tot = product(unitcells_xyz)
     allocate(common_config%str%atoms(n_tot))   ! allocate mass, name...
@@ -83,7 +77,6 @@ contains
       end do
     end do
     
-    
     ! print to screen
     
     write(*, *) " "
@@ -102,7 +95,7 @@ contains
   ! Notice the total number of atoms in the returning structure is
   ! 4 * product(unitcells_xyz). 
   ! Further the resulting structure is returned with its center at the origin.
-    
+  !
   subroutine make_fcc_structure(density, unitcells_xyz)
     real(db), intent(in) :: density
     integer, dimension(ndim) :: unitcells_xyz
@@ -111,8 +104,7 @@ contains
     real(db), dimension(ndim) :: gap, put_atom_at ! gap between atoms
     
     integer :: n = 1, nx, ny, nz, n_tot, j
-    
-    
+     
     ! calculate box edges and gap. Notice to accummodate product(unitcells_xyz) 'unit cells'
     ! the box is blown up by 4^(1/3) in each direction. The resulting number of atoms
     ! is therefore 4 * product(unitcells_xyz)
@@ -120,7 +112,6 @@ contains
     edges = unitcells_xyz / (density/4.0_db)**(1.0_db/3.0_db)
     common_config%str%box_edges = edges
     gap = edges / unitcells_xyz
-    
     
     n_tot = 4*product(unitcells_xyz)
     allocate(common_config%str%atoms(n_tot))   ! allocate mass, name...
@@ -164,13 +155,15 @@ contains
   end subroutine make_fcc_structure  
   
   
-  !START_DOCUMENT
+  ! START_DOCUMENT
+  !
   subroutine start_document()
     use flib_sax
   end subroutine start_document
 
 
   ! BEGIN_ELEMENT
+  !
   subroutine begin_element(name,attributes)
     use flib_sax  
     character(len=*), intent(in)   :: name
@@ -190,6 +183,7 @@ contains
         
       case("box-edges")
         ! check unit
+        
         call get_value(attributes,"units",units,status)
         if (units /= "AA") then
           write(*,*) "ERROR, unit of box-edges must be in AA"
@@ -208,6 +202,7 @@ contains
     
       case("atomArray")
         ! check unit
+        
         call get_value(attributes,"units",units,status)
         if (units /= "AA") then
           write(*,*) "ERROR, unit of atomArray must be in AA"
@@ -238,14 +233,13 @@ contains
 
         count_number_atoms = count_number_atoms + 1        
 
-	
     end select
-
 
   end subroutine begin_element
 
 
   ! PCDATA_CHUNK
+  !
   subroutine pcdata_chunk(chunk)
     use flib_sax
     character(len=*), intent(in) :: chunk
@@ -254,6 +248,7 @@ contains
 
 
   ! END_ELEMENT
+  !
   subroutine end_element(name)
     use flib_sax  
     character(len=*), intent(in)   :: name
@@ -272,7 +267,8 @@ contains
   end subroutine end_element
 
 
-  !END_DOCUMENT
+  ! END_DOCUMENT
+  !
   subroutine end_document()
     use flib_sax  
   end subroutine end_document

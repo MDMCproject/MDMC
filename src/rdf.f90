@@ -6,9 +6,7 @@ use tic_toc_class
 
 implicit none
 
-
   public :: make_rdf, cal_rdf, save_rdf
-
 
   ! it is assumed that histogram stores distances in bins of size
   ! bin_length; with the first bin representing distances between
@@ -29,7 +27,6 @@ implicit none
     real(db), dimension(:), allocatable :: val
     real(db), dimension(:), allocatable :: prefac   ! g(r)=histogram*prefac
   end type rdf
-  
   
   character(len=10), parameter, private :: rdf_filename_prefix = "output/rdf"  
   integer, private :: filename_number = 1  ! so first saved rdf file will be called rdf1.xml
@@ -96,7 +93,7 @@ contains
   ! Notice the a_rdf%val array are assumed to represent g(r) at the center
   ! of each bin. That is at: 0.5*bin_length, 1.5*bin_length etc......
   ! The temperature is required to passed in dimensional units here.
-  
+  !
   subroutine save_rdf(a_rdf, temperature, density)
     use flib_wxml
     type (rdf), intent(in) :: a_rdf
@@ -148,11 +145,6 @@ contains
     
     call xml_AddAttribute(xf, "units", "AA")
     call xml_AddAttribute(xf, "bin-length", str(a_rdf%bin_length, format="(f10.5)"))
-    
-    ! Save an r_max value which is slightly too big. This is to do with the primitive way
-    ! the function which reads in such a file works -> see fom_readers.f90
-    ! call xml_AddAttribute(xf, "r-max", str(a_rdf%bin_length*(n_bin+0.01), format="(f10.5)"))
-    
     call xml_NewElement(xf, "this-file-was-created")
     call xml_AddAttribute(xf, "when", get_current_date_and_time())
     call xml_EndElement(xf, "this-file-was-created")
@@ -165,7 +157,6 @@ contains
     end do 
     
     call xml_EndElement(xf, "rdf")
-    
     call xml_Close(xf)
     
   end subroutine save_rdf

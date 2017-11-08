@@ -34,10 +34,7 @@ implicit none
   
   private integrat_over_r_precal
   
-  
   type (integrat_over_r_precal), private :: local_integrat_over_r_precal  
-  
-  
   
   character(len=15), parameter, private :: filename_prefix = "output/s_q_time"    
   integer, private :: filname_number = 1    
@@ -51,7 +48,6 @@ contains
     call check_if_s_q_time_allocated(container)     
 
     n_t_bin = size(container%self, 2)
-  
   end function get_s_q_time_n_t_bin 
 
 
@@ -81,38 +77,32 @@ contains
     call check_if_time_corr_hist_container_is_allocated(g_r_t)
     call check_if_s_q_time_allocated(s_q_t)
     
-    
     ! Has local_integrat_over_r_precal been allocated and populated
     ! Notice should also compare the Q array in that container with 
     ! Q array in the s_q_t container  
     
     n_r = get_time_corr_hist_n_r_bin(g_r_t)
-    
     if (is_integrat_over_r_precal_allocated(local_integrat_over_r_precal) == .false.) then
       local_integrat_over_r_precal = make_and_cal_integrat_over_r_precal( &
         n_r, get_time_corr_hist_r_bin(g_r_t) &
         , s_q_t%q)
     end if
-  
-
-    ! calculate 
     
     n_atom = get_n_atom(str)
     density = get_density(str)
     
     n_q = size(s_q_t%q)
     n_t = get_time_corr_hist_n_time_bin(g_r_t)
-    
-    
+      
     allocate(prefac_s_d(n_r))
     allocate(prefac_s_s(n_r))
     
     ! This are to turn histogram counts into g functions. See page 29 equations
     ! (29-30) in my handwritten notes
+    
     prefac_s_d =  g_r_t%volume_prefac / (density*(n_atom-1)*g_r_t%n_accum)
     prefac_s_s =  g_r_t%volume_prefac / (density*g_r_t%n_accum)
     
-   
     ! note he calculation below could be done faster
     
     s_q_t%diff = 0
@@ -135,13 +125,11 @@ contains
       end do
     end do
 
-
-    ! force the correct exact values for 'self' when t = 0
+    ! use the exact values for 'self' when t = 0
     
     do i_q = 1, n_q
        s_q_t%self(i_q, 1) = 1.0;
     end do
-
 
     deallocate(prefac_s_d)
     deallocate(prefac_s_s)
@@ -149,12 +137,11 @@ contains
   end subroutine cal_s_q_time
 
 
-  
   ! The temperature is assumed to be in dimensionless units.
   ! Print S(q,t) to either filename given by name_of_file or
   ! if this argument is not specified the name given by module 
   ! attribute filename_prefix + number
-
+  !
   subroutine print_s_q_time(container, density, temperature, name_of_file)
     use flib_wxml
     type(s_q_time), intent(in) :: container  
@@ -189,27 +176,23 @@ contains
     
     write(*,'(3a)') "Write ", trim(filename), " to disk"
     
-    
     call xml_OpenFile(filename, xf, indent=.true.)
-    
     call xml_AddXMLDeclaration(xf, "UTF-8")
     call xml_NewElement(xf, "s-q-time")
     
-    ! notice convert units of temperature from dimensionless to K  
+    ! notice convert units of temperature from dimensionless to K
+    
     call xml_AddAttribute(xf, "title", "T = " // trim(str(temperature * T_unit, format="(f10.5)")) // &
                                          " K: rho = " // trim(str(density, format="(f10.5)")) &
                                          // " atoms/AA-3")
-    
     call xml_AddAttribute(xf, "q-units", "AA^-1")
     call xml_AddAttribute(xf, "n-q-points", str(size(container%q), format="(i)") )
     call xml_AddAttribute(xf, "n-time-bin", str(get_s_q_time_n_t_bin(container), format="(i)"))
     call xml_AddAttribute(xf, "time-bin", str(container%t_bin, format="(f10.5)"))
     call xml_AddAttribute(xf, "time-unit", "10^-13 s")        
-    
     call xml_NewElement(xf, "this-file-was-created")
     call xml_AddAttribute(xf, "when", get_current_date_and_time())
     call xml_EndElement(xf, "this-file-was-created")  
-    
     
     n_t_bin = size(container%self, 2)
 
@@ -225,7 +208,6 @@ contains
     end do
     
     call xml_EndElement(xf, "s-q-time")
-    
     call xml_Close(xf)    
   
   end subroutine print_s_q_time
@@ -252,7 +234,6 @@ contains
     else
       boolean = .true.
     end if  
-    
   end function is_integrat_over_r_precal_allocated
 
 
@@ -297,8 +278,8 @@ contains
 
 
 
-  ! t_bin and n_t_bin are needed to pass on the time-binning info to this container
-
+  ! t_bin and n_t_bin determine the time binning for this container
+  !
   function make_s_q_time(q, t_bin, n_t_bin) result(container)
     real(db), dimension(:), intent(in) :: q
     real(db), intent(in) :: t_bin
@@ -321,8 +302,5 @@ contains
     container%diff = 0
     
   end function make_s_q_time
-
-
-
 
 end module s_q_time_class

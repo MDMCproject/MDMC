@@ -1,5 +1,4 @@
 module configuration_class
-!use structure_class
 use fnc_constraint_class
 
   implicit none
@@ -10,10 +9,8 @@ use fnc_constraint_class
 
   type constraints
     private
-    type (fnc_constraint), pointer :: pt_fnc_constraint => null()
-  !  type (cutoff_constraint), pointer :: pt_cutoff_constraint 
+    type (fnc_constraint), pointer :: pt_fnc_constraint => null() 
   end type constraints
-
 
   ! This type holds a structure and constraints that are associated
   ! with this structure. Note that, the structure are not required
@@ -25,22 +22,17 @@ use fnc_constraint_class
     type (constraints) :: constr_list
   end type configuration
 
-
   interface add_constraint
     module procedure add_fnc_constraint
   end interface
 
-  !type (configuration)  :: my_configuration
-
 contains
-
 
   subroutine add_fnc_constraint(a_config, fnc_target)
     type (configuration), intent(inout) :: a_config
     type (fnc_constraint), target, intent(in) :: fnc_target
     
     a_config%constr_list%pt_fnc_constraint => fnc_target
-
   end subroutine add_fnc_constraint
 
 
@@ -55,6 +47,5 @@ contains
     !  etc....
     end if
   end function is_valid_structure
-
 
 end module configuration_class

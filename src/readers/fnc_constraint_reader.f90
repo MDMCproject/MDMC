@@ -1,8 +1,10 @@
+! Code meant to read fnc constraints
+! Current not implemented
+
 module fnc_constraint_reader_class
 use flib_sax
 use common_block_class, only : common_config
 use various_constants_class
-
 
   implicit none
   
@@ -32,12 +34,14 @@ contains
 
   end subroutine make_fnc_constraint
 
-  !START_DOCUMENT
+  ! START_DOCUMENT
+  !
   subroutine start_document()
   end subroutine start_document
 
 
   ! BEGIN_ELEMENT
+  !
   subroutine begin_element(name,attributes)
     character(len=*), intent(in)   :: name
     type(dictionary_t), intent(in) :: attributes
@@ -49,20 +53,14 @@ contains
     real(db) :: number_dp(1)
 
     select case(name)
-      case("molecule")
-        !call get_value(attributes,"number", read_number_atoms,status)
-        !write(*,*) number_atoms
-        !allocate(common_config%str%atoms(number_atoms))
-        count_number_atoms = 1    
-
-	
+  
     end select
-
 
   end subroutine begin_element
 
 
   ! PCDATA_CHUNK
+  !
   subroutine pcdata_chunk(chunk)
     character(len=*), intent(in) :: chunk
 
@@ -70,15 +68,15 @@ contains
 
 
   ! END_ELEMENT
+  !
   subroutine end_element(name)
     character(len=*), intent(in)   :: name
-
-
 
   end subroutine end_element
 
 
-  !END_DOCUMENT
+  ! END_DOCUMENT
+  !
   subroutine end_document()
   end subroutine end_document
 

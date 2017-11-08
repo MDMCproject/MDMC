@@ -1,8 +1,10 @@
+! boiler template code for handling FNC constraint
+! but no implementation as of yet
+    
 module fnc_constraint_class
 use structure_class
 
 implicit none
-
 
   type fnc_group
     integer :: atomindex
@@ -24,6 +26,7 @@ contains
 
   end function validate_fnc_constraint
 
+  
   function make_fnc_constraint(filename) result (new_fnc_constraint)
     character(*)  :: filename
     type (fnc_constraint) :: new_fnc_constraint

@@ -10,7 +10,6 @@ use time_corr_algorithm_class
   private :: begin_element, end_element, pcdata_chunk
   private :: start_document, end_document                               
 
-
 contains
 
   ! read S(q,omega) data from file and store in target_s_qo_fom
@@ -27,16 +26,13 @@ contains
     character(len=40) :: read_db, read_int
     type (dictionary_t) :: structure_attributes
     
-    
     integer :: n_q_points, n_omega
     integer :: i, j
     
     integer :: number_of_SQomega  
     
-    
     call open_xmlfile(trim(filename),fxml,iostat)
     if (iostat /= 0) stop "Cannot open S(q,omega) data file."
-    
     
     ! n_omega and n_q_points
     
@@ -48,7 +44,6 @@ contains
     call get_value(structure_attributes,"n-q-points",read_int,status=iostat)
     if (iostat /= 0) stop "No n-q-points attribute in S(q,omega) data file."
     n_q_points = string_to_int(read_int)
-    
     
     ! count SQomega elements and populate q array
     
@@ -71,26 +66,22 @@ contains
       stop "Number of data point in S(q,omega) inconsistent"
     end if
     
-
     allocate(target_s_qo_fom%omega(n_omega))
     allocate(target_s_qo_fom%obs(n_q_points, n_omega))
     allocate(target_s_qo_fom%esd(n_q_points, n_omega))
   
     ! initiate in case data contains no errorbars
+    
     target_s_qo_fom%esd = 1.0;
-  
   
     call close_xmlfile(fxml)  
     
-
     call open_xmlfile(trim(filename),fxml,iostat)
-    
     
     ! finally populate obs data and omega array note here this equals S-self+S-diff !!
     
     do j = 1, n_omega
-      do i = 1, n_q_points
-      
+      do i = 1, n_q_points  
         call get_node(fxml, path="//s-q-omega/SQomega", attributes=structure_attributes, status=iostat) 
         
         ! get S-diff, S-self or S
@@ -113,11 +104,8 @@ contains
             else
               target_s_qo_fom%esd(i, j) = 1.0
             end if
-            
           end if          
         end if     
-        
-        !print *, target_s_qo_fom%obs(i, j), "and ", target_s_qo_fom%esd(i, j)
         
         if (i == 1) then
           call get_value(structure_attributes,"omega",read_db,status=iostat)
@@ -127,20 +115,20 @@ contains
       end do
     end do
 
-    
     call close_xmlfile(fxml)                             
 
   end subroutine make_s_qo_fom_container
 
-  
-  
-  !START_DOCUMENT
+    
+  ! START_DOCUMENT
+  !
   subroutine start_document()
     use flib_sax
   end subroutine start_document
 
 
   ! BEGIN_ELEMENT
+  !
   subroutine begin_element(name,attributes)
     use flib_sax  
     character(len=*), intent(in)   :: name
@@ -150,16 +138,15 @@ contains
     real(db) :: number_db, number_db2
     character(len=40) :: read_db, read_int    
     
-
     select case(name)                       
 	
     end select
-
 
   end subroutine begin_element
 
 
   ! PCDATA_CHUNK
+  !
   subroutine pcdata_chunk(chunk)
     use flib_sax
     character(len=*), intent(in) :: chunk
@@ -168,6 +155,7 @@ contains
 
 
   ! END_ELEMENT
+  !
   subroutine end_element(name)
     use flib_sax  
     character(len=*), intent(in)   :: name
@@ -175,7 +163,8 @@ contains
   end subroutine end_element
 
 
-  !END_DOCUMENT
+  ! END_DOCUMENT
+  !
   subroutine end_document()
     use flib_sax  
   end subroutine end_document

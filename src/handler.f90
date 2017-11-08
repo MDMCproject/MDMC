@@ -13,7 +13,6 @@ use time_corr_algorithm_class
 
   implicit none
   
-  
   private :: begin_element, end_element, pcdata_chunk
   private :: start_document, end_document
   
@@ -23,12 +22,14 @@ use time_corr_algorithm_class
   
   ! The logical variables named 'in_ + something' are used to keep track of when the 
   ! XML reader is inside or not inside an XML element
+  
   logical, private  :: in_constraints = .false., in_use_near_neighbour_method = .false.
   logical, private  :: in_gpe = .false., in_fom = .false.
   logical, private  :: in_md_control = .false., in_mdmc_control = .false.
   
   ! Notice use the same setup param container for md_gridsearch_control as is used for
   ! mdmc_control - see code below
+  
   logical, private :: in_md_gridsearch_control = .false.
   logical, private  :: in_mdmc_control_time_corr = .false. 
   logical, private  :: in_md_control_time_corr = .false.
@@ -38,8 +39,9 @@ use time_corr_algorithm_class
   ! Notice that if nn_list_r_cut stays equal to 0.0 then nn_list%ignore_list stays 
   ! equal to .true. when attempting to make a nearest neighbour list with 
   ! make_near_neighb_list()
-  ! nn_list_delta_r defines the buffer region so that the near-neighbour pairs includes
+  ! nn_list_delta_r defines the buffer region so that the near-neighbour pairs include
   ! all pairs with distances less than r_cut+delta_r
+  
   real(db), private :: nn_list_r_cut = 0.0                                      
   real(db), private :: nn_list_delta_r       
                                              
@@ -72,11 +74,13 @@ contains
 
 
   ! START_DOCUMENT
+  !
   subroutine start_document()
   end subroutine start_document
 
 
   ! BEGIN_ELEMENT
+  !
   subroutine begin_element(name,attributes)
     character(len=*), intent(in)   :: name
     type(dictionary_t), intent(in) :: attributes
@@ -105,7 +109,6 @@ contains
       case("control-object")
 	    call get_value(attributes,"name",control_object_name,status)
 	
-	
         select case(control_object_name)
           case("md_control")
             in_md_control = .true.
@@ -125,8 +128,8 @@ contains
 	
     end select
 
-
     ! if in use-near-neighbour-method
+    
     if (in_use_near_neighbour_method) then
       select case(name)
         case("delta-r")
@@ -152,9 +155,9 @@ contains
           nn_list_r_cut = string_to_db(read_db)      
       end select
     end if    
-    
          
     ! if in md_control
+    
     if (in_md_control) then
       select case(name)
         case("step-limit")       
@@ -182,11 +185,13 @@ contains
           end if            
             
           ! read temperature and convert it to internal temperature unit
+          
           call get_value(attributes,"val",read_db,status)
           setup_md_control_params%temperature = string_to_db(read_db) / T_unit
             
         case("time-step")       
           ! check unit
+          
           call get_value(attributes,"units",units,status)
           if (units /= "10e-13s") then
             write(*,*) "ERROR, unit of time-step must be in 10e-13s"
@@ -201,6 +206,7 @@ contains
         
         case("r-max")
           ! check unit
+          
           call get_value(attributes,"units",units,status)
           if (units /= "AA") then
             write(*,*) "ERROR, unit of r-max must be in AA"
@@ -224,6 +230,7 @@ contains
           
         case("bin-length")
           ! check unit
+          
           call get_value(attributes,"units",units,status)
           if (units /= "AA") then
             write(*,*) "ERROR, unit of bin-length must be in AA"
@@ -298,6 +305,7 @@ contains
           call get_value(attributes,"val",read_db,status)
           
           ! read and to convert to internal temperature units
+          
           setup_mdmc_control_params%temperature = string_to_db(read_db) / T_unit           
             
         case("time-step")       
@@ -308,13 +316,12 @@ contains
           call get_value(attributes,"val",read_db,status)
           setup_mdmc_control_params%temperature_mc = string_to_db(read_db)
           
-          
         ! r-max and bin-length are here only used when wanting to save g(r) to file
           
         case("r-max")
           call get_value(attributes,"val",read_db,status)
           
-          ! it is assumed for now that r-max should be smaller than half
+          ! it is assumed for now that r-max must be smaller than half
           ! the shortest box edge
           
           number_db = string_to_db(read_db)
@@ -338,6 +345,7 @@ contains
           ! This parameter is used to add a time delay between
           ! buffers, where one buffer calculates one g(r,t). See also the
           ! comments elsewhere in this file where n_md_step_between_buffers is used
+          
           call get_value(attributes,"number",read_int,status)
           n_md_step_between_buffers = string_to_int(read_int);                 
 
@@ -349,13 +357,13 @@ contains
           call get_value(attributes,"number",read_int,status)
           
           ! set this time_corr_container private attribute directly
+          
           call set_n_g_r_t_to_average_over(string_to_int(read_int))
           
         case("md-per-time-bin")       
           call get_value(attributes,"number",read_int,status) 
           setup_mdmc_control_params%md_per_time_bin = string_to_int(read_int)                              
                
-          
       end select
     end if
         
@@ -369,6 +377,7 @@ contains
           
         case("sigma")
           ! check unit
+          
           call get_value(attributes,"units",units,status)
           if (units /= "AA") then
             write(*,*) "ERROR, unit of sigma must be in AA"
@@ -394,14 +403,13 @@ contains
                                       
               call get_value(attributes,"max-move",read_db,status)
               call set_func_param_max_move(target_lj_pe%params, "sigma", &
-                                      string_to_db(read_db))   
-                                      
-                                                                       
+                                      string_to_db(read_db))                                                                
             end if
           end if
           
         case("epsilon")
           ! check unit
+          
           call get_value(attributes,"units",units,status)
           if (units /= "KJ/mole") then
             write(*,*) "ERROR, unit of epsilon must be in KJ/mole"
@@ -431,9 +439,9 @@ contains
             end if
           end if          
           
-          
         case("r-cut")
           ! check unit
+          
           call get_value(attributes,"units",units,status)
           if (units /= "AA") then
             write(*,*) "ERROR, unit of r-cut must be in AA"
@@ -532,7 +540,6 @@ contains
       select case(name)
         case("fnc_constraint")
           call get_value(attributes,"filename",filename,status)
-          !call make_fnc_constraint(filename)
           call add_constraint(common_config, target_fnc_constr)
       end select
     end if
@@ -542,6 +549,7 @@ contains
 
 
   ! PCDATA_CHUNK
+  !
   subroutine pcdata_chunk(chunk)
     character(len=*), intent(in) :: chunk
 
@@ -549,6 +557,7 @@ contains
 
 
   ! END_ELEMENT
+  !
   subroutine end_element(name)
     character(len=*), intent(in)   :: name
 
@@ -585,8 +594,7 @@ contains
                                            setup_mdmc_control_params%average_over_repeated_equilibration, &
                                            setup_mdmc_control_params%adjust_temp_at_interval_repeated)              
         end if
-        
-        
+             
         ! Start running an algorithm 
           
         if (in_md_control == .true.) then
@@ -600,7 +608,6 @@ contains
         if (in_md_gridsearch_control == .true.) then
           call run_md_gridsearch_control(common_config, setup_mdmc_control_params)           
         end if
-        
         
         ! Before calling algorithms that compare against dynamical structure factor information
         ! do the following addition checks and adjustments
@@ -668,8 +675,7 @@ contains
           ! the number of time bins between when g(r,t)s are calculated
           
           call set_n_buffers( n_buffers )
-          
-          
+            
           if (in_mdmc_control_time_corr == .true.) then
             call run_mdmc_control_time_corr(common_config, setup_mdmc_control_params)
           else
@@ -711,13 +717,14 @@ contains
   end subroutine end_element
 
 
-  !END_DOCUMENT
+  ! END_DOCUMENT
+  !
   subroutine end_document()
   end subroutine end_document
   
   ! Additional user input check when temperature calibration is first part of 
   ! a MD simulation 
-  
+  !
   subroutine check_when_temperature_cali(total_steps, temperature_steps, average_over, cali_when)
     integer, intent(in) :: total_steps
     integer, intent(in) :: temperature_steps
@@ -732,8 +739,7 @@ contains
       write(*,*) "The total number of steps in MD simulation must be a multiple of "
       write(*,*) "the average-over XML attribute."
       stop
-    end if      
-    
+    end if       
     
     if ( temperature_steps > 0 ) then
       return    
@@ -768,7 +774,6 @@ contains
       stop
     end if    
   
-
   end subroutine check_when_temperature_cali 
 
 end module handler_class

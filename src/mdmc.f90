@@ -18,8 +18,7 @@ program mdmc
   character(len=99) :: filename, structure_filename
   type (dictionary_t) :: structure_attributes
   
-  logical :: build_structure_from_model = .true.
-  
+  logical :: build_structure_from_model = .true.  
   
   ! set build in random generator function seeds
   ! note only need to do this once 
@@ -36,11 +35,12 @@ program mdmc
   CALL RANDOM_SEED (PUT=new(1:I))
   
   ! Ask user for a MDMC job file
+  
   write (*,*) "Enter the filename of a MDMC job file: "
   read *, filename 
-  !filename = "./input/md_control.xml"
   
   ! create output directory - at this point in time hardcoded to 'output'
+  
   inquire( directory="output", exist=output_dir_exist )
   if ( output_dir_exist == .false. ) then
     write(*,*), "create output directory"
@@ -67,83 +67,67 @@ program mdmc
    
   call close_xmlfile(fxml)  
   
-  
   if (build_structure_from_model) then
     call handler_structure_part(trim(filename))
   end if
   
-  
   ! Same as above but for the <fom> element. 
   
   call open_xmlfile(trim(filename),fxml,iostat)
-  
   call get_node(fxml, path="//fom/rdf-fom/rdf-data",attributes=structure_attributes,status=iostat)
   call get_value(structure_attributes, "filename", structure_filename, iostat)
-  
   call close_xmlfile(fxml)  
   
   if (iostat == 0) then
     call make_rdf_fom(trim(structure_filename))
   end if
   
-  
   ! Similar to above but for the <control-object/q-values> and <control-object/omega-values> elements.
   ! As of this writing there is not an option for specifying q and omega values from a data file
   
   call alloc_q_omega_arrays(trim(filename))
 
-  
   ! open main input file to check for g-d-rt-fom element
   ! otherwise this code is here for the same reason as above
   
   call open_xmlfile(trim(filename),fxml,iostat)
-  
   call get_node(fxml, path="//fom/g-d-rt-fom/data-file",attributes=structure_attributes,status=iostat)
   call get_value(structure_attributes, "filename", structure_filename, iostat)
-  
   call close_xmlfile(fxml)  
   
   if (iostat == 0) then
     call make_g_d_rt_fom_container(trim(structure_filename))
   end if  
-  
-  
+    
   ! open main input file to check for s-qt-fom element
   ! otherwise this code is here for the same reason as above
   
   call open_xmlfile(trim(filename),fxml,iostat)
-  
   call get_node(fxml, path="//fom/s-qt-fom/data-file",attributes=structure_attributes,status=iostat)
   call get_value(structure_attributes, "filename", structure_filename, iostat)
-  
   call close_xmlfile(fxml)  
   
   if (iostat == 0) then
     call make_s_qt_fom_container(trim(structure_filename))
   end if    
   
- 
   ! open main input file to check for s-qo-fom element
   ! otherwise this code is here for the same reason as above
   
   call open_xmlfile(trim(filename),fxml,iostat)
-  
   call get_node(fxml, path="//fom/s-qo-fom/data-file",attributes=structure_attributes,status=iostat)
   call get_value(structure_attributes, "filename", structure_filename, iostat)
-  
   call close_xmlfile(fxml)  
   
   if (iostat == 0) then
     call make_s_qo_fom_container(trim(structure_filename))
   end if    
 
-    
   ! Now finally read in the rest of the job file and run the 
   ! simulation specified in the job file 
   
   call startup_handler(trim(filename))
   
-
 end program mdmc
 
 

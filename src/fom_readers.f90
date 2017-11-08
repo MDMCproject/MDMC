@@ -38,7 +38,6 @@ contains
     type(xml_t) :: fxml
     integer     :: iostat
     
-    
     ! before reading the rdf data file from a-to-z determine
     ! separately how many g-of-r elements it contains
     
@@ -53,7 +52,6 @@ contains
   
     call close_xmlfile(fxml)  
 
-
     ! now begin reading rdf data file from a-to-z
 
     call open_xmlfile(filename,fxml,iostat)
@@ -65,21 +63,21 @@ contains
                  pcdata_chunk_handler=pcdata_chunk, &
                  start_document=start_document, &
                  end_document=end_document)
-
     
     call close_xmlfile(fxml)                             
 
   end subroutine make_rdf_fom
 
-  
-  
-  !START_DOCUMENT
+    
+  ! START_DOCUMENT
+  !
   subroutine start_document()
     use flib_sax
   end subroutine start_document
 
 
   ! BEGIN_ELEMENT
+  !
   subroutine begin_element(name,attributes)
     use flib_sax  
     character(len=*), intent(in)   :: name
@@ -89,37 +87,30 @@ contains
     real(db) :: number_db, number_db2
     character(len=40) :: read_db, read_int    
     
-
     select case(name)
       case("rdf")
         call get_value(attributes,"title", target_rdf_fom%title, status)
-        
-        
+            
         call get_value(attributes,"bin-length", read_db,status)
         number_db2 = string_to_db(read_db)
 
-        
         target_rdf_fom%rdf_data = make_rdf(product(common_config%str%box_edges), &
                                   size(common_config%str%atoms), number_of_g_of_r, &
-                                  number_db2)
-                        
+                                  number_db2)                        
         count_number_atoms = 1
-
                         
       case("g-of-r")
-
         call get_value(attributes,"g", read_db,status)
         target_rdf_fom%rdf_data%val(count_number_atoms) = string_to_db(read_db)
    
         count_number_atoms = count_number_atoms + 1        
-        	
     end select
-
 
   end subroutine begin_element
 
 
   ! PCDATA_CHUNK
+  !
   subroutine pcdata_chunk(chunk)
     use flib_sax
     character(len=*), intent(in) :: chunk
@@ -128,6 +119,7 @@ contains
 
 
   ! END_ELEMENT
+  !
   subroutine end_element(name)
     use flib_sax  
     character(len=*), intent(in)   :: name
@@ -135,7 +127,8 @@ contains
   end subroutine end_element
 
 
-  !END_DOCUMENT
+  ! END_DOCUMENT
+  !
   subroutine end_document()
     use flib_sax  
   end subroutine end_document

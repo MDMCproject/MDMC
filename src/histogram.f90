@@ -4,12 +4,10 @@ use structure_class
 
 implicit none
 
-
   public :: make_histogram, deallocate_histogram
   public :: copy_histogram
   public :: cal_histogram
   public :: accum_histogram, clear_histogram
-
 
   ! it is assumed that histogram stores distances in bins of size
   ! bin_length; with the first bin representing distances between
@@ -20,16 +18,16 @@ implicit none
     real(db) :: bin_length   
     
     ! used when calculating a single histogram
+    
     integer, dimension(:), allocatable :: val
     
     ! used when using accumulating histograms
+    
     integer, dimension(:), allocatable :: sum 
     integer :: n_accum  
     
     ! Notice in the current design %val and %sum are not
     ! in sync. 
-    
-    ! ....
     
   end type histogram
   
@@ -40,10 +38,9 @@ implicit none
 
 contains
 
-
   ! Same as cal_histogram but in additional this function also adds the
   ! calculated histogram to the hist%sum attribute and increase hist%n_accum
-
+  !
   subroutine accum_histogram(hist, str)
     type (histogram), intent(inout) :: hist
     type (structure), intent(in) :: str    
@@ -51,7 +48,6 @@ contains
     ! fill up the hist%val array
     
     call cal_histogram(hist, str)
-    
     
     ! add the hist%val array to the hist%sum array
     
@@ -63,14 +59,13 @@ contains
   
   ! This one is used together with accum_histogram. 
   ! It resets the hist%n_accum and hist%sum attributes
-  
+  !
   subroutine clear_histogram(hist)
     type (histogram), intent(inout) :: hist  
   
     hist%val = 0
     hist%n_accum = 0
     hist%sum = 0
-  
   end subroutine clear_histogram
   
   
@@ -81,14 +76,12 @@ contains
     
     deallocate(hist%val)
     deallocate(hist%sum)
-  
   end subroutine deallocate_histogram
   
     
   function make_histogram_r_max(r_max, bin_length) result(hist)
     real(db), intent(in) :: r_max, bin_length
     type (histogram) :: hist
-    
     
     hist%bin_length = bin_length 
     
@@ -104,18 +97,17 @@ contains
     hist%val = 0
     hist%sum = 0
     hist%n_accum = 0
-  
   end function make_histogram_r_max
 
+  
   function make_histogram_n_bin(n_bin, bin_length) result(hist)
     real(db), intent(in) :: bin_length
     integer, intent(in):: n_bin
     type (histogram) :: hist
-    
-    
+      
     hist%bin_length = bin_length 
     
-    ! Want the histogram to ideally represent values not 
+    ! Wants the histogram to ideally represent values not 
     ! larger than r_max here. Hence the reason for using floor()
     ! here rather than nint().
     
@@ -158,7 +150,7 @@ contains
   
   
   ! Populate the histogram%val array (but doesn't alter %sum and %n_accum)
-  
+  !
   subroutine cal_histogram(hist, str)
     type (histogram), intent(inout) :: hist
     type (structure), intent(in) :: str
@@ -170,8 +162,7 @@ contains
     real (db) :: rr
     real (db), dimension(ndim) :: diff_vec   
 		
-		
-	r_max = hist%bin_length * size(hist%val)
+    r_max = hist%bin_length * size(hist%val)
     rr_max = r_max * r_max
     
     n_tot = size(str%atoms)   ! number of atoms
@@ -187,8 +178,7 @@ contains
         do i2 = i1+1, n_tot
           diff_vec = str%r(i1,:) - str%r(i2,:)
           
-          call apply_boundary_condition_to_vector_expensive(diff_vec, str%box_edges)
-          
+          call apply_boundary_condition_to_vector_expensive(diff_vec, str%box_edges)      
           
           rr = sum(diff_vec*diff_vec)
           
@@ -222,6 +212,5 @@ contains
 		end if
 
   end subroutine cal_histogram
-
 
 end module histogram_class

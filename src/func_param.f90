@@ -22,7 +22,6 @@ implicit none
     real(db) :: max_move   ! max length this parameter is allowed to move
   end type func_param
 
-
   integer, parameter, private    :: MAX_ITEMS = 64
   type func_params
     integer :: number_of_items = 0
@@ -46,28 +45,19 @@ contains
   end subroutine print_func_params
 
 
-
   ! used by add_xml_attribute_func_params()
-  
+  !
   subroutine xml_add_attribute_func_params(xf, params)
     use flib_wxml 
     type (xmlf_t), intent(inout) :: xf      
     type (func_params), intent(in) :: params
 
-
     integer :: i
-   
-    
+       
     do i = 1, params%number_of_items
-!      if (params%p(i)%fixed == .false.) then
+      call xml_AddAttribute(xf, trim(params%p(i)%name), str(params%p(i)%val, format="(f10.5)"))
+    end do
 
-
-      call xml_AddAttribute(xf, trim(params%p(i)%name), str(params%p(i)%val, format="(f10.5)")) 
-
-!      end if
-    end do 
-
-  
   end subroutine xml_add_attribute_func_params
 
 
@@ -82,8 +72,7 @@ contains
       call xml_NewElement(xf, trim(params%p(i)%name)) 
       call xml_AddAttribute(xf, "val", str(params%p(i)%val, format="(es12.5)"))
       call xml_EndElement(xf, trim(params%p(i)%name))
-    end do
-  
+    end do  
   end subroutine write_func_param_to_file
 
 
@@ -96,8 +85,9 @@ contains
     
     do i = 1, params%number_of_items
       if (params%p(i)%fixed == .false.) then
-          ! get a random number between 0 and 1
-	      call random_number(ran_num)  
+        ! get a random number between 0 and 1
+          
+        call random_number(ran_num)  
   	    
         params%p(i)%val = params%p(i)%val + params%p(i)%max_move*(ran_num-0.5)
         
@@ -124,7 +114,6 @@ contains
         return
       end if
     end do
-  
   end function does_func_param_exist
 
 
@@ -135,7 +124,6 @@ contains
     
     integer :: i
    
-    
     do i = 1, params%number_of_items
       if (trim(params%p(i)%name) == trim(name)) then
         val = params%p(i)%val
@@ -160,7 +148,6 @@ contains
     
     integer :: i
    
-    
     do i = 1, params%number_of_items
       if (trim(params%p(i)%name) == trim(name)) then
         params%p(i)%min = min
@@ -209,7 +196,6 @@ contains
     logical, intent(in) :: fixed
     
     integer :: i
-   
     
     do i = 1, params%number_of_items
       if (trim(params%p(i)%name) == trim(name)) then
@@ -234,7 +220,6 @@ contains
     real (db), intent(in) :: max_move
     
     integer :: i
-   
     
     do i = 1, params%number_of_items
       if (trim(params%p(i)%name) == trim(name)) then
@@ -288,8 +273,7 @@ contains
         return
       end if
     end do
-    
-    
+     
     ! if hasn't returned by this stage then name was not found
     ! and a error should be thrown but for now brute force
     
@@ -298,6 +282,5 @@ contains
     stop  
 
   end subroutine set_func_param_val
-    
     
 end module func_param_class
