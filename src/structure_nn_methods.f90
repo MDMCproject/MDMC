@@ -9,8 +9,8 @@ implicit none
   public :: build_near_neighb
   public :: update_nn_list_flags
 
-
-  ! used for the cell method (use rapaport's notation)
+  ! used for the cell method (Rapaport's notation)
+  
   integer, parameter, private :: n_offset = 14
   
   private :: get_num_near_neighb 
@@ -43,11 +43,9 @@ contains
     nn_list_out%max_an_atom_has_moved = nn_list_in%max_an_atom_has_moved
     nn_list_out%what_is_stored = nn_list_in%what_is_stored
   
-  
     allocate(nn_list_out%pairs(size(nn_list_in%pairs)))
     nn_list_out%pairs = nn_list_in%pairs
-
-    
+  
     allocate(nn_list_out%dists(size(nn_list_in%dists)))
     nn_list_out%dists = nn_list_in%dists
     
@@ -59,7 +57,7 @@ contains
   ! this is a 'shallow' copy of nn_list, meaning that the two input
   ! lists are assumed to have exactly the same array sizes and no memory
   ! allocated (or deallocated)
-
+  !
   subroutine shallow_copy_near_neighb_list(nn_list_in, nn_list_out)
     type (near_neighb_list), intent(in) :: nn_list_in
     type (near_neighb_list), intent(inout) :: nn_list_out
@@ -71,7 +69,6 @@ contains
     if ( nn_list_in%ignore_list == .true. ) then
       return
     end if 
-  
   
     ! make some checks to see if arrays sizes are the same
     
@@ -88,8 +85,7 @@ contains
     end if    
   
     call shallow_copy_cell_list(nn_list_in%cells, nn_list_out%cells)  
-    
-    
+      
     nn_list_out%pairs_allocated = nn_list_in%pairs_allocated
     nn_list_out%n_pairs = nn_list_in%n_pairs
     nn_list_out%needs_updating = nn_list_in%needs_updating
@@ -104,7 +100,6 @@ contains
   end subroutine shallow_copy_near_neighb_list
 
 
-  
   subroutine update_nn_list_flags(max_an_atom_has_moved, nn_list)
     real(db), intent(in) :: max_an_atom_has_moved
     type (near_neighb_list), intent(inout) :: nn_list
@@ -115,8 +110,7 @@ contains
     if (nn_list%max_an_atom_has_moved > 0.5 * nn_list%delta_r) then
       nn_list%needs_updating = .true.
       nn_list%max_an_atom_has_moved = 0.0
-    end if 
-    
+    end if     
   end subroutine update_nn_list_flags
   
 
@@ -145,14 +139,12 @@ contains
     
     n_tot = size(str%atoms)
     
-    
     ! stuff to do with when to update neighbor list
     
     str%nn_list%needs_updating = .true.
     str%nn_list%delta_r = delta_r
     str%nn_list%r_cut = r_cut   
     str%nn_list%max_an_atom_has_moved = 0.0
-    
                                               
     ! Determine whether or not to use cell method
                                              
@@ -171,7 +163,6 @@ contains
     
     allocate(str%nn_list%cells%list(n_tot+product(str%nn_list%cells%num_cells)))
     
-    
     ! get number of nn atom pairs required for the structure: str         
     
     str%nn_list%n_pairs = get_num_near_neighb(str%nn_list%cells, &
@@ -189,7 +180,6 @@ contains
       write(*,'(a,i6)') "and number of possible pairs are ", n_tot*(n_tot-1) / 2
       stop
     end if
-    
 
     str%nn_list%pairs_allocated = str%nn_list%n_pairs+10*n_tot
     
@@ -211,7 +201,6 @@ contains
       write(*,'(a,i6)') "and number of possible pairs are ", n_tot*(n_tot-1) / 2
       write(*,*) " "
     end if
-    
     
     ! a nn-list is here a member of a structure type. It is implicitely assumed
     ! this nn-list is always in sync with the structure, therefore:
@@ -250,13 +239,11 @@ contains
       return
     end if
     
-    
     if (str%nn_list%cells%ignore_cell_method == .true.) then
       call build_near_neighb_without_cell(str)
     else
       call build_near_neighb_with_cell(str)
     end if
-    
     
     ! at this point a fresh nn-list has just been build, hence
     
@@ -264,13 +251,9 @@ contains
     
   end subroutine build_near_neighb
 
-
-!***************************************************************************!
-!!!!!!!!!!!!!!!!!!!!!!! private functions/subroutines !!!!!!!!!!!!!!!!!!!!!!!
-!***************************************************************************! 
   
   ! build new nn-list and populate dists array with, for now, r2 values
-  
+  !  
   subroutine build_near_neighb_without_cell(str)
     type (structure), intent(inout) :: str
     
@@ -311,13 +294,14 @@ contains
     end do
     
     ! update number of pairs
+    
     str%nn_list%n_pairs = num
     
   end subroutine build_near_neighb_without_cell
   
   
   ! same as build_near_neighb_without_cell but using cell method
-  
+  !
   subroutine build_near_neighb_with_cell(str)
     type (structure), intent(inout) :: str
     
@@ -350,9 +334,10 @@ contains
       dummy = str%r(i,:) + 0.5 * str%box_edges
       
       ! find 3D cell position
+      
       cp_3d = floor(dummy * inverse_cell_width)
       
-      ! here assume that we are in 3D
+      ! assume that we are in 3D.
       ! locating the cell position of an atom in a 1D array by having the fastest
       ! running dimension to be (1), second fastest (2) and slowest (3). 
       ! that means (cp_3d(1),cp_3d(2), cp_3d(3)) has the following index in a 
@@ -363,49 +348,33 @@ contains
       !         + cp_3d(1)
       ! which is what is calculated below
       ! cp_1d stands for cell position 1D
+      
       cp_1d = (cp_3d(3) * str%nn_list%cells%num_cells(2) + cp_3d(2)) * & 
               str%nn_list%cells%num_cells(1) + cp_3d(1)
       
-      
-      ! Here I could check whether I have remembered to do wrap around 
-      
-      !if (cp_1d < 0) then
-      !  write(*,*) "ERROR - serious error in simulation in build_near_neighb_with_cell"
-      !  write(*,*) "Likely causes are that you have forgot to do wrap around"
-      !  write(*,'(a,i6)') "Value of cp_1d = ", cp_1d
-      !  stop
-      !end if 
-      
-      
       ! in the speciel cells the 'first' element in each cell is stored in 
       ! the last n_tot+1, n_tot+2, ... n_tot+product(num_cells) elements
+      
       cp_1d = cp_1d + n_tot + 1
       
       ! put the previous atom listed in cell-list cells%list(cp_1d) into
       ! cells%list(i) (which was also the 1st atom listed in that list)
+      
       str%nn_list%cells%list(i) = str%nn_list%cells%list(cp_1d)
       
       ! now let this cell-list point to the current atom number (here i). This 
       ! then takes on the significance of the first atom in this cell-list; 
       ! the content of that element then points to the next atom and so on 
       ! until -1 is encountered
-      str%nn_list%cells%list(cp_1d) = i
       
-
+      str%nn_list%cells%list(cp_1d) = i
     end do
-    
-    !do i = 1, n_tot+product(str%nn_list%cells%num_cells)
-    !  write(*,'(a,i10, a,i10)') "n=",i, " cells(n)=", str%nn_list%cells%list(i)
-    !end do
-    !stop
-    
   
     num = 0
     do cp1z = 0, str%nn_list%cells%num_cells(3)-1
       do cp1y = 0, str%nn_list%cells%num_cells(2)-1
         do cp1x = 0, str%nn_list%cells%num_cells(1)-1
-          cp1_3d(1)=cp1x; cp1_3d(2)=cp1y; cp1_3d(3)=cp1z
-    !      
+          cp1_3d(1)=cp1x; cp1_3d(2)=cp1y; cp1_3d(3)=cp1z 
           cp1_1d = (cp1_3d(3) * str%nn_list%cells%num_cells(2) + cp1_3d(2)) * & 
                    str%nn_list%cells%num_cells(1) + cp1_3d(1) + n_tot + 1
           
@@ -414,6 +383,7 @@ contains
             shift = 0.0
             
             ! wrap around
+            
             do j = 1, ndim
               if (cp2_3d(j) >= str%nn_list%cells%num_cells(j)) then
                 cp2_3d(j) = 0
@@ -429,28 +399,23 @@ contains
             
             j1 = str%nn_list%cells%list(cp1_1d)
             
-            
             do while (j1 >= 0)
               j2 = str%nn_list%cells%list(cp2_1d)
               do while (j2 >= 0)
-                !write(*,'(a,i6,a,i6)') "j1=", j1-1, " j2=", j2-1
-                ! remember to not counting twice distances within same cell
+                ! remember to not count twice the distances within same cell
                 ! i.e. when cp1_1d==cp2_1d
+                
                 if (cp1_1d /= cp2_1d .or. j2 < j1) then
                   diff_vec = str%r(j1,:) - str%r(j2,:)
                   diff_vec = diff_vec - shift
-                  !write(*,'(a,i6,a,i6,a,i6)') "j1=", j1-1, " j2=", j2-1, " num=", num
-                  !write(*,'(3f12.6)') str%r(j1,:)
-                  !write(*,'(3f12.6)') str%r(j2,:)
-                  !write(*,'(3f12.6)') diff_vec
-                  !write(*,'(3f12.6)') shift
+
                   rr = sum(diff_vec*diff_vec)
                   if (rr < rr_cut_neighbour) then
                     
                     ! this number must never be bigger than
                     ! str%nn_list%pairs_allocated
-                    num = num + 1
                     
+                    num = num + 1
                     if (num > str%nn_list%pairs_allocated) then
                       write (*, '(a)') "ERROR in build_near_neighb_with_cell"
                       stop
@@ -459,8 +424,6 @@ contains
                     str%nn_list%pairs(2*num-1) = j1
                     str%nn_list%pairs(2*num) = j2
                     str%nn_list%dists(num) = rr
-                    !write(*,'(a,i6,a,i6,a,i6)') "j1=", j1-1, " j2=", j2-1, " num=", num
-                    !stop
                   end if
                 end if
               
@@ -468,15 +431,13 @@ contains
               end do
               j1 = str%nn_list%cells%list(j1)
             end do
-          
-            
           end do
         end do
       end do
     end do
     
-    
     ! update number of pairs
+    
     str%nn_list%n_pairs = num
     
   end subroutine build_near_neighb_with_cell
@@ -485,7 +446,7 @@ contains
   ! populate the dists array only, for now, with r2 values. This function
   ! does not 'build' a new nn-list but assumes the existing nn-list is still
   ! ok
-  
+  !
   subroutine cal_nn_distances(str)
     type (structure), intent(inout) :: str
     
@@ -504,7 +465,6 @@ contains
     end do
     
       str%nn_list%what_is_stored = "r2"
-      
   end subroutine cal_nn_distances
   
   
@@ -520,7 +480,6 @@ contains
     else
       num = get_num_near_neighb_with_cell(cells, str, r_cut_neighbour)
     end if
-  
   end function get_num_near_neighb
   
   
@@ -569,7 +528,6 @@ contains
     real(db), intent(in) :: r_cut_neighbour
     integer :: num
     
-  
     real(db) :: rr_cut_neighbour
     real(db), dimension(ndim) :: inverse_cell_width, dummy
     real(db), dimension(ndim) :: shift  ! atom shift caused by cell method
@@ -583,15 +541,11 @@ contains
     offset_vals = reshape( (/0,0,0, 1,0,0, 1,1,0, 0,1,0, -1,1,0, 0,0,1, 1,0,1, 1,1,1, 0,1,1, -1,1,1, -1,0,1, -1,-1,1, 0,-1,1, 1,-1,1/), & 
                   shape(offset_vals))
     
-    
-    
     n_tot = size(str%atoms)
    
     rr_cut_neighbour = r_cut_neighbour*r_cut_neighbour
     
     inverse_cell_width = cells%num_cells / str%box_edges
-    
-    !write(*, '(a,3f10.3)') "inverse_cell_witdh ", inverse_cell_width
     
     do i = 1, product(cells%num_cells)
       cells%list(n_tot+i) = -1
@@ -601,10 +555,11 @@ contains
       dummy = str%r(i,:) + 0.5 * str%box_edges
       
       ! find 3D cell position
+      
       cp_3d = floor(dummy * inverse_cell_width)
       
-      ! here assume that we are in 3D
-      ! locating the cell position of an atom in a 1D array by having the fastest
+      ! Assume that we are in 3D.
+      ! Locating the cell position of an atom in a 1D array by having the fastest
       ! running dimension to be (1), second fastest (2) and slowest (3). 
       ! that means (cp_3d(1),cp_3d(2), cp_3d(3)) has the following index in a 
       ! 1D (which first entry is index=0):
@@ -614,41 +569,33 @@ contains
       !         + cp_3d(1)
       ! which is what is calculated below
       ! cp_1d stands for cell position 1D
+      
       cp_1d = (cp_3d(3) * cells%num_cells(2) + cp_3d(2)) * cells%num_cells(1) &
               + cp_3d(1)
       
       ! in the speciel cells the 'first' element in each cell is stored in 
       ! the last n_tot+1, n_tot+2, ... n_tot+product(num_cells) elements
+      
       cp_1d = cp_1d + n_tot + 1
       
       ! put the previous atom listed in cell-list cells%list(cp_1d) into
       ! cells%list(i) (which was also the 1st atom listed in that list)
+      
       cells%list(i) = cells%list(cp_1d)
       
       ! now let this cell-list point to the current atom number (here i). This 
       ! then takes on the significance of the first atom in this cell-list; 
       ! the content of that element then points to the next atom and so on 
       ! until -1 is encountered
-      cells%list(cp_1d) = i
       
-      !write(*, '(a,i10)') "i = ", i
-      !write(*, '(a,3f10.3)') "dummy ", dummy
-      !write(*, '(a,3i10)') "cp_3d ", cp_3d
-      !write(*, '(a,i10)') "cp_1d ",cp_1d
-
+      cells%list(cp_1d) = i
     end do
-    
-    !do i = 1, n_tot+product(cells%num_cells)
-    !  write(*,'(i10, i10)') i, cells%list(i)
-    !end do
-    
   
     num = 0
     do cp1z = 0, cells%num_cells(3)-1
       do cp1y = 0, cells%num_cells(2)-1
         do cp1x = 0, cells%num_cells(1)-1
-          cp1_3d(1)=cp1x; cp1_3d(2)=cp1y; cp1_3d(3)=cp1z
-    !      
+          cp1_3d(1)=cp1x; cp1_3d(2)=cp1y; cp1_3d(3)=cp1z 
           cp1_1d = (cp1_3d(3) * cells%num_cells(2) + cp1_3d(2)) * & 
                    cells%num_cells(1) + cp1_3d(1) + n_tot + 1
           
@@ -657,6 +604,7 @@ contains
             shift = 0.0
             
             ! wrap around
+            
             do j = 1, ndim
               if (cp2_3d(j) >= cells%num_cells(j)) then
                 cp2_3d(j) = 0
@@ -671,7 +619,6 @@ contains
                      cells%num_cells(1) + cp2_3d(1) + n_tot + 1
             
             j1 = cells%list(cp1_1d)
-            
           
             do while (j1 >= 0)
               j2 = cells%list(cp2_1d)
@@ -679,15 +626,13 @@ contains
               
                 ! remember to not counting twice distances within same cell
                 ! i.e. when cp1_1d==cp2_1d
+                
                 if (cp1_1d /= cp2_1d .or. j2 < j1) then
                   diff_vec = str%r(j1,:) - str%r(j2,:)
                   diff_vec = diff_vec - shift
                   
                   if (sum(diff_vec*diff_vec) < rr_cut_neighbour) then
                     num = num + 1
-                  
-                  
-                   ! write(*, '(3i6)') j1, j2, num
                   end if
                 end if
               
@@ -695,8 +640,6 @@ contains
               end do
               j1 = cells%list(j1)
             end do
-          
-            
           end do
         end do
       end do
@@ -714,19 +657,17 @@ contains
     
     allocate(cell_out%list(size(cell_in%list))) 
     cell_out%list = cell_in%list
-    
   end function copy_cell_list
   
   
   ! this is a 'shallow' copy of cell_list, meaning that the two input
   ! cell_lists are assumed to have exactly the same array sizes and no memory
   ! allocated (or deallocated)
-    
+  !
   subroutine shallow_copy_cell_list(cell_in, cell_out)
     type (cell_list), intent(in) :: cell_in
     type (cell_list), intent(inout) :: cell_out
-    
-    
+        
     ! make some checks to see if arrays sizes are the same
     
     if (size(cell_in%list) /= size(cell_out%list)) then
@@ -739,7 +680,6 @@ contains
     cell_out%num_cells = cell_in%num_cells
     
     cell_out%list = cell_in%list
-    
   end subroutine shallow_copy_cell_list  
 
 end module structure_nn_methods_class

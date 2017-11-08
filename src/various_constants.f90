@@ -1,14 +1,13 @@
 module various_constants_class
 
 implicit none
-
-  ! integer, parameter :: db = selected_real_kind(15,307)
+  
   integer, parameter :: db = kind(1.d0)
   
-  ! Notice there are places in the code where it is assumed that atoms move
+  ! There are places in the code where it is assumed that atoms move
   ! in 3D, in particular in structure_reader.f90
-  integer, parameter :: ndim = 3
   
+  integer, parameter :: ndim = 3
   
   ! this code does it calculations assuming:
   !
@@ -26,12 +25,10 @@ implicit none
   real(db), parameter :: T_unit = 120.2790473899446716382_db
   real(db), parameter :: P_unit = 16387.2_db
   
-  
   ! To specify when a no-data datapoint (likelihood of having the
   ! number specified below as a real datapoint is close to zero).
   
   real(db), parameter :: no_datapoint_available = 120279047389.944_db
-  
     
   ! values below are copied from Ed Akin's figure 2.1
   

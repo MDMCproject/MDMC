@@ -2,11 +2,9 @@ module structure_type_definition_class
 use various_constants_class
 
 implicit none
-
-  ! moved here because used in structure_nn_methods 
+  
   public :: apply_boundary_condition_to_vector
   public :: apply_boundary_condition_to_vector_expensive
-
 
   ! the below is the fastest and most compressed collection of single link
   ! list I have ever seen. Its drawback is that it is a pain to handle but
@@ -18,7 +16,6 @@ implicit none
     integer, dimension(ndim) :: num_cells
     integer, dimension(:), allocatable :: list
   end type cell_list
-
 
   ! This type is only include to speed up the calculation. Most importantly by
   ! replacing the double summation over atoms by a sum over nearest neighbours
@@ -32,6 +29,7 @@ implicit none
     ! that this list is no-point or requires more
     ! memory than what can be allocated or otherwise
     ! what don't what to use near neighbour method
+    
     logical :: ignore_list = .true.  
   
     ! the list - for now just pairs of j1, j2
@@ -39,16 +37,19 @@ implicit none
     ! space allocated then there are nearest neigbour pairs for a given structure
     ! For this reason also when looping over pairs you most not use pairs_allocated
     ! or size(pairs) but always n_pairs
+    
     integer, dimension(:), allocatable :: pairs
     integer :: pairs_allocated
     integer :: n_pairs
   
-    ! stuff decide if list needs updating and with rebuilding
+    ! stuff used to decide if list needs updating and with rebuilding
+    
     logical :: needs_updating = .true.
     real(db) :: delta_r, r_cut
     real(db) :: max_an_atom_has_moved = 0.0_db
   
     ! storage of numbers for potential later use
+    
     character(len=2) :: what_is_stored
     real(db), dimension(:), allocatable :: dists
     
@@ -87,6 +88,7 @@ implicit none
     ! defined in box_edges and with the box centered around the origin. That 
     ! means e.g. along the x-direction the atoms are placed
     ! within -box_edge(1)/2 and box_edge(1)/2
+    
     real(db), dimension(ndim) :: box_edges  
       
     character(len=120) :: title = " "
@@ -96,11 +98,10 @@ implicit none
   
 contains
 
-
   ! fast way of applying boundary conditions. However, only valid 
   ! when atoms haven't moved further than box_edges outside the
   ! center box.
-
+  !
   subroutine apply_boundary_condition_to_vector(vec, box_edges)
     real (db), dimension(ndim), intent(inout) :: vec
     real (db), dimension(ndim), intent(in) :: box_edges
@@ -114,8 +115,7 @@ contains
       if (vec(i) < -0.5 * box_edges(i)) then
         vec(i) = vec(i) + box_edges(i)
       end if       
-    end do
-    
+    end do 
   end subroutine apply_boundary_condition_to_vector  
   
   
@@ -123,7 +123,7 @@ contains
   ! test it seems that in fact this 'expension' version is only a little
   ! slower than apply_boundary_condition_to_vector(). Thus, in the future
   ! perhaps on use this one!?
-  
+  !
   subroutine apply_boundary_condition_to_vector_expensive(vec, box_edges)
     real (db), dimension(ndim), intent(inout) :: vec
     real (db), dimension(ndim), intent(in) :: box_edges
@@ -140,7 +140,6 @@ contains
         vec(i) = vec(i) + floor(-vec(i)/box_edges(i)+0.5)*box_edges(i)
       end if       
     end do
-    
   end subroutine apply_boundary_condition_to_vector_expensive    
   
 end module structure_type_definition_class

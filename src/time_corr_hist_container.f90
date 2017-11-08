@@ -44,9 +44,7 @@ implicit none
     ! Store the inverse volume of the spherical shells.
 
     real(db), dimension(:), allocatable :: volume_prefac 
-    
   end type time_corr_hist_container
-  
   
   character(len=27), parameter, private :: filename_prefix1 = "output/einstein_diffuse_exp"  
   integer, private :: filname_number1 = 1  ! so first saved rdf file will be called einstein_diffuse_exp1.xml
@@ -70,6 +68,7 @@ contains
     end if  
   end subroutine check_if_time_corr_hist_container_is_allocated
 
+  
   ! Resetting variables to zero that are used for accumulating info
   !
   subroutine clear_time_corr_hist_container(container)
@@ -214,8 +213,7 @@ contains
     
     n_eval_times = size(container%einstein_diffuse_exp)    
     
-    call xml_OpenFile(filename, xf, indent=.true.)
-    
+    call xml_OpenFile(filename, xf, indent=.true.)  
     call xml_AddXMLDeclaration(xf, "UTF-8")
     call xml_NewElement(xf, "einstein-diffuse-exp")
     
@@ -235,10 +233,8 @@ contains
     
     call xml_AddAttribute(xf, "n-atom", str(n_atom, format="(i)"))
     call xml_AddAttribute(xf, "density", str(density, format="(f10.5)"))    
-        
     call xml_AddAttribute(xf, "time-unit", "10^-13 s")
     call xml_AddAttribute(xf, "diffuse-units", "10^13 AA^2 s^-1")
-    
     call xml_NewElement(xf, "this-file-was-created")
     call xml_AddAttribute(xf, "when", get_current_date_and_time())
     call xml_EndElement(xf, "this-file-was-created")
@@ -251,7 +247,6 @@ contains
     end do 
     
     call xml_EndElement(xf, "einstein-diffuse-exp")
-    
     call xml_Close(xf)    
   
   end subroutine print_einstein_diffuse_exp
@@ -313,11 +308,11 @@ contains
     r_bin = container%g_s_hists_sum(1)%bin_length
     
     call xml_OpenFile(filename, xf, indent=.true.)
-    
     call xml_AddXMLDeclaration(xf, "UTF-8")
     call xml_NewElement(xf, "G_s-space-time-pair-correlation-function")
     
-    ! notice convert units of temperature from dimensionless to K  
+    ! notice convert units of temperature from dimensionless to K
+    
     if (present(temperature)) then
       call xml_AddAttribute(xf, "title", "T = " // trim(str(temperature * T_unit, format="(f10.5)")) // &
                                          " K: density = " // trim(str(density, format="(f10.5)")) &
@@ -328,10 +323,8 @@ contains
     end if
     
     call xml_AddAttribute(xf, "bin-length", str(r_bin, format="(f10.5)"))
-    
     call xml_AddAttribute(xf, "time-unit", "10^-13 s")
     call xml_AddAttribute(xf, "r-units", "AA")
-    
     call xml_NewElement(xf, "this-file-was-created")
     call xml_AddAttribute(xf, "when", get_current_date_and_time())
     call xml_EndElement(xf, "this-file-was-created")
@@ -342,7 +335,8 @@ contains
         call xml_AddAttribute(xf, "r", str((i_bin-0.5)*r_bin, format="(f10.5)"))
         call xml_AddAttribute(xf, "t", str((i-1)*container%time_bin, format="(f10.5)"))
         
-        ! calculate prefactor: V / ( N*volume_of_spherical_shell(r) )  
+        ! calculate prefactor: V / ( N*volume_of_spherical_shell(r) )
+        
         prefac = container%volume_prefac(i_bin) / (container%n_accum*density)
         
         call xml_AddAttribute(xf, "G", str(container%g_s_hists_sum(i)%val(i_bin) * &
@@ -352,7 +346,6 @@ contains
     end do
     
     call xml_EndElement(xf, "G_s-space-time-pair-correlation-function")
-    
     call xml_Close(xf)    
   
   end subroutine print_g_s
@@ -422,7 +415,6 @@ contains
     r_bin = container%g_s_hists_sum(1)%bin_length
     
     call xml_OpenFile(filename, xf, indent=.true.)
-    
     call xml_AddXMLDeclaration(xf, "UTF-8")
     call xml_NewElement(xf, "G_d-space-time-pair-correlation-function")
     
@@ -432,17 +424,13 @@ contains
                                          " K")
     call xml_AddAttribute(xf, "density", str(density, format="(f10.5)"))
     call xml_AddAttribute(xf, "density-unit", "atoms/AA-3")                                  
-    
     call xml_AddAttribute(xf, "n-atom", str(n_atom, format="(i)"))
     call xml_AddAttribute(xf, "time-bin", str(container%time_bin, format="(f10.5)"))
     call xml_AddAttribute(xf, "bin-length", str(r_bin, format="(f10.5)"))
-    
     call xml_AddAttribute(xf, "n-time-bin", str(n_time_bin, format="(i)"))
     call xml_AddAttribute(xf, "n-r-bin", str(n_r_bin, format="(i)"))
-    
     call xml_AddAttribute(xf, "time-unit", "10^-13 s")
     call xml_AddAttribute(xf, "r-units", "AA")
-    
     call xml_NewElement(xf, "this-file-was-created")
     call xml_AddAttribute(xf, "when", get_current_date_and_time())
     call xml_EndElement(xf, "this-file-was-created")
@@ -464,7 +452,6 @@ contains
     end do
     
     call xml_EndElement(xf, "G_d-space-time-pair-correlation-function")
-    
     call xml_Close(xf)    
   
   end subroutine print_g_d  
@@ -492,7 +479,6 @@ contains
     r_bin = container%g_s_hists_sum(1)%bin_length
     
     call xml_OpenFile(filename, xf, indent=.true.)
-    
     call xml_AddXMLDeclaration(xf, "UTF-8")
     call xml_NewElement(xf, "normalised-h-s-histogram")
     
@@ -508,10 +494,8 @@ contains
     end if
     
     call xml_AddAttribute(xf, "bin-length", str(r_bin, format="(f10.5)"))
-    
     call xml_AddAttribute(xf, "time-unit", "10^-13 s")
     call xml_AddAttribute(xf, "r-units", "AA")
-        
     call xml_NewElement(xf, "this-file-was-created")
     call xml_AddAttribute(xf, "when", get_current_date_and_time())
     call xml_EndElement(xf, "this-file-was-created")
@@ -528,7 +512,6 @@ contains
     end do
     
     call xml_EndElement(xf, "normalised-h-s-histogram")
-    
     call xml_Close(xf)    
   
   end subroutine print_h_s_hist
@@ -556,11 +539,11 @@ contains
     r_bin = container%g_d_hists_sum(1)%bin_length
     
     call xml_OpenFile(filename, xf, indent=.true.)
-    
     call xml_AddXMLDeclaration(xf, "UTF-8")
     call xml_NewElement(xf, "normalised-h-d-histogram")
     
-    ! notice convert units of temperature from dimensionless to K  
+    ! notice convert units of temperature from dimensionless to K
+    
     if (present(temperature)) then
       call xml_AddAttribute(xf, "title", "T = " // trim(str(temperature * T_unit, format="(f10.5)")) // &
                                          " K: density = " // trim(str(density, format="(f10.5)")) &
@@ -571,10 +554,8 @@ contains
     end if
     
     call xml_AddAttribute(xf, "bin-length", str(r_bin, format="(f10.5)"))
-    
     call xml_AddAttribute(xf, "time-unit", "10^-13 s")
     call xml_AddAttribute(xf, "r-units", "AA")
-    
     call xml_NewElement(xf, "this-file-was-created")
     call xml_AddAttribute(xf, "when", get_current_date_and_time())
     call xml_EndElement(xf, "this-file-was-created")
@@ -591,7 +572,6 @@ contains
     end do
     
     call xml_EndElement(xf, "normalised-h-d-histogram")
-    
     call xml_Close(xf)    
   
   end subroutine print_h_d_hist

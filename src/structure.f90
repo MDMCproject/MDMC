@@ -1,16 +1,11 @@
 module structure_class
-use various_constants_class         ! I should not need this one here
-use structure_type_definition_class ! I should not need this one here
 use structure_nn_methods_class
 
 implicit none
 
-  !public :: apply_boundary_condition_to_vector  (moved to structure_type_definition because used in
-  !                                              structure_nn_methods)
   public :: apply_boundary_condition
   public :: copy_structure, shallow_copy_structure
   public :: save_structure
-  public :: swap_atoms
   
   public :: get_n_atom
   public :: get_density
@@ -33,9 +28,10 @@ contains
   end function get_density
     
 
-  ! apply periodic boundary conditions, however assume here that atoms have
+  ! apply periodic boundary conditions, however assume that atoms have
   ! not moved out more that box_edge length away from the region
   ! -box_edge/2 : box_edge/2
+  !
   subroutine apply_boundary_condition(str)
     type (structure), intent(inout) :: str
     
@@ -44,7 +40,6 @@ contains
     do i_a = 1, size(str%atoms)
       
       call apply_boundary_condition_to_vector(str%r(i_a,:), str%box_edges)
-      
       
       ! check that atoms have not moved further than one box length!!
       ! This might be caused by 1) crap initial structure where two atoms starts
@@ -89,16 +84,14 @@ contains
     end do
     
     str_out%r = str_in%r
-    
     str_out%nn_list = copy_near_neighb_list(str_in%nn_list)
-  
   end function copy_structure
 
 
   ! this is a 'shallow' copy of structure, meaning that the two input
   ! structures are assumed to have exactly the same array sizes and no memory
   ! allocated (or deallocated)
-  
+  !
   subroutine shallow_copy_structure(str_in, str_out)
     type (structure), intent(in) :: str_in
     type (structure), intent(inout) :: str_out
@@ -132,15 +125,7 @@ contains
     end do
     
     str_out%r = str_in%r
-  
   end subroutine shallow_copy_structure
-  
-  
-  subroutine swap_atoms(a_structure, atom_number1, atom_number2)
-    type (structure), intent(inout) :: a_structure
-    integer, intent(in) :: atom_number1, atom_number2
-
-  end subroutine swap_atoms
   
   
   subroutine save_structure(s, filename, temperature)
@@ -155,17 +140,15 @@ contains
     integer :: i
     real(db) :: density 
   
-  
     write(*,'(3a)') "Write ", trim(filename), " to disk"
     
     call xml_OpenFile(filename, xf, indent=.true.)
-    
     call xml_AddXMLDeclaration(xf, "UTF-8")
     call xml_NewElement(xf, "molecule")
     
     if (present(temperature)) then
-    call xml_AddAttribute(xf, "title", "T = " // trim(str(temperature, format="(f10.5)")) // &
-                                         " K: rho = " // trim(str(density, format="(f10.5)")) &
+      call xml_AddAttribute(xf, "title", "T = " // trim(str(temperature, format="(f10.5)")) // &
+                                " K: rho = " // trim(str(density, format="(f10.5)")) &
                                          // " atoms/AA-3")
     else  
       density = size(s%atoms) / product(s%box_edges)
@@ -176,14 +159,12 @@ contains
     call xml_NewElement(xf, "this-file-was-created")
     call xml_AddAttribute(xf, "when", get_current_date_and_time())
     call xml_EndElement(xf, "this-file-was-created")
-    
     call xml_NewElement(xf, "box-edges")
     call xml_AddAttribute(xf, "units", "AA")
     call xml_AddAttribute(xf, "x", str(s%box_edges(1), format="(f12.5)"))  
     call xml_AddAttribute(xf, "y", str(s%box_edges(2), format="(f12.5)"))
     call xml_AddAttribute(xf, "z", str(s%box_edges(3), format="(f12.5)"))
     call xml_EndElement(xf, "box-edges")
-    
     call xml_NewElement(xf, "atomArray")
     call xml_AddAttribute(xf, "number", str(size(s%atoms)))
     call xml_AddAttribute(xf, "units", "AA")
@@ -204,7 +185,5 @@ contains
     call xml_Close(xf)
   
   end subroutine save_structure
-
-    
     
 end module structure_class

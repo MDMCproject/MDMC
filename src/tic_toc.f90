@@ -7,12 +7,14 @@ implicit none
   ! this is a modified version of the tic-toc model in Matlab and
   ! Figure 4.10 in "Object-oriented programming via Fortran 90/95"
   ! by Ed Akin
+  
 contains
 
   subroutine tic
     call system_clock(time_last_tic, time_counts_per_sec)
   end subroutine tic
 
+  
   function toc() result(sec)
     real :: sec
     

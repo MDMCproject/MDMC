@@ -47,19 +47,16 @@ implicit none
     
     integer :: time_count
  
- 
     ! org_r holds the atomic coordinates at time_count=0 and
     ! act_r at any later time. 
     ! Both have dimension n_atoms x ndim
     
     real(db), dimension(:,:), allocatable :: org_r, act_r
     
-    
     ! sum of square differences between org_r and act_r for
     ! all the atoms. This array has dimension <n-time-bin>
     
     real(db), dimension(:), allocatable :: sum_square_diffs
-   
     
     ! histograms for g_s and g_d for various values of time_count.
     ! These arrays have dimension <n-time-bin>, i.e. that many histograms.
@@ -71,7 +68,6 @@ implicit none
   
   private buffer
 
-  
   ! bufs holds all the buffers
 
   type (buffer), dimension(:), allocatable, private :: bufs  
@@ -116,11 +112,8 @@ contains
     call reset_buffers(n_time_bin)
     
     call check_if_time_corr_hist_container_is_allocated(container)
-
-
-!    character(len=80) :: filename
     
-    ! here keep on calling do_time_correlation until enough buffers have 
+    ! keep on calling do_time_correlation until enough buffers have 
     ! been calculated
     
     do while (do_time_correlation(container, ps%str) == .false.)    
