@@ -13,6 +13,8 @@
 !           N^2 * volume_of_spherical_shell(r)
 !
 ! See also Eq. (6) page 19aa in my handwritten notes
+!
+!   FOM = sum_i ( g_i^{data} - scale_factor * g_i^{cal} )^2
 !    
     
 module rdf_fom_class

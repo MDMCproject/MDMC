@@ -16,6 +16,11 @@
 !
 ! In practice not sure if you would ever have real data in this format,
 ! but this FOM may be useful nevertheless in some cases
+!
+!   FOM = sum_i ( g_i^{data} - g_i^{cal} )^2
+!
+! where g_i is short for the i'th (g^norm)_d(r,t) array point
+!
 
 module g_d_rt_fom_class
 use various_constants_class
@@ -50,7 +55,6 @@ implicit none
     real(db) :: density
     
     !real(db) :: scale_factor = 1.0
-    !real(db) :: weight = 1.0
     
     character(len=120) :: title = " "
     

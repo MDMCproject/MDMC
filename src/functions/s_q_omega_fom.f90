@@ -9,6 +9,13 @@
 ! also a unit of inverse frequency. Further the unit of q is AA^-1 and unit
 ! of omega 1/(0.1ps).
 !
+!              ( S_i^{data} - scale_factor * S_i^{cal} )^2
+!  FOM = sum_i -------------------------------------------
+!                            sigma_i^2
+!
+! where S_i is short for the i'th S(q,omega) array point
+! The sigma's can be ignored by using the ignore-errors in the job file
+!
     
 module s_q_omega_fom_class
 use various_constants_class

@@ -7,6 +7,10 @@
 ! assumes here units of AA^-3, and it follows that S(q,t) is dimensionless. 
 ! Time is measured in units of 10^-13s=0.1ps and q is AA^-1.
 !
+!   FOM = sum_i ( S_i^{data} - scale_factor * S_i^{cal} )^2
+!
+! where S_i is short for the i'th S(q,t) array point
+!
     
 module s_q_time_fom_class
 use various_constants_class
