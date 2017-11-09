@@ -34,7 +34,14 @@ program mdmc
   new = 5
   CALL RANDOM_SEED (PUT=new(1:I))
   
-  ! Ask user for a MDMC job file
+  ! A short welcome print to screen. Replace ... with release number and
+  ! date for user releases
+  
+  write (*,*) "**********************************************************"
+  write (*,*) "MDMC Version ... "
+  write (*,*) " "
+  
+  ! Ask user for a MDMC job file  
   
   write (*,*) "Enter the filename of a MDMC job file: "
   read *, filename 
