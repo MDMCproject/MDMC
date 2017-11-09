@@ -5,8 +5,8 @@ module common_block_class
 use configuration_class
 use function_class
 
-  ! Used for reading in initial configuration from XML input
-  ! and may than be altered in subsequent algorithms
+  ! Used when reading in the user specified configuration to 
+  ! use from input MDMC job file
   
   type(configuration) :: common_config
 

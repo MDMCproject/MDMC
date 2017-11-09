@@ -67,7 +67,6 @@ contains
     logical :: accept_parameters ! for metropolis
     
     type (xmlf_t) :: xf
-
     call xml_OpenFile("output/mdmc_results.xml", xf, indent=.true.)    
     call xml_AddXMLDeclaration(xf, "UTF-8")
     call xml_NewElement(xf, "mdmc-control-results")
@@ -161,7 +160,6 @@ contains
     write(print_to_file, *) " "
     write(print_to_file, '(a,f12.4,a)') "Taken ", toc(), " seconds to execute initial equilibration."
     write(print_to_file, *) " "
-
 
     ! Determine if the MD simulation reached an acceptable equilibrium
     !
@@ -305,7 +303,6 @@ contains
         cycle
       end if   
 
-
       ! cal averaged rdf
 
       do j = 1, c%average_over_this_many_rdf
@@ -432,6 +429,7 @@ contains
   
   
   ! check to see if temperature is within certain limits of t_target
+  !
   function acceptable_temperature(t, t_target) result (yes_or_no)
     real (db), intent(in) :: t, t_target
     logical :: yes_or_no 
@@ -443,7 +441,9 @@ contains
     end if
   end function acceptable_temperature
   
+  
   ! check to see if energy is within certain limits of t_target
+  !
   function acceptable_energy(e, e_target) result (yes_or_no)
     real (db), intent(in) :: e, e_target
     logical :: yes_or_no 

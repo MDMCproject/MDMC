@@ -21,7 +21,6 @@ use s_q_omega_class
   private :: acceptable_temperature
   private :: acceptable_energy  
   
-
 contains
 
   subroutine run_md_control_time_corr(a_config, c)
@@ -60,45 +59,35 @@ contains
     logical :: accept_parameters ! for metropolis
     
     type (xmlf_t) :: xf
-
-
     call xml_OpenFile("output/mdmc_results.xml", xf, indent=.true.)
-    
     call xml_AddXMLDeclaration(xf, "UTF-8")
     call xml_NewElement(xf, "md-control-time-corr-results")
-
     call xml_AddAttribute(xf, "title", "rho = " // str(density, format="(f10.5)") &
                                          // "atoms/AA-3")
-    
     call xml_NewElement(xf, "this-file-was-created")
     call xml_AddAttribute(xf, "when", get_current_date_and_time())
     call xml_EndElement(xf, "this-file-was-created")
-	  
 	  
     if (print_to_file /= 0) then
       open(print_to_file, file="output/job_log.txt")
     end if
 
-	  		
     write(print_to_file,*) "In run_md_control"
 
     call tic
 
-    ! initiate phasespace
+    ! prepare phasespaces
     
     my_ps = make_phasespace(a_config%str, c%temperature)
-    
     my_ps_old = copy_phasespace(my_ps)
-    
     my_ps_best = copy_phasespace(my_ps)
                                                                    
     
-    ! initiate time correlation histogram container
+    ! prepare space and time correlation histogram container
     
     my_time_corr_container = make_time_corr_hist_container(c%r_max, c%bin_length, c%n_time_bin, &
                              c%md_per_time_bin * c%md_delta_t)
     call clear_time_corr_hist_container(my_time_corr_container)                         
-    
     
     ! to cal and print out s_q_time and s_q_omega
     
@@ -111,7 +100,7 @@ contains
     sum_kin_energy = 0.0
     
     do i = 1, c%total_steps_initial_equilibration
-      time_now = c%md_delta_t * i   ! perhaps print this one out 
+      time_now = c%md_delta_t * i 
       
       ! do one trajectory of length = 1 where pressure_comp and pot_energy is also
       ! calculated
@@ -144,7 +133,7 @@ contains
         average_energy_end_of_temp_calibration = my_props.tot_energy.ave 
       end if
       
-      ! print out stuff and interval = average_over_this_many_steps
+      ! print out stuff at interval = average_over_this_many_steps
         
       if (mod(i,c%average_over_initial_equilibration) == 0) then 
         call md_print_properties(print_to_file, my_props)
@@ -159,13 +148,11 @@ contains
         call md_reset_properties(my_props)
         write(*, '(a,i8,a,f15.5,a)') "MD steps = ", i, " MD run-time = ", time_now, "*10e-13"
       end if
-
     end do
     
     write(print_to_file, *) " "
     write(print_to_file, '(a,f12.4,a)') "Taken ", toc(), " seconds to execute initial equilibration."
     write(print_to_file, *) " "
-
 
     ! Determine if equilibrium was reached
     !
@@ -185,10 +172,8 @@ contains
          write(print_to_screen, *) "Energy outside acceptable value - STOP"
          stop
     end if     
-
-
  
- ! -------- time correlation part ------------------------- !
+ ! -------- calculate and save g(r,t), S(q,t) and S(q,omega) ------------------------- !
 
   density = size(my_ps%str%atoms) / product(my_ps%str%box_edges) ! for printing
 
@@ -211,10 +196,8 @@ contains
   write(print_to_screen, *) "Write dynamical structure factors to disk"   
   call print_s_q_omega(my_s_q_omega, density, c%temperature)  
  
- ! -------- end time correlation -------------------------- !
+ ! -------- calculate and save g(r,t), S(q,t) and S(q,omega) -------------------------- !
 
-
-    
     print *, ' '
     print *, 'Job took ', toc(), ' seconds to execute.'
     
@@ -228,12 +211,8 @@ contains
   end subroutine run_md_control_time_corr
   
   
-  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-  !!!!!!!!!!!!!!!  private functions/subroutines !!!!!!!!!!!!!!
-  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-  
-  
   ! check to see if temperature is within certain limits of t_target
+  !
   function acceptable_temperature(t, t_target) result (yes_or_no)
     real (db), intent(in) :: t, t_target
     logical :: yes_or_no 
@@ -245,7 +224,9 @@ contains
     end if
   end function acceptable_temperature
   
+  
   ! check to see if energy is within certain limits of t_target
+  !
   function acceptable_energy(e, e_target) result (yes_or_no)
     real (db), intent(in) :: e, e_target
     logical :: yes_or_no 

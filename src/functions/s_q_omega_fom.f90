@@ -27,7 +27,6 @@ implicit none
 
   public :: s_qo_fom_val
 
-
   type s_qo_fom_container
     real(db), dimension(:,:), allocatable :: obs  ! holds the data
     real(db), dimension(:,:), allocatable :: esd  ! holds esds for the data
@@ -38,14 +37,15 @@ implicit none
     real(db) :: scale_factor = 1.0 ! apply scale factor to calculated data
     
     ! optional set to true to ignore data esds when calculating this fom
+    
     logical :: ignore_errors = .false.    
     
     character(len=120) :: title = " "
     
     ! stuff which is in common for all function containers
+    
     type (func_params) :: params
   end type s_qo_fom_container
-
 
 contains
 
@@ -61,7 +61,6 @@ contains
     val = 0.0
     n_q = size(s_qo_data%q)
     n_omega = size(s_qo_data%omega)
-
     
     ! Check if the array dimensions are the same
     
@@ -72,8 +71,7 @@ contains
       write(*,*) "mis-match between calculated and observed s(q,omega) data arrays"
       stop
     end if    
-    
-         
+             
     ! Note it is currently allowed to have obs data with 'no data available', a bit 
     ! like non-a-number data     
          
@@ -81,6 +79,7 @@ contains
       do i_o = 1, n_omega     
         do i_q = 1, n_q 
           ! only sum over obs data points
+          
           if ( abs(s_qo_data%obs(i_q, i_o) - no_datapoint_available) > 0.0001 ) then
             val = val + &
                  (s_qo_data%obs(i_q, i_o) - s_qo_data%scale_factor*(s_qo_cal%self(i_q, i_o) + s_qo_cal%diff(i_q,i_o)))**2        
@@ -91,6 +90,7 @@ contains
       do i_o = 1, n_omega     
         do i_q = 1, n_q 
           ! only sum over obs data points
+          
           if ( abs(s_qo_data%obs(i_q, i_o) - no_datapoint_available) > 0.0001 ) then
             val = val + &
                   (s_qo_data%obs(i_q, i_o) - s_qo_data%scale_factor*(s_qo_cal%self(i_q, i_o) + s_qo_cal%diff(i_q,i_o)))**2 &
@@ -102,5 +102,4 @@ contains
   
   end function s_qo_fom_val
   
-    
 end module s_q_omega_fom_class

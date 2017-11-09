@@ -140,7 +140,6 @@ contains
         average_energy_end_of_temp_calibration = my_props.tot_energy.ave 
       end if      
 
-  
       ! print out stuff at interval = average_over_initial_equilibration
         
       if (mod(i,c%average_over_initial_equilibration) == 0) then 
@@ -241,7 +240,6 @@ contains
 
  ! ---------------------- core mdmc part ------------------------ !              
                
-  
     ! save state
     
     fom_old = fom_val
@@ -340,7 +338,6 @@ contains
       write(print_to_screen,'(a,f14.5)') "FOM = ", fom_val
       write(print_to_screen, '(a,f14.5)') "Finished cal FOM. Time: ", toc()
       
-      
       ! Check if new best FOM
       ! Here whether or not this parameter move will be rejected or accepted 
       ! If the new FOM value is lower it should always be accepted, but as a
@@ -352,7 +349,6 @@ contains
         call shallow_copy_phasespace(my_ps, my_ps_best)      
       end if
      
-      
       ! Metropolis check
 
       delta_fom = fom_val - fom_old
@@ -371,15 +367,12 @@ contains
         end if
       end if
  
-        
-      if (accept_parameters) then
-      
+      if (accept_parameters) then     
         call xml_NewElement(xf, "accept")
         call xml_AddAttribute(xf, "N", str(i, format="(i)"))
         call add_xml_attribute_func_params(xf, common_pe_list)
         call xml_AddAttribute(xf, "val", str(fom_val, format="(f14.5)"))
         call xml_EndElement(xf, "accept")       
-     
       
         ! save state
     
@@ -392,23 +385,18 @@ contains
         if (fom_val < fom_best_accepted) then
           fom_best_accepted = fom_val     
         end if        
-        
       else
-      
         call xml_NewElement(xf, "rejected")
         call xml_AddAttribute(xf, "N", str(i, format="(i)"))
         call add_xml_attribute_func_params(xf, common_pe_list)
         call xml_AddAttribute(xf, "val", str(fom_val, format="(f14.5)"))
         call xml_EndElement(xf, "rejected")
         
-        
         ! restore state
     
         call restore_func_params(common_pe_list)
         call shallow_copy_phasespace(my_ps_old, my_ps)          
-              
       end if  
-      
     end do
     
     ! Another sanity check
@@ -423,7 +411,6 @@ contains
     end if    
      
  ! ---------------- finished core mdmc part ------------------------ !    
-
 
     ! print out the best solution found. Note my_ps_best has a copy of the phase-space
     ! and the end point of that FOM calculation, not the start of it. Therefore the 

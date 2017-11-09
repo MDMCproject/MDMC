@@ -27,7 +27,6 @@ implicit none
 
   public :: rdf_fom_val
 
-
   type rdf_fom_container
     type (rdf) :: rdf_data
     
@@ -43,10 +42,10 @@ implicit none
     character(len=120) :: title = " "
     
     ! stuff which is in common for all function containers
+    
     type (func_params) :: params
   end type rdf_fom_container
 
-  
   interface rdf_fom_val
     module procedure rdf_fom_val_structure
     module procedure rdf_fom_val_histogram
@@ -70,8 +69,8 @@ contains
     
     val = c%weight / n_bin * &
       sum( (c%rdf_data%val(1:n_bin) - c%scale_factor*c%rdf_cal%val)**2 )
-
   end function rdf_fom_val_structure
+  
   
   function rdf_fom_val_histogram(hist, c) result (val)
     type (histogram), intent(in) :: hist
@@ -86,8 +85,6 @@ contains
     
     val = c%weight / n_bin * &
       sum( (c%rdf_data%val(1:n_bin) - c%scale_factor*c%rdf_cal%val)**2 )
-
   end function rdf_fom_val_histogram
   
-    
 end module rdf_fom_class

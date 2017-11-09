@@ -13,10 +13,10 @@ implicit none
 
   type lj_pe_container
     ! stuff which is in common for all function containers
+    
     type (func_params) :: params
     type (histogram) :: hist
   end type lj_pe_container
-
 
 contains
 
@@ -28,7 +28,8 @@ contains
     if (str%nn_list%ignore_list == .true.) then
       val = lj_val_without_nn(str, container)
     else
-      ! will remove unnessary 3rd arg later
+      ! TODO: remove unnessary 3rd arg
+      
       val = lj_val_nn(str, container, str%nn_list)
     end if
 		
@@ -54,7 +55,6 @@ contains
     
     integer :: j ! used only in nearest neighbour summation loop
     
-    
     ! test for optional arguments and set extra_args
     
     if (present(pressure_comp) .and. present(pot_energy)) then
@@ -70,24 +70,22 @@ contains
       stop    
     end if    
     
-    
-    sigma = get_func_param_val(container%params, "sigma")  !container%params%p(1)%val
-    epsilon = get_func_param_val(container%params, "epsilon") !container%params%p(2)%val
+    sigma = get_func_param_val(container%params, "sigma")
+    epsilon = get_func_param_val(container%params, "epsilon")
     epsilon_times4 = 4*epsilon
     sigma2 = sigma * sigma
     epsi48sigma2 = 48.0 * epsilon / sigma2
         
-    
     if (does_func_param_exist(container%params, "r-cut")) then
       r_cut = get_func_param_val(container%params, "r-cut")
     else
       ! otherwise put r_cut to a value higher than any possible distance
+      
       r_cut = sqrt(sum(str%box_edges*str%box_edges))
     end if
     
-    
     ! when using neighest neighbour method all distances less than
-    ! nn_list%r_cut are 'guarentied' to be in the list but not 
+    ! nn_list%r_cut are 'guaranteed' to be in the list but not 
     ! higher distances
     
     if (str%nn_list%ignore_list == .false.) then
@@ -96,18 +94,16 @@ contains
       end if    
     end if
     
-    
     rr_cut = r_cut * r_cut
     
     n_tot = size(str%atoms)
     
     ! initiate 
+    
     deriv = 0.0
     
-    
     ! Do either single summation loop (nn-method) or double summation
-    ! Notice quite a lot of code is repeated twice below. Also, I hope
-    ! apply_periodic_box_condition is called 'inline'!?
+    ! Notice quite a lot of code is repeated twice below
     
     if (str%nn_list%ignore_list == .true.) then
     
@@ -126,29 +122,28 @@ contains
             
             ! be aware that derivatives are calculated which are 
             ! equal to - force
+            
             deriv(i1,:) = deriv(i1,:) - prefac * diff_vec
             deriv(i2,:) = deriv(i2,:) + prefac * diff_vec
             
             if (extra_args) then
               ! calculate potential energy
+              
               pot_energy = pot_energy + epsilon_times4 * rri3 * (rri3 - 1.0)
             
               ! calculate sum_i=1^n-1 sum_j>i f_ij |r_ij|^2
+              
               pressure_comp = pressure_comp + prefac * rr     
-            end if
-                    
+            end if      
           end if
-  			
         end do
       end do
-    
     else
     
       do j = 1, str%nn_list%n_pairs
 
   	    i1 = str%nn_list%pairs(2*j-1)
   	    i2 = str%nn_list%pairs(2*j)
-        
         
         ! Notice I could speed up the calculation by moving the calculation of
         ! diff_vec into type near_neighb_list with the penalty that this would
@@ -167,28 +162,25 @@ contains
           
           ! be aware that derivatives are calculated which are 
           ! equal to - force
+          
           deriv(i1,:) = deriv(i1,:) - prefac * diff_vec
           deriv(i2,:) = deriv(i2,:) + prefac * diff_vec
         
           if (extra_args) then
             ! calculate potential energy
+            
             pot_energy = pot_energy + epsilon_times4 * rri3 * (rri3 - 1.0)
           
             ! calculate sum_i=1^n-1 sum_j>i f_ij |r_ij|^2
+            
             pressure_comp = pressure_comp + prefac * rr     
           end if    
         end if
-    
   	  end do    
-    
     end if
     
   end subroutine lj_deriv
 
-
-
-
-!!!!!!!!!!!!!!!!!!!!!!! private functions/subroutines !!!!!!!!!!!!!!!!!!!!!!! 
 
   function lj_val_without_nn(str, container) result (val)
     type (structure), intent(in) :: str
@@ -203,17 +195,16 @@ contains
     real (db) :: rr, rri, rri3
     real (db), dimension(ndim) :: diff_vec
     
-    
-    sigma = get_func_param_val(container%params, "sigma")  !container%params%p(1)%val
-    epsilon = get_func_param_val(container%params, "epsilon") !container%params%p(2)%val
+    sigma = get_func_param_val(container%params, "sigma")
+    epsilon = get_func_param_val(container%params, "epsilon")
     epsilon_times4 = 4*epsilon
     sigma2 = sigma * sigma
-    
     
     if (does_func_param_exist(container%params, "r-cut")) then
       r_cut = get_func_param_val(container%params, "r-cut")
     else
       ! otherwise put r_cut to a value higher than any possible distance
+      
       r_cut = sqrt(sum(str%box_edges*str%box_edges))
     end if
     
@@ -237,7 +228,6 @@ contains
           val = val + epsilon_times4 * rri3 * (rri3 - 1.0)
           
         end if
-			
       end do
     end do
  
@@ -257,7 +247,6 @@ contains
     real (db) :: sigma2    ! = sigma*sigma
     real (db) :: rr, rri, rri3
     
-    
     sigma = get_func_param_val(container%params, "sigma")  
     epsilon = get_func_param_val(container%params, "epsilon") 
     epsilon_times4 = 4*epsilon
@@ -267,9 +256,9 @@ contains
       r_cut = get_func_param_val(container%params, "r-cut")
     else
       ! otherwise put r_cut to a value higher than any possible distance
+      
       r_cut = sqrt(sum(str%box_edges*str%box_edges))
     end if
-    
     
     ! when using neighest neighbour method all distances less than
     ! nn_list%r_cut are 'guarentied' to be in the list but not 
@@ -279,7 +268,6 @@ contains
       r_cut = nn_list%r_cut
     end if
     
-    
     rr_cut = r_cut * r_cut
     
   	n_tot = size(str%atoms)
@@ -287,20 +275,13 @@ contains
     val = 0.0
     
     do j = 1, nn_list%n_pairs
-
-  	  !i1 = nn_list%pairs(2*j-1)
-  	  !i2 = nn_list%pairs(2*j)
-      
       rr = nn_list%dists(j)
       
-        
       if (rr < rr_cut) then
         rri = sigma2 / rr
         rri3 = rri * rri * rri
         val = val + epsilon_times4 * rri3 * (rri3 - 1.0)
-        
       end if
-  
   	end do
 
   end function lj_val_nn

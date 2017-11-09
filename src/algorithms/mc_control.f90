@@ -2,7 +2,6 @@ module mc_control_class
 use configuration_class
 use function_class
 use common_block_class, only : common_config, common_pe_list
-!use common_potential_block_class
 use phasespace_class
 use md_properties_class
 use control_containers_class

@@ -30,7 +30,6 @@ contains
     real(db) :: sig_r_cut3
     real(db) :: sigma, epsilon
   
-  
     ! md storage containers
 
     type (phasespace) :: my_ps
@@ -46,25 +45,19 @@ contains
 	    open(print_to_file, file="output/job_log.txt")
 	  end if
 	  
-		
     write(print_to_file, *) "In run_md_control"
-
 
     call tic
 
-    ! initiate
+    ! prepare phase-space and containers for calculating rdf
     
     my_ps = make_phasespace(a_config%str, c%temperature)                      
-    
-    my_histogram = make_histogram(c%r_max, c%bin_length)
-                        
+    my_histogram = make_histogram(c%r_max, c%bin_length)                  
     my_rdf = make_rdf(product(a_config%str%box_edges), size(a_config%str%atoms), &
                       floor(c%r_max/c%bin_length), c%bin_length)
- 
-                          
     
     do i = 1, c%step_limit
-      time_now = c%md_delta_t * i   ! perhaps print this one out 
+      time_now = c%md_delta_t * i
       
       ! do one trajectory of length = 1 where pressure_comp and pot_energy is also
       ! calculated
@@ -85,9 +78,8 @@ contains
           sum_kin_energy = 0.0
         end if
       end if
-     
-        
-      ! print out stuff and interval = average_over_this_many_steps
+       
+      ! print out stuff at interval = average_over_this_many_steps
         
       if (mod(i,c%average_over_this_many_step) == 0) then 
         call md_print_properties(print_to_file, my_props)
@@ -97,14 +89,9 @@ contains
           write(*,'(a,3f12.6)') "total momentum ", sum(my_ps%p,1)
           write(*,*) "Serious problem - total momentum different from zero"
           stop
-        end if
-        
+        end if      
         
         ! Print out pressure correction term 
-        ! Notice, the calculation is limited for simplicity to the case where
-        ! we use the neighest nearbour method since some r_cut value is needed
-        ! to cal sig_r_cut3 below. For the case where nn-method not use we could
-        ! perhaps define a r_cut value to L/2 or something like that
         
         if ( associated (common_pe_list%pt_lj_pe) ) then
           if (a_config%str%nn_list%r_cut /= 0.0) then
@@ -115,15 +102,13 @@ contains
             pressure_corr = 32.0 * pi_value* density**2 * sigma**3 * epsilon * &
                             (sig_r_cut3**3 - 1.5*sig_r_cut3) / 9.0
                             
-            ! convert to atm
+            ! convert to atm and print
             
             pressure_corr = pressure_corr * P_unit
-            
             write(print_to_file,'(a,f12.6)') "P_corr(atm) = ", pressure_corr
           end if
         end if
-        
-        
+          
         call md_reset_properties(my_props)
         write(print_to_file, '(a,i8,a,f12.4,a)') "MD steps = ", i, " MD run-time = ", time_now, "*10e-13"
         write(print_to_screen, '(a,i8,a,f12.4,a)') "MD steps = ", i, " MD run-time = ", time_now, "*10e-13"
@@ -138,8 +123,7 @@ contains
             call accum_histogram(my_histogram, my_ps%str)
           end if
           
-          
-          ! when average_over_this_many_rdf rdf's have been calculated then print out the average
+          ! when average_over_this_many_rdf rdfs have been calculated then print out the average
           ! of these and reset rdf sum container
           
           if ( mod(i-c%total_step_temp_cali, c%cal_rdf_at_interval*c%average_over_this_many_rdf) == 0 ) then
