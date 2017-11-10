@@ -43,7 +43,7 @@ program mdmc
   
   ! Ask user for a MDMC job file  
   
-  write (*,*) "Enter the filename of a MDMC job file: "
+  write (*,*) "Enter the full pathname or full relative pathname of a MDMC job file: "
   read *, filename 
   
   ! create output directory - at this point in time hardcoded to 'output'
@@ -62,7 +62,7 @@ program mdmc
   ! <structure> element has an attribute "filename" or not
   
   call open_xmlfile(trim(filename),fxml,iostat)
-  if (iostat /= 0) stop "Cannot open file."
+  if (iostat /= 0) stop "Cannot open file. Did you specify the FULL pathname or FULL RELATIVE pathname?"
   
   call get_node(fxml, path="//structure",attributes=structure_attributes,status=iostat)
   
