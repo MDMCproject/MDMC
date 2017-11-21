@@ -40,11 +40,12 @@ implicit none
   
 contains
 
-  ! Calculate dynamical structure factors from intermediate scattering function as
+  ! Returns the diff (s_qo%diff) and self (s_qo%self) part of dynamical structure factor, 
+  ! where both of these are culculated from intermediate scattering function using
   !
   ! S(q,omega) = (1/pi) * int_0^infinity ( cos(omega*t) * S(q,t)) dt
   !
-  ! where this integral is approximated according to method make_and_cal_precal_cos_values()
+  ! This integral is approximated using the method described in make_and_cal_precal_cos_values()
   !
   subroutine cal_s_q_omega(s_qt, str, s_qo)
     type(s_q_time), intent(in) :: s_qt

@@ -51,7 +51,7 @@ contains
   end function get_s_q_time_n_t_bin 
 
 
-  ! Calculate diff and self intermediate scattering functions as:
+  ! Returns diff (s_q_t%diff) and self (s_q_t%self) intermediate scattering functions as:
   !
   ! S_d(q,t) = density * ((N-1)/N) * sum_over_i ( R_i(q) * ((g_d)_i(t)-1) )
   ! and
