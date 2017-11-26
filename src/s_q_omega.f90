@@ -72,7 +72,7 @@ contains
         n_t, s_qt%t_bin, s_qo%omega)
     end if
   
-    ! calculate S(Q,omega)
+    ! calculate S(q,omega)
   
     s_qo%self = matmul(s_qt%self, local_precal_cos_values%val)
     s_qo%diff = matmul(s_qt%diff, local_precal_cos_values%val) 

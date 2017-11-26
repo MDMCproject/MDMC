@@ -237,7 +237,7 @@ contains
   end function is_integrat_over_r_precal_allocated
 
 
-  ! calculates 4pi/Q * [sin(Qr)/Q^2 - rcos(Qr)/Q] evaluated at r=i*delta_r minus evaluated
+  ! calculates 4pi/q * [sin(q*r)/q^2 - rcos(q*r)/q] evaluated at r=i*delta_r minus evaluated
   ! at r=(i-1)*delta_r for i=1..Nr, where Nr is the number of r-bins.
   ! See page 27, equation (24) in my handwritten notes
   !
@@ -261,7 +261,7 @@ contains
     do i_q = 1, n_q
       prefac = 4 * pi_value / q(i_q)**2
       
-      lower_lim = 0  ! since sin(Q*r) = 0 for r=0
+      lower_lim = 0  ! since sin(q*r) = 0 for r=0
       
       do i_r = 1, n_r
         r = i_r * bin_length
