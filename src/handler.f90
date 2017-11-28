@@ -665,8 +665,9 @@ contains
           n_buffers = setup_mdmc_control_params%n_time_bin/n_time_bin_between_buffers
           if (n_buffers > get_n_g_r_t_to_average_over()) then
             write(*,*) " "
-            write(*,*) "In Job file please increase n-md-step-between-buffers or n-g-r-t-to-average-over"
-            write(*,*) "otherwise when g(r,t) more buffers are created than needed."
+            write(*,*) "In Job file please increase n-md-step-between-buffers or"
+            write(*,*) "n-g-r-t-to-average-over otherwise when calculating"
+            write(*,*) "g(r,t) more buffers are created than needed."
             write(*,*) "That is more buffers than n-g-r-t-to-average-over which is inefficient."
             stop            
           end if

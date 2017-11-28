@@ -59,7 +59,7 @@
       <n-g-r-t-to-average-over number="2" />  <!-- Number of complete g(r,t)s to average over -->
       <n-time-bin number="100" /> <!-- Number of time bins -->
       <md-per-time-bin number="1" /> <!-- Number of MD steps which makes up a time bin -->
-      <n-md-step-between-buffers number="10" /> <!-- how long between calculated buffers (g(r,t)s) to reduce correlation between these -->      
+      <n-md-step-between-buffers number="50" /> <!-- how long between calculated buffers (g(r,t)s) to reduce correlation between these -->      
     </time-correlation>
 
     <!-- Here define the r binning of g(r,t) -->
