@@ -1,25 +1,21 @@
 # MDMC
 
+This software was created to test a new algorithm for fitting/optimising Potential Energy (PE) parameters against dynamical information such as S(q,omega) and S(q,t).
+
+A zip file containing Windows executable, user manual, scripts for plotting, example MDMC job files and Argon test data are available for download from https://github.com/MDMCproject/MDMC/releases.
+
+Documentation related to and referenced to in the code can be found in source code directory doc.
+
+Library used by this software
+-----------------------------
+
 This software uses the XML reader/writer library called xmlf90, a copy of which
 is located in src/xmlf90-1.2. For more information about this library see 
 https://github.com/rscircus/xmlf90 (xmlf90 is 3-clause BSD license which is compatible with GNU GPL).
 
-To compile
-----------
+To compile source code
+----------------------
 
 * Intel Microsoft Visual studio: Open mdmc.sln in /src and compile.
 
 * Other platforms: in /src find both a traditional makefile and SCons makefile scripts (named SConstruct and SConscript) are available (possibly a bit out of date).
-
-To run
-------
-
-The source-code directory src contains the the sub-directory input which contains examples 
-of input files in the form of MDMC job files (XML formatted files). One of these is
-./input/md_control.xml which should be fast to execute and simply just run a small MD
-simulation. 
-
-From the command line type mdmc.exe (mdmc on linux). You are then asked to name a MDMC
-job file. The program then runs and output all results into a folder 'output' in the directory 
-of the executable.
-
