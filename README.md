@@ -2,7 +2,7 @@
 
 This software was created to test a new algorithm for fitting/optimising Potential Energy (PE) parameters against dynamical information such as S(q,omega) and S(q,t).
 
-A zip file containing Windows executable, user manual, scripts for plotting, example MDMC job files and Argon test data are available for download from https://github.com/MDMCproject/MDMC/releases.
+A zip file containing Windows executable, user manual, scripts for plotting, example MDMC job files and Argon test data is available for download from https://github.com/MDMCproject/MDMC/releases.
 
 Documentation related to and referenced to in the code can be found in source code directory doc.
 
