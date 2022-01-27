@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<mdmc-control-results title="rho = 0.00000">
+ <this-file-was-created when="Date 24/01/2022; time 16:19:29" />
+ <accept sigma="4.00000" epsilon="1.50000" r-cut="100.00000"
+  val="**************" />
+ <rejected N="1" sigma="4.03142" epsilon="1.50768" r-cut="100.00000"
+  val="**************" />
+ <rejected N="2" sigma="4.05236" epsilon="1.45021" r-cut="100.00000"
+  val="**************" />
+ <accept N="3" sigma="3.90508" epsilon="1.42728" r-cut="100.00000"
+  val="**************" />
+ <rejected N="4" sigma="3.95809" epsilon="1.43946" r-cut="100.00000"
+  val="**************" />
+ <accept N="5" sigma="3.81203" epsilon="1.45973" r-cut="100.00000"
+  val="**************" />
+ <rejected N="6" sigma="3.87037" epsilon="1.40573" r-cut="100.00000"
+  val="**************" />
+ <rejected N="7" sigma="3.86671" epsilon="1.52892" r-cut="100.00000"
+  val="**************" />
+ <rejected N="8" sigma="3.83433" epsilon="1.49473" r-cut="100.00000"
+  val="**************" />
+ <rejected N="9" sigma="3.85702" epsilon="1.41532" r-cut="100.00000"
+  val="**************" />
+ <rejected N="10" sigma="3.82297" epsilon="1.50888" r-cut="100.00000"
+  val="**************" />
+ <accept N="11" sigma="3.78839" epsilon="1.40471" r-cut="100.00000"
+  val="**************" />
+ <accept N="12" sigma="3.76086" epsilon="1.43571" r-cut="100.00000"
+  val="**************" />
+ <accept N="13" sigma="3.71006" epsilon="1.39364" r-cut="100.00000"
+  val="**************" />
+ <rejected N="14" sigma="3.74909" epsilon="1.44351" r-cut="100.00000"
+  val="**************" />
+ <rejected N="15" sigma="3.73717" epsilon="1.31282" r-cut="100.00000"
+  val="**************" />
+ <rejected N="16" sigma="3.77663" epsilon="1.45951" r-cut="100.00000"
+  val="**************" />
+ <accept N="17" sigma="3.69318" epsilon="1.45037" r-cut="100.00000"
+  val="98938657.47766" />
+ <rejected N="18" sigma="3.70385" epsilon="1.47626" r-cut="100.00000"
+  val="**************" />
+ <rejected N="19" sigma="3.75897" epsilon="1.38739" r-cut="100.00000"
+  val="**************" />
+ <rejected N="20" sigma="3.70708" epsilon="1.39924" r-cut="100.00000"
+  val="**************" />
+ <rejected N="21" sigma="3.78715" epsilon="1.53404" r-cut="100.00000"
+  val="**************" />
+ <rejected N="22" sigma="3.78783" epsilon="1.41342" r-cut="100.00000"
+  val="**************" />
+ <accept N="23" sigma="3.68493" epsilon="1.36253" r-cut="100.00000"
+  val="76946141.86301" />
+ <accept N="24" sigma="3.62523" epsilon="1.36932" r-cut="100.00000"
+  val="461838.87504" />
+ <rejected N="25" sigma="3.70394" epsilon="1.37195" r-cut="100.00000"
+  val="1044077.53190" />
+ <accept N="26" sigma="3.62795" epsilon="1.35812" r-cut="100.00000"
+  val="461052.20215" />
+ <accept N="27" sigma="3.58887" epsilon="1.32890" r-cut="100.00000"
+  val="311780.29862" />
+ <rejected N="28" sigma="3.67222" epsilon="1.39876" r-cut="100.00000"
+  val="715717.69189" />
+ <rejected N="29" sigma="3.57589" epsilon="1.40892" r-cut="100.00000"
+  val="327276.55937" />
+ <rejected N="30" sigma="3.68503" epsilon="1.35398" r-cut="100.00000"
+  val="822907.42260" />
+ <accept N="31" sigma="3.50072" epsilon="1.39953" r-cut="100.00000"
+  val="160138.87789" />
+ <accept N="32" sigma="3.47321" epsilon="1.32669" r-cut="100.00000"
+  val="113314.84022" />
+ <accept N="33" sigma="3.42809" epsilon="1.28619" r-cut="100.00000"
+  val="73339.51690" />
+ <rejected N="34" sigma="3.45012" epsilon="1.30901" r-cut="100.00000"
+  val="95287.14967" />
+ <rejected N="35" sigma="3.45733" epsilon="1.19528" r-cut="100.00000"
+  val="79437.45400" />
+ <rejected N="36" sigma="3.50597" epsilon="1.23663" r-cut="100.00000"
+  val="131076.02338" />
+ <rejected N="37" sigma="3.46328" epsilon="1.32013" r-cut="100.00000"
+  val="99649.75921" />
+ <rejected N="38" sigma="3.45710" epsilon="1.30405" r-cut="100.00000"
+  val="85668.51144" />
+ <accept N="39" sigma="3.40837" epsilon="1.38019" r-cut="100.00000"
+  val="68652.52075" />
+ <accept N="40" sigma="3.35151" epsilon="1.37812" r-cut="100.00000"
+  val="53461.88700" />
+ <rejected N="41" sigma="3.42514" epsilon="1.44960" r-cut="100.00000"
+  val="81796.88776" />
+ <rejected N="42" sigma="3.44731" epsilon="1.28015" r-cut="100.00000"
+  val="93511.82284" />
+ <accept N="43" sigma="3.32525" epsilon="1.30470" r-cut="100.00000"
+  val="50813.83564" />
+ <rejected N="44" sigma="3.24287" epsilon="1.30120" r-cut="100.00000"
+  val="136626.78326" />
+ <accept N="45" sigma="3.39338" epsilon="1.22371" r-cut="100.00000"
+  val="48017.50072" />
+ <rejected N="46" sigma="3.48558" epsilon="1.24909" r-cut="100.00000"
+  val="109420.67187" />
+ <accept N="47" sigma="3.33503" epsilon="1.16103" r-cut="100.00000"
+  val="35800.77536" />
+ <rejected N="48" sigma="3.26601" epsilon="1.24119" r-cut="100.00000"
+  val="72686.90649" />
+ <rejected N="49" sigma="3.26474" epsilon="1.24681" r-cut="100.00000"
+  val="63905.09470" />
+ <rejected N="50" sigma="3.42431" epsilon="1.20284" r-cut="100.00000"
+  val="59721.71091" />
+ <rejected N="51" sigma="3.27543" epsilon="1.10392" r-cut="100.00000"
+  val="56879.10093" />
+ <rejected N="52" sigma="3.30723" epsilon="1.06951" r-cut="100.00000"
+  val="43435.01309" />
+ <rejected N="53" sigma="3.31828" epsilon="1.20361" r-cut="100.00000"
+  val="42347.14335" />
+ <rejected N="54" sigma="3.37498" epsilon="1.24534" r-cut="100.00000"
+  val="46767.16391" />
+ <accept N="55" sigma="3.35770" epsilon="1.08250" r-cut="100.00000"
+  val="34982.66039" />
+ <rejected N="56" sigma="3.38949" epsilon="0.98739" r-cut="100.00000"
+  val="38323.05360" />
+ <rejected N="57" sigma="3.43666" epsilon="1.14624" r-cut="100.00000"
+  val="58621.38278" />
+ <rejected N="58" sigma="3.42381" epsilon="0.99912" r-cut="100.00000"
+  val="51555.38544" />
+ <rejected N="59" sigma="3.38546" epsilon="1.15981" r-cut="100.00000"
+  val="46006.62004" />
+ <rejected N="60" sigma="3.37962" epsilon="1.05299" r-cut="100.00000"
+  val="39520.13493" />
+ <rejected N="61" sigma="3.44155" epsilon="1.16508" r-cut="100.00000"
+  val="63464.31143" />
+ <rejected N="62" sigma="3.37152" epsilon="1.18010" r-cut="100.00000"
+  val="44916.16634" />
+ <rejected N="63" sigma="3.28804" epsilon="1.06662" r-cut="100.00000"
+  val="49970.43814" />
+ <rejected N="64" sigma="3.27357" epsilon="1.09278" r-cut="100.00000"
+  val="55012.81255" />
+ <rejected N="65" sigma="3.32676" epsilon="1.00980" r-cut="100.00000"
+  val="38542.67172" />
+ <rejected N="66" sigma="3.35849" epsilon="1.17033" r-cut="100.00000"
+  val="37435.28049" />
+ <rejected N="67" sigma="3.41502" epsilon="1.13811" r-cut="100.00000"
+  val="54731.32189" />
+ <rejected N="68" sigma="3.31235" epsilon="1.00007" r-cut="100.00000"
+  val="45583.91227" />
+ <rejected N="69" sigma="3.45513" epsilon="1.00619" r-cut="100.00000"
+  val="57915.80522" />
+ <rejected N="70" sigma="3.34593" epsilon="1.14842" r-cut="100.00000"
+  val="35796.85923" />
+ <rejected N="71" sigma="3.32437" epsilon="1.08359" r-cut="100.00000"
+  val="39550.63155" />
+ <rejected N="72" sigma="3.31591" epsilon="1.05300" r-cut="100.00000"
+  val="43417.96770" />
+ <rejected N="73" sigma="3.28172" epsilon="1.04169" r-cut="100.00000"
+  val="49927.36051" />
+ <rejected N="74" sigma="3.26287" epsilon="1.17463" r-cut="100.00000"
+  val="68659.82913" />
+ <rejected N="75" sigma="3.33734" epsilon="1.14793" r-cut="100.00000"
+  val="37436.32627" />
+ <rejected N="76" sigma="3.27524" epsilon="1.02442" r-cut="100.00000"
+  val="55301.78772" />
+ <rejected N="77" sigma="3.42736" epsilon="1.00131" r-cut="100.00000"
+  val="49096.24464" />
+ <rejected N="78" sigma="3.42751" epsilon="1.06567" r-cut="100.00000"
+  val="52557.65014" />
+ <rejected N="79" sigma="3.31373" epsilon="1.13655" r-cut="100.00000"
+  val="39445.91325" />
+ <rejected N="80" sigma="3.44314" epsilon="1.02090" r-cut="100.00000"
+  val="56435.25194" />
+ <rejected N="81" sigma="3.42571" epsilon="1.09083" r-cut="100.00000"
+  val="59999.72370" />
+ <rejected N="82" sigma="3.33444" epsilon="1.05795" r-cut="100.00000"
+  val="42326.74002" />
+ <accept N="83" sigma="3.34576" epsilon="1.01317" r-cut="100.00000"
+  val="31057.18164" />
+ <rejected N="84" sigma="3.35368" epsilon="0.93997" r-cut="100.00000"
+  val="37180.90643" />
+ <rejected N="85" sigma="3.25486" epsilon="0.99025" r-cut="100.00000"
+  val="73993.47214" />
+ <rejected N="86" sigma="3.33373" epsilon="1.08759" r-cut="100.00000"
+  val="35265.78844" />
+ <rejected N="87" sigma="3.33245" epsilon="1.01021" r-cut="100.00000"
+  val="38917.73591" />
+ <rejected N="88" sigma="3.29162" epsilon="0.97971" r-cut="100.00000"
+  val="51036.83931" />
+ <rejected N="89" sigma="3.35550" epsilon="1.05852" r-cut="100.00000"
+  val="37521.84668" />
+ <rejected N="90" sigma="3.37583" epsilon="0.98355" r-cut="100.00000"
+  val="36035.70775" />
+ <rejected N="91" sigma="3.33908" epsilon="1.08697" r-cut="100.00000"
+  val="37069.81398" />
+ <rejected N="92" sigma="3.33149" epsilon="1.07875" r-cut="100.00000"
+  val="39547.03004" />
+ <rejected N="93" sigma="3.31293" epsilon="1.03583" r-cut="100.00000"
+  val="41539.45357" />
+ <rejected N="94" sigma="3.30474" epsilon="0.96173" r-cut="100.00000"
+  val="45874.36209" />
+ <rejected N="95" sigma="3.25622" epsilon="1.07608" r-cut="100.00000"
+  val="58782.76778" />
+ <rejected N="96" sigma="3.30081" epsilon="0.97575" r-cut="100.00000"
+  val="51502.82702" />
+ <rejected N="97" sigma="3.28729" epsilon="1.06743" r-cut="100.00000"
+  val="44173.48920" />
+ <rejected N="98" sigma="3.28431" epsilon="1.03468" r-cut="100.00000"
+  val="54281.12028" />
+ <rejected N="99" sigma="3.37596" epsilon="1.02824" r-cut="100.00000"
+  val="34186.12115" />
+ <rejected N="100" sigma="3.36805" epsilon="0.95248" r-cut="100.00000"
+  val="36479.09407" />
+</mdmc-control-results>
