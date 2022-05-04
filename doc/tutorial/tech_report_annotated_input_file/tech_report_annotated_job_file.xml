@@ -1,0 +1,104 @@
+<!-- This mdmc job-file is annotated to make it easier to compare with
+     text in report https://epubs.stfc.ac.uk/work/36113739 -->
+
+<job>
+
+  <!-- Define a simulation box that contains 6*6*6*4=864 Argon
+       atoms and density 0.0176. Initially, the atoms are arranged
+	   in a FCC grid - this initially configuration is immaterial
+	   since calibration is done before FF parameter refinement starts 
+	   (to verify this e.g. change the starting sigma and epsilon parameters
+	   below to those or the published sigma=3.36 and epsilon=1.0243 or
+	   any other initially starting configuration (see manual) and the
+	   initial MD calibration will make this immaterial -->
+  <structure what-init-structure-to-build="fcc">
+    <title>Liquid Ar</title>
+    <density units="atom/AA3" val="0.0176" />
+    <number-of-unit-cells nx="6" ny ="6" nz="6" />
+  </structure>
+  
+  <!-- Optionally use nearest neighbour method in MD simulations -->    
+  <use-near-neighbour-method>
+    <r-cut units="AA" val="7.491" />   
+    <delta-r units="AA" val="1.364" />            
+  </use-near-neighbour-method>  
+  
+  <!-- Specify the data. FOM function is the standard least-squared FOM function -->
+  <fom>
+    <s-qo-fom>
+      <data-file filename="./data/argon/Well_s_q_omega_Ag_data_unsymmetrised.xml" />
+    </s-qo-fom>
+  </fom> 
+  
+  <!-- Specify the FF -->
+  <gpe>
+    <lj-potential>
+      <sigma units="AA" val="4.0" fixed="no" min="1.0" max="6.0" max-move="0.2" />
+      <epsilon units="KJ/mole" val="1.5"  fixed="no" min="0.2" max="5.0" max-move="0.2" /> 
+      
+      <!-- you can argue whether r-cut below is a property of this potentially,
+           but for now you can optionally specify an r-cut value here, which
+           simply put the potential to zero for all r values higher than r-cut 
+           -->
+      <r-cut units="AA" val="100.0" />  
+    </lj-potential>
+  </gpe>
+  
+  <!-- specify how the FF refinement is done -->
+  <control-object name="mdmc_control_time_corr">
+  
+    <!-- you are required to specify the q and omega values where data
+         were measured. Apologies for the inconvenience of this -->
+    <q-values>
+      <q start="0.42" step="0.42" n-step="2" />
+      <q start="1.62" step="0.3" n-step="2" />
+      <q start="2.58" step="0.42" n-step="2" />
+      <q start="3.9" step="10000.0" n-step="0" />
+    </q-values>
+
+    <omega-values>
+      <omega start="0.0" step="0.02" n-step="10" />
+      <omega start="0.25" step="0.05" n-step="15" />
+      <omega start="1.1" step="0.1" n-step="9" />
+    </omega-values>
+    
+    <!-- Set time-step and target temperature for MD simulation -->
+    <temperature units="Kelvin" val="120.0" />
+    <time-step units="10e-13s" val="0.1075" />   
+    
+    <!-- Controlling the initial MD calibration -->
+    <total-steps-initial-equilibration number="50000" average-over="1000" />
+    <perform-initial-temperature-calibration>
+      <total-step-temp-cali number="40000" />
+      <adjust-temp-at-interval number="2000" />
+    </perform-initial-temperature-calibration>
+
+    <!-- Controlling the MC (Monte-Carlo). How many MC steps (cycles)
+         and temperature-mc controls the acceptance rate -->
+    <mc-steps number="100" />
+    <temperature-mc val="1" />
+
+    <!-- Controlling MD simulations between MC steps -->
+    <md-steps-repeated-equilibration number="50000" average-over="1000" />
+    <perform-repeated-temperature-calibration>
+      <total-step-temp-cali-repeated number="40000" />
+      <adjust-temp-at-interval-repeated number="1000" />
+    </perform-repeated-temperature-calibration>
+    
+    <!-- Define how g(r,t) is calculated and also the time binning of g(r,t) -->
+    <time-correlation>
+      <n-g-r-t-to-average-over number="20" />    <!-- Number of g(r,t)s to average over to reduce statistical noise -->
+      <n-time-bin number="250" /> <!-- Number of time bins -->
+      <md-per-time-bin number="7" /> <!-- Number of MD steps which makes up a time bin -->
+      <n-md-step-between-buffers number="100" />  <!-- how long between calculated buffers (g(r,t)s) to reduce correlation between these -->
+    </time-correlation>    
+    
+    <!-- Here define the r binning of g(r,t) -->
+    <calculate-rdf>
+      <r-max units="AA" val="50.0" />
+      <bin-length units="AA" val="0.2" />
+    </calculate-rdf>    
+        
+  </control-object>
+
+</job>
