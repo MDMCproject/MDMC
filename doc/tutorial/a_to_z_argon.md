@@ -1,4 +1,3 @@
-# blah
 This tutorial go through in some detail how to recreate the results in the 
 technical report: https://doi.org/10.1103/PhysRevA.31.3391.
 
