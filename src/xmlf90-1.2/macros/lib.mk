@@ -1,9 +1,7 @@
 #
-# Macro file to compile and install modules in FLIB itself
+# Macro file to compile and install modules and library
 #
 include $(FLIB_ROOT)/fortran.mk
-#
-LIBRARY=libxmlf90_sax.a
 #
 CP=cp
 install: $(OBJFILES)

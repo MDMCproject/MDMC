@@ -3,6 +3,7 @@ OBJFILES= m_debug.o m_buffer.o m_elstack.o m_dictionary.o m_io.o \
           m_xml_error.o  m_fsm.o  m_xml_parser.o flib_sax.o
 MODFILES=$(OBJFILES:.o=)
 
+LIBRARY=libxmlf90_sax.a
 FLIB_ROOT=../macros
 MK=$(FLIB_ROOT)/lib.mk
 include $(MK)
