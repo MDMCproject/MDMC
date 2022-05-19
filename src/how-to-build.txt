@@ -1,10 +1,12 @@
-Using ordinary Makefiles: 
-1) make sure xmlf90_sax library is compiled first by going to 
-trunk/src/xmlf90_sax/sax and using linux type 'make' and under windows type 
-'nmake -f windows-makefile'.
-2) go to the trunk/src directory. Type 'make' under linux and
-'nmake -f windows-makefile' under windows.
+For windows use Intel Microsoft Visual studio: Open mdmc.sln in /src and compile
 
-Using SCONS makefiles:
+Using ordinary Makefiles - targeted for linux:
+1) make sure xmlf90_sax library is compiled first by going to
+trunk/src/xmlf90_sax/sax and using linux type 'make'
+2) make sure xmlf90_wxml library is compiled first by going to
+trunk/src/xmlf90_sax/wxml and using linux type 'make'
+3) go to the trunk/src directory. Type 'make'
+
+Using SCONS makefiles (out of date and in need of considerably updating before use):
 1) go to the trunk/src directory and type 'scons'. You may have to edit the 
 SConstruct file first so that only the library is build to start with.
