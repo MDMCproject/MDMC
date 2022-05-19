@@ -1,16 +1,12 @@
-#
-# Makefile for moldynmoncar
-#
-
 FCOM=ifort
 LINK=ifort
 
+FLIB_ROOT=xmlf90-1.2/macros
 include $(FLIB_ROOT)/fortran.mk
 
 #### link to Fortran XML library (xmlf90) ####
 
-#FLIB_ROOT=$(HOME)/xmlf90-1.2/macros
-LIBS=-L$(FLIB_ROOT)/lib/ -lxmlf90_sax
+LIBS=-L$(FLIB_ROOT)/lib/ -lxmlf90_sax -lxmlf90_wxml
 MOD_SEARCH=-I$(FLIB_ROOT)/modules/
 
 
