@@ -5,7 +5,9 @@ Using ordinary Makefiles - targeted for linux:
 trunk/src/xmlf90_sax/sax and using linux type 'make'
 2) make sure xmlf90_wxml library is compiled first by going to
 trunk/src/xmlf90_sax/wxml and using linux type 'make'
-3) go to the trunk/src directory. Type 'make'
+3) make sure xmlf90_xpath library is compiled first by going to
+trunk/src/xmlf90_sax/xpath and using linux type 'make'
+4) go to the trunk/src directory. Type 'make'
 
 Using SCONS makefiles (out of date and in need of considerably updating before use):
 1) go to the trunk/src directory and type 'scons'. You may have to edit the 

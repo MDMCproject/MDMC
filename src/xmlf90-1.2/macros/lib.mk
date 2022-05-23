@@ -2,6 +2,7 @@
 # Macro file to compile and install modules and library
 #
 include $(FLIB_ROOT)/fortran.mk
+LIB_STD=$(FLIB_ROOT)/lib/
 #
 CP=cp
 install: $(OBJFILES)
