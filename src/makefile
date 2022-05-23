@@ -1,6 +1,3 @@
-#FCOM=ifort
-#LINK=ifort
-
 FLIB_ROOT=xmlf90-1.2/macros
 include $(FLIB_ROOT)/fortran.mk
 
