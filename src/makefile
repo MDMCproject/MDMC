@@ -20,8 +20,8 @@ OBJS= various_constants.o structure_type_definition.o \
       func_param.o \
       histogram.o rdf.o histogram_cutdown.o time_corr_hist_container.o s_q_time.o s_q_omega.o \
       $(OBJ_FUNCTIONS) function.o \
-      common_block.o phasespace.o time_corr_algorithm.o fnc_constraint.o \
-      configuration.o md_properties.o control_containers.o \
+      common_block.o phasespace.o time_corr_algorithm.o  \
+      md_properties.o control_containers.o \
       $(OBJ_READERS) \
       func_params_wrapper.o $(OBJ_ALGORITHMS) \
       handler.o \
@@ -34,7 +34,6 @@ default: $(TARGET)
 
 #%.o: %.f90
 #	$(FC) $(MOD_SEARCH) $(FFLAGS) -o $@ -c $<
-
 
 $(TARGET): $(OBJS)
 	$(FC) $(FFLAGS) -o $(TARGET) $(OBJS) $(LIBS)

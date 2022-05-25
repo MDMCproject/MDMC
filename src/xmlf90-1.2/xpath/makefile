@@ -3,7 +3,7 @@ MODFILES=$(OBJFILES:.o=)
 
 LIBRARY=libxmlf90_xpath.a
 FLIB_ROOT=../macros
-LIBS=-L$(FLIB_ROOT)/lib/ -lxmlf90_sax
+LIBS=-L$(FLIB_ROOT)/lib/ -lxmlf90_sax -I$(FLIB_ROOT)/sax/
 MK=$(FLIB_ROOT)/lib.mk
 include $(MK)
 

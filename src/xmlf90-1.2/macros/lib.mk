@@ -8,7 +8,7 @@ CP=cp
 install: $(OBJFILES)
 	@echo "  ==> Updating $(LIBRARY) with $(OBJFILES)"
 	$(AR) r $(LIB_STD)$(LIBRARY) $(OBJFILES)
-	$(RANLIB) $(LIB_STD)$(LIBRARY)
+#	$(RANLIB) $(LIB_STD)$(LIBRARY)
 	@echo "  ==> Installing modules: $(MODFILES)"
 	@for i in $(MODFILES) ; do  \
 	   if [ -f $$i.$(MOD_EXT) ] ; then \

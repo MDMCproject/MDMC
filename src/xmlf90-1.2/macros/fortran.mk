@@ -10,7 +10,7 @@ FC=ifort
 # to link properly using Fedora Core 4!!!!
 # I copied and pasted to below flags from a suggestion by a bloke
 # called Andrew from some Intel mailing list
-FFLAGS= -pthread -pad -Vaxlib -mp -save -O0 -w95 -extend_source
+FFLAGS= -pthread -pad -save -O0 -extend-source
 
 INC_PREFIX=-I
 MOD_PREFIX=-I
@@ -24,10 +24,10 @@ MOD_SEARCH=$(MOD_PREFIX)$(MOD_STD)
 # It works at least with GNU make
 %.o : %.mod
 #
-.f90.o:
-	$(FC) -c $(MOD_SEARCH) $(INC_SEARCH) $(FFLAGS)   $<
-#%.o: %.f90
-#	$(FC) $(MOD_SEARCH) $(FFLAGS) -o $@ -c $<
+#.f90.o:
+#	$(FC) -c $(MOD_SEARCH) $(INC_SEARCH) $(FFLAGS)   $<
+%.o: %.f90
+	$(FC) $(MOD_SEARCH) $(FFLAGS) -o $@ -c $<
 
 
 
