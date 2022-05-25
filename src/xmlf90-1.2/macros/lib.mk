@@ -1,15 +1,14 @@
 #
-# Macro file to compile and install modules in FLIB itself
+# Macro file to compile and install modules and library
 #
 include $(FLIB_ROOT)/fortran.mk
-#
-LIBRARY=libxmlf90_sax.a
+LIB_STD=$(FLIB_ROOT)/lib/
 #
 CP=cp
 install: $(OBJFILES)
 	@echo "  ==> Updating $(LIBRARY) with $(OBJFILES)"
 	$(AR) r $(LIB_STD)$(LIBRARY) $(OBJFILES)
-	$(RANLIB) $(LIB_STD)$(LIBRARY)
+#	$(RANLIB) $(LIB_STD)$(LIBRARY)
 	@echo "  ==> Installing modules: $(MODFILES)"
 	@for i in $(MODFILES) ; do  \
 	   if [ -f $$i.$(MOD_EXT) ] ; then \
