@@ -48,11 +48,11 @@ program mdmc
   
   ! create output directory - at this point in time hardcoded to 'output'
   
-  inquire( directory="output", exist=output_dir_exist )
-  if ( output_dir_exist == .false. ) then
-    write(*,*), "create output directory"
-    call system('mkdir output')
-  end if    
+  !inquire( directory="output", exist=output_dir_exist )
+  !if ( output_dir_exist == .false. ) then
+  !  write(*,*), "create output directory"
+  !  call system('mkdir output')
+  !end if    
   
   ! Because of bug in otherwise very useful xmlf90 library 
   ! need to read in input file in bits...... 

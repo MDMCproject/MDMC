@@ -137,7 +137,7 @@ contains
       ! numerical errors. Not sure if this is the best point to record this total average
       
       if (i == c%total_step_temp_cali) then
-        average_energy_end_of_temp_calibration = my_props.tot_energy.ave 
+        average_energy_end_of_temp_calibration = my_props%tot_energy%ave 
       end if      
 
       ! print out stuff at interval = average_over_initial_equilibration
@@ -172,9 +172,9 @@ contains
     ! dimensionless temperature
     !
     ! First up check the temperature and the end of the simulation is OK
-    
-    if ( acceptable_temperature((2.0/ndim)*my_props.kin_energy.ave, &
-         c%temperature, 0.2d+0) == .false.) then
+
+    if ( acceptable_temperature((2.0/ndim)*my_props%kin_energy%ave, &
+         c%temperature, 0.2d+0) .eqv. .false.) then
          write(print_to_screen, *) "Initial equilibration did not reach equilibrium"
          write(print_to_screen, *) "Temperature outside acceptable value"
          stop
@@ -185,7 +185,7 @@ contains
     ! calibration
 
     if ( acceptable_energy(average_energy_end_of_temp_calibration, &
-         my_props.tot_energy.ave, 0.1d+0) == .false.) then
+         my_props%tot_energy%ave, 0.1d+0) .eqv. .false.) then
          write(print_to_screen, *) "Initial equilibration did not reach equilibrium - STOP"
          write(print_to_screen, *) "Total energy drift is too high since temperature calibration ended"
          stop
@@ -281,7 +281,7 @@ contains
         ! this energy has drifted too much due to numerical errors
         
         if (i_md == c%total_step_temp_cali_repeated) then
-          average_energy_end_of_temp_calibration = my_props.tot_energy.ave 
+          average_energy_end_of_temp_calibration = my_props%tot_energy%ave 
         end if      
         
         if (mod(i_md,c%average_over_repeated_equilibration) == 0) then 
@@ -304,10 +304,10 @@ contains
       ! dimensionless temperature
       !
       ! Check temperature OK and if energy has been drifting too much
-      
-      if ( acceptable_temperature((2.0/ndim)*my_props.kin_energy.ave, &
-          c%temperature, 0.2d+0) == .false. .or. acceptable_energy(average_energy_end_of_temp_calibration, &
-          my_props.tot_energy.ave, 0.1d+0) == .false.) then
+
+      if ( acceptable_temperature((2.0/ndim)*my_props%kin_energy%ave, &
+          c%temperature, 0.2d+0) .eqv. .false. .or. acceptable_energy(average_energy_end_of_temp_calibration, &
+          my_props%tot_energy%ave, 0.1d+0) .eqv. .false.) then
         write(print_to_screen, *) "Did not reach equilibrium in MD run within MC loop"
         write(print_to_file, *) "Did not reach equilibrium in MD run within MC loop"
 

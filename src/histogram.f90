@@ -172,7 +172,7 @@ contains
     ! Do different summations depending on whether the nearest neighbour list is
     ! in use    
     
-    if (str%nn_list%ignore_list == .true. .or. str%nn_list%r_cut < r_max) then
+    if (str%nn_list%ignore_list .or. str%nn_list%r_cut < r_max) then
     
       do i1 = 1, n_tot
         do i2 = i1+1, n_tot
