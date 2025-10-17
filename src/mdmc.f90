@@ -41,10 +41,16 @@ program mdmc
   write (*,*) "MDMC Version ... "
   write (*,*) " "
   
-  ! Ask user for a MDMC job file  
-  
-  write (*,*) "Enter the full pathname or full relative pathname of a MDMC job file: "
-  read *, filename 
+  ! Ask user for a MDMC job file. If a command-line argument is provided
+  ! use that as the filename, otherwise prompt the user interactively.
+
+  argc = command_argument_count()
+  if (argc >= 1) then
+    call get_command_argument(1, filename)
+  else
+    write (*,*) "Enter the full pathname or full relative pathname of a MDMC job file: "
+    read (*,*) filename
+  end if
   
   ! create output directory - at this point in time hardcoded to 'output'
   
