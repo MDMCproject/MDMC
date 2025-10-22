@@ -597,22 +597,22 @@ contains
              
         ! Start running an algorithm 
           
-        if (in_md_control == .true.) then
+        if (in_md_control) then
           call run_md_control(common_config, setup_md_control_params)
         end if
         
-        if (in_mdmc_control == .true.) then
+        if (in_mdmc_control) then
           call run_mdmc_control(common_config, setup_mdmc_control_params)
         end if
         
-        if (in_md_gridsearch_control == .true.) then
+        if (in_md_gridsearch_control) then
           call run_md_gridsearch_control(common_config, setup_mdmc_control_params)           
         end if
         
         ! Before calling algorithms that compare against dynamical structure factor information
         ! do the following addition checks and adjustments
         
-        if (in_md_control_time_corr == .true. .or. in_mdmc_control_time_corr == .true.) then
+        if (in_md_control_time_corr .or. in_mdmc_control_time_corr) then
           
           ! Within a 'buffer' a full g(r,t) is calculated.
           ! A time bin for g(r,t) has the length: MD time step * md_per_time_bin.
@@ -677,7 +677,7 @@ contains
           
           call set_n_buffers( n_buffers )
             
-          if (in_mdmc_control_time_corr == .true.) then
+          if (in_mdmc_control_time_corr) then
             call run_mdmc_control_time_corr(common_config, setup_mdmc_control_params)
           else
             call run_md_control_time_corr(common_config, setup_mdmc_control_params)    

@@ -60,7 +60,7 @@ contains
   subroutine check_if_time_corr_hist_container_is_allocated(container)
     type(time_corr_hist_container), intent(in) :: container
   
-    if (allocated(container%einstein_diffuse_exp) == .false.) then
+    if (allocated(container%einstein_diffuse_exp) .eqv. .false.) then
       write(*,*) " "
       write(*,*) "ERROR in time_corr_hist_container.f90"
       write(*,*) "Forgot to allocate time_corr_hist_container"

@@ -82,7 +82,7 @@ contains
     ! Q array in the s_q_t container  
     
     n_r = get_time_corr_hist_n_r_bin(g_r_t)
-    if (is_integrat_over_r_precal_allocated(local_integrat_over_r_precal) == .false.) then
+    if (is_integrat_over_r_precal_allocated(local_integrat_over_r_precal) .eqv. .false.) then
       local_integrat_over_r_precal = make_and_cal_integrat_over_r_precal( &
         n_r, get_time_corr_hist_r_bin(g_r_t) &
         , s_q_t%q)
@@ -216,7 +216,7 @@ contains
   subroutine check_if_s_q_time_allocated(container)
     type(s_q_time), intent(in) :: container
   
-    if (allocated(container%q) == .false.) then
+    if (allocated(container%q) .eqv. .false.) then
       write(*,*) " "
       write(*,*) "ERROR in s_q_time.f90"
       write(*,*) "Forgot to allocate s_q_time"
@@ -229,7 +229,7 @@ contains
     type(integrat_over_r_precal), intent(in) :: container
     logical :: boolean
   
-    if (allocated(container%val) == .false.) then
+    if (allocated(container%val) .eqv. .false.) then
       boolean = .false.
     else
       boolean = .true.

@@ -31,7 +31,7 @@ contains
     
     nn_list_out%ignore_list = nn_list_in%ignore_list 
     
-    if ( nn_list_in%ignore_list == .true. ) then
+    if ( nn_list_in%ignore_list ) then
       return
     end if 
   
@@ -66,7 +66,7 @@ contains
     
     nn_list_out%ignore_list = nn_list_in%ignore_list 
     
-    if ( nn_list_in%ignore_list == .true. ) then
+    if ( nn_list_in%ignore_list ) then
       return
     end if 
   
@@ -217,7 +217,7 @@ contains
     ! when nn_list%ignore_list == .true.
     ! This restriction will probably be removed later
     
-    if (str%nn_list%ignore_list == .true.) then
+    if (str%nn_list%ignore_list ) then
       write(*,'(a)') "ERROR in build_near_neighb"
       write(*,'(a)') "Not allowed to rebuild nn_list when"
       write(*,'(a)') "ignore_list == .true."
@@ -234,12 +234,12 @@ contains
     ! atomic position coordinates are changed the nn_list is updated
     ! accordingly
     
-    if (str%nn_list%needs_updating == .false.) then
+    if (str%nn_list%needs_updating .eqv. .false.) then
       call cal_nn_distances(str)
       return
     end if
     
-    if (str%nn_list%cells%ignore_cell_method == .true.) then
+    if (str%nn_list%cells%ignore_cell_method) then
       call build_near_neighb_without_cell(str)
     else
       call build_near_neighb_with_cell(str)
@@ -317,8 +317,10 @@ contains
     
     integer, dimension(ndim,14) :: offset_vals
   
-    offset_vals = reshape( (/0,0,0, 1,0,0, 1,1,0, 0,1,0, -1,1,0, 0,0,1, 1,0,1, 1,1,1, 0,1,1, -1,1,1, -1,0,1, -1,-1,1, 0,-1,1, 1,-1,1/), & 
-                  shape(offset_vals))
+    offset_vals = reshape( (/ &
+    0,0,0, 1,0,0, 1,1,0, 0,1,0, -1,1,0, &
+    0,0,1, 1,0,1, 1,1,1, 0,1,1, -1,1,1, &
+    -1,0,1, -1,-1,1, 0,-1,1, 1,-1,1 /), shape(offset_vals))
     
     n_tot = size(str%atoms)
     r_cut_neighbour = str%nn_list%r_cut + str%nn_list%delta_r
@@ -538,8 +540,10 @@ contains
     
     integer, dimension(ndim,14) :: offset_vals
   
-    offset_vals = reshape( (/0,0,0, 1,0,0, 1,1,0, 0,1,0, -1,1,0, 0,0,1, 1,0,1, 1,1,1, 0,1,1, -1,1,1, -1,0,1, -1,-1,1, 0,-1,1, 1,-1,1/), & 
-                  shape(offset_vals))
+    offset_vals = reshape( (/ &
+    0,0,0, 1,0,0, 1,1,0, 0,1,0, -1,1,0, &
+    0,0,1, 1,0,1, 1,1,1, 0,1,1, -1,1,1, &
+    -1,0,1, -1,-1,1, 0,-1,1, 1,-1,1 /), shape(offset_vals))
     
     n_tot = size(str%atoms)
    

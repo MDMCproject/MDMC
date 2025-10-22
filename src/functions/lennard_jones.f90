@@ -25,7 +25,7 @@ contains
     type (lj_pe_container), intent(in) :: container
     real (db) :: val    
 	
-    if (str%nn_list%ignore_list == .true.) then
+    if (str%nn_list%ignore_list) then
       val = lj_val_without_nn(str, container)
     else
       ! TODO: remove unnessary 3rd arg
@@ -61,7 +61,7 @@ contains
       extra_args = .true.
       pressure_comp = 0.0
       pot_energy = 0.0
-    else if (present(pressure_comp)==.false. .and. present(pot_energy)==.false.) then
+    else if (present(pressure_comp) .eqv. .false. .and. present(pot_energy) .eqv. .false.) then
       extra_args = .false.
     else
       write(*,*) "ERROR in lj_deriv"
@@ -88,7 +88,7 @@ contains
     ! nn_list%r_cut are 'guaranteed' to be in the list but not 
     ! higher distances
     
-    if (str%nn_list%ignore_list == .false.) then
+    if (str%nn_list%ignore_list .eqv. .false.) then
       if (str%nn_list%r_cut < r_cut) then
         r_cut = str%nn_list%r_cut
       end if    
@@ -105,7 +105,7 @@ contains
     ! Do either single summation loop (nn-method) or double summation
     ! Notice quite a lot of code is repeated twice below
     
-    if (str%nn_list%ignore_list == .true.) then
+    if (str%nn_list%ignore_list) then
     
       do i1 = 1, n_tot
         do i2 = i1+1, n_tot

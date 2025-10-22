@@ -75,7 +75,7 @@ contains
     ! Note it is currently allowed to have obs data with 'no data available', a bit 
     ! like non-a-number data     
          
-    if (s_qo_data%ignore_errors == .true.) then
+    if (s_qo_data%ignore_errors) then
       do i_o = 1, n_omega     
         do i_q = 1, n_q 
           ! only sum over obs data points

@@ -128,7 +128,7 @@ contains
     
     if (present(pressure_comp) .and. present(pot_energy)) then
       extra_args = .true.
-    else if (present(pressure_comp)==.false. .and. present(pot_energy)==.false.) then
+    else if (present(pressure_comp) .eqv. .false. .and. present(pot_energy) .eqv. .false.) then
       extra_args = .false.
     else
       write(*,*) "ERROR in trajectory_in_phasespace"
@@ -164,7 +164,7 @@ contains
       
       ! if nn-list in use - update it to the new atomic coordinates first
       
-      if (ps%str%nn_list%ignore_list == .false.) then
+      if (ps%str%nn_list%ignore_list .eqv. .false.) then
          ps%v2 = sum(ps%p_div_mass*ps%p_div_mass,2)
         
         ! update nearest neighbour list flags
