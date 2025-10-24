@@ -1,32 +1,26 @@
 This tutorial go through in some detail how to recreate the results in the 
-technical report: https://doi.org/10.1103/PhysRevA.31.3391.
+technical report: https://epubs.stfc.ac.uk/work/36113739.
 
-Please note when below refer to `mdmc` this should be read as `mdmc-fortran`. 
-The code described in this tutorial was created purely to test an algorithm
-and not for user comsumption. A code designed for this purpose is being 
-constructed. In due course this code will be named `mdmc` the code repository
-be renamed to `mdmc-fortran` (or some other name that convey that this code
-been superceeded).
+The code described in this tutorial was written with the focus to test an idea 
+for a new algorithm and as written only tested for Argon. Although in theory 
+this code could be extended this is not recommended. Instead please see the soon
+public python based implementation in the github repository ..... 
 
 First step is to either download the Window executable via the zip file
 `mdmc_release_v0.1.zip` available from
-https://github.com/MDMCproject/MDMC/releases/tag/v0.1 or as also explained in
-[README.md](../../README.md) compile the code on your platform of choice;
-please note (as of this writing) this has not been done for a while (and
-anyone please don't hesitate to contribute any updates to these back to this
-repository). 
+https://github.com/MDMCproject/MDMC/releases/tag/v0.1 or compile this code 
+[README.md](../../README.md). 
 
-Here will run the code via the Windows executable in zip file. The folder 
-structure of this zip file is (closely mirrows the folder structure within the
-`src` folder of the this repo):
+Unzip the Windows executable. The folder 
+structure of this zip file is:
 
 <img src="images/zip_folder_structure.png" width="200" height="150" />
 
-The executable is, not surprisingly, `mdmc.exe`. As explained in
+The executable is, `mdmc.exe`. As per
 ``user_manual_release_v0.1.docx`` this executable take one input which is a
 job-file. Examples of these are in the folder `job_files`. Of particular
 interest here is the job-file `job_files\mdmc_control_time_corr_argon.xml`.
-Note, `mdmc.exe` is using no form of threading and/or MPI and to run 100 
+Note, `mdmc.exe` is not form using threading/MPI and to run 100 
 Monte-Carlo accept/reject step using a Intel(R) Core(TM) i7-8705G CPU @ 3.10GHz
 takes about 5 hours, where 100 MC-steps is sufficient to demonstrate and
 reproduce the essential features of the results in the technical report. Hence,
