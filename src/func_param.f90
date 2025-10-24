@@ -84,7 +84,7 @@ contains
     real (db) :: ran_num
     
     do i = 1, params%number_of_items
-      if (params%p(i)%fixed .eqv. .false.) then
+      if (.not. params%p(i)%fixed) then
         ! get a random number between 0 and 1
           
         call random_number(ran_num)  

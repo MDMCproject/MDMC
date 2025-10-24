@@ -55,7 +55,7 @@ contains
     
     if (present(pressure_comp) .and. present(pot_energy)) then
       call md_cal_properties_extra(ps, props, list, pressure_comp, pot_energy)
-    else if (present(pressure_comp) .eqv. .false. .and. present(pot_energy) .eqv. .false.) then
+    else if ((.not. present(pressure_comp)) .and. (.not. present(pot_energy))) then
       call md_cal_properties_not_extra(ps, props, list)
     else
       write(*,*) "ERROR in md_cal_properties"
