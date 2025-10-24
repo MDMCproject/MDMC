@@ -234,7 +234,7 @@ contains
     ! atomic position coordinates are changed the nn_list is updated
     ! accordingly
     
-    if (str%nn_list%needs_updating .eqv. .false.) then
+    if (.not. str%nn_list%needs_updating) then
       call cal_nn_distances(str)
       return
     end if

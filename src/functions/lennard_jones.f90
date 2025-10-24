@@ -61,7 +61,7 @@ contains
       extra_args = .true.
       pressure_comp = 0.0
       pot_energy = 0.0
-    else if (present(pressure_comp) .eqv. .false. .and. present(pot_energy) .eqv. .false.) then
+    else if ((.not. present(pressure_comp)) .and. (.not. present(pot_energy))) then
       extra_args = .false.
     else
       write(*,*) "ERROR in lj_deriv"
@@ -88,7 +88,7 @@ contains
     ! nn_list%r_cut are 'guaranteed' to be in the list but not 
     ! higher distances
     
-    if (str%nn_list%ignore_list .eqv. .false.) then
+    if (.not. str%nn_list%ignore_list) then
       if (str%nn_list%r_cut < r_cut) then
         r_cut = str%nn_list%r_cut
       end if    

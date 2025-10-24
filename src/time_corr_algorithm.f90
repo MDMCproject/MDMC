@@ -102,7 +102,7 @@ contains
 
     ! Can't start before memory for buffers been allocated
     
-    if (allocated(bufs) .eqv. .false.) then
+    if (.not. allocated(bufs)) then
       call allocate_buffer(n_time_bin, &
                            size(ps%str%atoms), &
                            get_time_corr_hist_r_max(container), &
@@ -115,8 +115,8 @@ contains
     
     ! keep on calling do_time_correlation until enough buffers have 
     ! been calculated
-    
-    do while (do_time_correlation(container, ps%str) .eqv. .false.)    
+
+    do while (.not. do_time_correlation(container, ps%str))    
       call trajectory_in_phasespace(ps, f_list, md_per_time_bin, md_delta_t)
     end do
      

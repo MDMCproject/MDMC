@@ -173,8 +173,8 @@ contains
     !
     ! First up check the temperature and the end of the simulation is OK
 
-    if ( acceptable_temperature((2.0/ndim)*my_props%kin_energy%ave, &
-         c%temperature, 0.2d+0) .eqv. .false.) then
+    if (.not. acceptable_temperature((2.0/ndim)*my_props%kin_energy%ave, &
+         c%temperature, 0.2d+0)) then
          write(print_to_screen, *) "Initial equilibration did not reach equilibrium"
          write(print_to_screen, *) "Temperature outside acceptable value"
          stop
@@ -184,8 +184,8 @@ contains
     ! Secondly check that the total energy has not drifted since the temperature
     ! calibration
 
-    if ( acceptable_energy(average_energy_end_of_temp_calibration, &
-         my_props%tot_energy%ave, 0.1d+0) .eqv. .false.) then
+    if (.not. acceptable_energy(average_energy_end_of_temp_calibration, &
+         my_props%tot_energy%ave, 0.1d+0)) then
          write(print_to_screen, *) "Initial equilibration did not reach equilibrium - STOP"
          write(print_to_screen, *) "Total energy drift is too high since temperature calibration ended"
          stop
@@ -305,9 +305,9 @@ contains
       !
       ! Check temperature OK and if energy has been drifting too much
 
-      if ( acceptable_temperature((2.0/ndim)*my_props%kin_energy%ave, &
-          c%temperature, 0.2d+0) .eqv. .false. .or. acceptable_energy(average_energy_end_of_temp_calibration, &
-          my_props%tot_energy%ave, 0.1d+0) .eqv. .false.) then
+      if ((.not. acceptable_temperature((2.0/ndim)*my_props%kin_energy%ave, &
+          c%temperature, 0.2d+0)) .or. (.not. acceptable_energy(average_energy_end_of_temp_calibration, &
+          my_props%tot_energy%ave, 0.1d+0))) then
         write(print_to_screen, *) "Did not reach equilibrium in MD run within MC loop"
         write(print_to_file, *) "Did not reach equilibrium in MD run within MC loop"
 
@@ -369,7 +369,7 @@ contains
  
       if (accept_parameters) then     
         call xml_NewElement(xf, "accept")
-        call xml_AddAttribute(xf, "N", str(i, format="(i)"))
+        call xml_AddAttribute(xf, "N", str(i, format="(i0)"))
         call add_xml_attribute_func_params(xf, common_pe_list)
         call xml_AddAttribute(xf, "val", str(fom_val, format="(f14.5)"))
         call xml_EndElement(xf, "accept")       
@@ -387,7 +387,7 @@ contains
         end if        
       else
         call xml_NewElement(xf, "rejected")
-        call xml_AddAttribute(xf, "N", str(i, format="(i)"))
+        call xml_AddAttribute(xf, "N", str(i, format="(i0)"))
         call add_xml_attribute_func_params(xf, common_pe_list)
         call xml_AddAttribute(xf, "val", str(fom_val, format="(f14.5)"))
         call xml_EndElement(xf, "rejected")

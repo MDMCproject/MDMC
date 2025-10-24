@@ -159,15 +159,14 @@ contains
     ! Note the (2.0/ndim) factor is to convert from dimensionless kin_energy per atom to 
     ! dimensionless temperature
     
-    if ( acceptable_temperature((2.0/ndim)*my_props%kin_energy%ave, &
-         c%temperature) .eqv. .false.) then
+    if (.not. acceptable_temperature((2.0/ndim)*my_props%kin_energy%ave,c%temperature)) then
          write(print_to_screen, *) "Initial equilibration did not reach equilibrium"
          write(print_to_screen, *) "Temperature outside acceptable value - STOP"
          stop
     end if   
     
-    if ( acceptable_energy(average_energy_end_of_temp_calibration, &
-         my_props%tot_energy%ave) .eqv. .false.) then
+    if (.not. acceptable_energy(average_energy_end_of_temp_calibration, &
+         my_props%tot_energy%ave)) then
          write(print_to_screen, *) "Initial equilibration did not reach equilibrium - STOP"
          write(print_to_screen, *) "Energy outside acceptable value - STOP"
          stop

@@ -125,10 +125,10 @@ contains
     logical :: extra_args 
     
     ! test for optional arguments and set extra_args
-    
+
     if (present(pressure_comp) .and. present(pot_energy)) then
       extra_args = .true.
-    else if (present(pressure_comp) .eqv. .false. .and. present(pot_energy) .eqv. .false.) then
+    else if ((.not. present(pressure_comp)) .and. (.not. present(pot_energy))) then
       extra_args = .false.
     else
       write(*,*) "ERROR in trajectory_in_phasespace"
@@ -164,7 +164,7 @@ contains
       
       ! if nn-list in use - update it to the new atomic coordinates first
       
-      if (ps%str%nn_list%ignore_list .eqv. .false.) then
+      if (.not. ps%str%nn_list%ignore_list) then
          ps%v2 = sum(ps%p_div_mass*ps%p_div_mass,2)
         
         ! update nearest neighbour list flags
