@@ -60,7 +60,7 @@ contains
   subroutine check_if_time_corr_hist_container_is_allocated(container)
     type(time_corr_hist_container), intent(in) :: container
   
-    if (allocated(container%einstein_diffuse_exp) == .false.) then
+    if (.not. allocated(container%einstein_diffuse_exp)) then
       write(*,*) " "
       write(*,*) "ERROR in time_corr_hist_container.f90"
       write(*,*) "Forgot to allocate time_corr_hist_container"
@@ -231,7 +231,7 @@ contains
                                          // "atoms/AA-3")
     end if
     
-    call xml_AddAttribute(xf, "n-atom", str(n_atom, format="(i)"))
+    call xml_AddAttribute(xf, "n-atom", str(n_atom, format="(i0)"))
     call xml_AddAttribute(xf, "density", str(density, format="(f10.5)"))    
     call xml_AddAttribute(xf, "time-unit", "10^-13 s")
     call xml_AddAttribute(xf, "diffuse-units", "10^13 AA^2 s^-1")
@@ -424,11 +424,11 @@ contains
                                          " K")
     call xml_AddAttribute(xf, "density", str(density, format="(f10.5)"))
     call xml_AddAttribute(xf, "density-unit", "atoms/AA-3")                                  
-    call xml_AddAttribute(xf, "n-atom", str(n_atom, format="(i)"))
+    call xml_AddAttribute(xf, "n-atom", str(n_atom, format="(i0)"))
     call xml_AddAttribute(xf, "time-bin", str(container%time_bin, format="(f10.5)"))
     call xml_AddAttribute(xf, "bin-length", str(r_bin, format="(f10.5)"))
-    call xml_AddAttribute(xf, "n-time-bin", str(n_time_bin, format="(i)"))
-    call xml_AddAttribute(xf, "n-r-bin", str(n_r_bin, format="(i)"))
+    call xml_AddAttribute(xf, "n-time-bin", str(n_time_bin, format="(i0)"))
+    call xml_AddAttribute(xf, "n-r-bin", str(n_r_bin, format="(i0)"))
     call xml_AddAttribute(xf, "time-unit", "10^-13 s")
     call xml_AddAttribute(xf, "r-units", "AA")
     call xml_NewElement(xf, "this-file-was-created")

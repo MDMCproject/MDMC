@@ -82,7 +82,7 @@ contains
     ! Q array in the s_q_t container  
     
     n_r = get_time_corr_hist_n_r_bin(g_r_t)
-    if (is_integrat_over_r_precal_allocated(local_integrat_over_r_precal) == .false.) then
+    if (.not. is_integrat_over_r_precal_allocated(local_integrat_over_r_precal)) then
       local_integrat_over_r_precal = make_and_cal_integrat_over_r_precal( &
         n_r, get_time_corr_hist_r_bin(g_r_t) &
         , s_q_t%q)
@@ -186,8 +186,8 @@ contains
                                          " K: rho = " // trim(str(density, format="(f10.5)")) &
                                          // " atoms/AA-3")
     call xml_AddAttribute(xf, "q-units", "AA^-1")
-    call xml_AddAttribute(xf, "n-q-points", str(size(container%q), format="(i)") )
-    call xml_AddAttribute(xf, "n-time-bin", str(get_s_q_time_n_t_bin(container), format="(i)"))
+    call xml_AddAttribute(xf, "n-q-points", str(size(container%q), format="(i0)") )
+    call xml_AddAttribute(xf, "n-time-bin", str(get_s_q_time_n_t_bin(container), format="(i0)"))
     call xml_AddAttribute(xf, "time-bin", str(container%t_bin, format="(f10.5)"))
     call xml_AddAttribute(xf, "time-unit", "10^-13 s")        
     call xml_NewElement(xf, "this-file-was-created")
@@ -216,7 +216,7 @@ contains
   subroutine check_if_s_q_time_allocated(container)
     type(s_q_time), intent(in) :: container
   
-    if (allocated(container%q) == .false.) then
+    if (.not. allocated(container%q)) then
       write(*,*) " "
       write(*,*) "ERROR in s_q_time.f90"
       write(*,*) "Forgot to allocate s_q_time"
@@ -229,7 +229,7 @@ contains
     type(integrat_over_r_precal), intent(in) :: container
     logical :: boolean
   
-    if (allocated(container%val) == .false.) then
+    if (.not. allocated(container%val)) then
       boolean = .false.
     else
       boolean = .true.

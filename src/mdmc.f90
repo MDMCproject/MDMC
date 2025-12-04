@@ -1,5 +1,4 @@
 program mdmc
-
   use flib_sax
   use handler_class, only :  startup_handler
   use handler_structure_part_class, only : handler_structure_part
@@ -20,6 +19,8 @@ program mdmc
   
   logical :: build_structure_from_model = .true.  
   
+  integer :: exitstat
+
   ! set build in random generator function seeds
   ! note only need to do this once 
   !
@@ -41,18 +42,28 @@ program mdmc
   write (*,*) "MDMC Version ... "
   write (*,*) " "
   
-  ! Ask user for a MDMC job file  
-  
-  write (*,*) "Enter the full pathname or full relative pathname of a MDMC job file: "
-  read *, filename 
+  ! Ask user for a MDMC job file. If a command-line argument is provided
+  ! use that as the filename, otherwise prompt the user interactively.
+
+  argc = command_argument_count()
+  if (argc >= 1) then
+    call get_command_argument(1, filename)
+  else
+    write (*,*) "Enter the full pathname or full relative pathname of a MDMC job file: "
+    read (*,*) filename
+  end if
   
   ! create output directory - at this point in time hardcoded to 'output'
   
-  inquire( directory="output", exist=output_dir_exist )
-  if ( output_dir_exist == .false. ) then
-    write(*,*), "create output directory"
-    call system('mkdir output')
-  end if    
+  call execute_command_line('test -d output', exitstat=exitstat)
+  if (exitstat /= 0) then
+    write(*,*) 'Creating output directory'
+    call execute_command_line('mkdir -p output', exitstat=exitstat)
+    if (exitstat /= 0) then
+      write(*,*) 'Failed to create output directory (mkdir exit status=', exitstat,')'
+      stop 1
+    end if
+  end if   
   
   ! Because of bug in otherwise very useful xmlf90 library 
   ! need to read in input file in bits...... 

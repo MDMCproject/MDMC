@@ -194,7 +194,7 @@ contains
     
     if (present(pressure_comp) .and. present(pot_energy)) then
       call lj_deriv(str, deriv, list%pt_lj_pe, pressure_comp, pot_energy)
-    else if (present(pressure_comp)==.false. .and. present(pot_energy)==.false.) then
+    else if ((.not. present(pressure_comp)) .and. (.not. present(pot_energy))) then
       call lj_deriv(str, deriv, list%pt_lj_pe)
     else
       write(*,*) "ERROR in func_deriv"

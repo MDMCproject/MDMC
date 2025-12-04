@@ -67,7 +67,7 @@ contains
     
     n_t = get_s_q_time_n_t_bin(s_qt)
     
-    if (is_precal_cos_values_allocated(local_precal_cos_values) == .false.) then
+    if (.not. is_precal_cos_values_allocated(local_precal_cos_values)) then
       local_precal_cos_values = make_and_cal_precal_cos_values( &
         n_t, s_qt%t_bin, s_qo%omega)
     end if
@@ -128,8 +128,8 @@ contains
     call xml_AddAttribute(xf, "title", "T = " // trim(str(temperature * T_unit, format="(f10.5)")) // &
                                          " K: rho = " // trim(str(density, format="(f10.5)")) &
                                          // " atoms/AA-3")
-    call xml_AddAttribute(xf, "n-omega-points", str(size(container%omega), format="(i)") )
-    call xml_AddAttribute(xf, "n-q-points", str(size(container%q), format="(i)") )
+    call xml_AddAttribute(xf, "n-omega-points", str(size(container%omega), format="(i0)") )
+    call xml_AddAttribute(xf, "n-q-points", str(size(container%q), format="(i0)") )
     call xml_AddAttribute(xf, "q-units", "AA^-1")
     call xml_AddAttribute(xf, "omega-unit", "1/[10^-13 s]")        
     call xml_NewElement(xf, "this-file-was-created")
@@ -157,8 +157,8 @@ contains
 
   subroutine check_if_s_q_omega_allocated(container)
     type(s_q_omega), intent(in) :: container
-  
-    if (allocated(container%q) == .false.) then
+
+    if (.not. allocated(container%q)) then
       write(*,*) " "
       write(*,*) "ERROR in s_q_omega.f90"
       write(*,*) "Forgot to allocate s_q_omega"
@@ -170,8 +170,8 @@ contains
   function is_precal_cos_values_allocated(container) result(boolean)
     type(precal_cos_values), intent(in) :: container
     logical :: boolean
-  
-    if (allocated(container%val) == .false.) then
+
+    if (.not. allocated(container%val)) then
       boolean = .false.
     else
       boolean = .true.
