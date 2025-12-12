@@ -31,7 +31,7 @@
       <scale-factor val="1.0" />
     </s-qt-fom>  -->
     <s-qo-fom>
-      <data-file filename="../data/Van_Well_thesis_Ag_data/Well_s_q_omega_Ag_data_unsymmetrised.xml" />
+      <data-file filename="Well_s_q_omega_Ag_data_unsymmetrised.xml" />
       <scale-factor val="1.0" />
       <ignore-errors />  <!-- If data contains errors ignore these -->
     </s-qo-fom>
@@ -80,7 +80,7 @@
 
     <!-- Controlling the MC (Monte-Carlo). How many MC steps (cycles)
          and temperature-mc controls the acceptance rate -->
-    <mc-steps number="200" />
+    <mc-steps number="100" />
     <temperature-mc val="1" />
 
     <!-- Controlling MD simulations between MC steps -->

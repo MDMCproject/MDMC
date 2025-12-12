@@ -36,10 +36,18 @@ def analyseMDMCrun(filename):
     rejectedYaxisSigma = np.zeros(nRejected)
     rejectedYaxisEpsilon = np.zeros(nRejected)
     
+    # note cusmetic difference with the equivalent matlab script, here
+    # here start MC step indexing at 0, while in matlab it starts at 1.
     # Parse accept elements
     iAcc = 0
     for elem in accept_elements:
-        acceptXaxis[iAcc] = iAcc + 1
+        if elem.get('N') is None:
+            if iAcc != 0:
+                print("Error: only first accept is expected to not have attribute 'N'")
+                exit(1)
+            acceptXaxis[iAcc] = iAcc
+        else:
+            acceptXaxis[iAcc] = int(elem.get('N'))
         acceptYaxis[iAcc] = float(elem.get('val'))
         acceptYaxisSigma[iAcc] = float(elem.get('sigma'))
         acceptYaxisEpsilon[iAcc] = float(elem.get('epsilon'))
@@ -47,14 +55,13 @@ def analyseMDMCrun(filename):
     
     # Parse rejected elements
     iRej = 0
-    iMC = nAccept + 1
     for elem in rejected_elements:
-        rejectedXaxis[iRej] = iMC
+        rejectedXaxis[iRej] = int(elem.get('N'))
         rejectedYaxis[iRej] = float(elem.get('val'))
         rejectedYaxisSigma[iRej] = float(elem.get('sigma'))
         rejectedYaxisEpsilon[iRej] = float(elem.get('epsilon'))
         iRej += 1
-        iMC += 1
+
     
     # Create plots
     fig, (ax1, ax2, ax3) = plt.subplots(1, 3, figsize=(15, 4))
@@ -98,3 +105,8 @@ if __name__ == '__main__':
     import sys
     if len(sys.argv) > 1:
         analyseMDMCrun(sys.argv[1])
+    else:
+        print("Usage: python analyseMDMCrun.py <mdmc results xml file>")
+        # for debugging purposes
+        print("Try reading from hardcoded mdmc_results.xml file")
+        analyseMDMCrun('/root/mdmc/build/bin/output/mdmc_results.xml')

@@ -32,8 +32,7 @@ def read_G_d(filename):
         t_temp[i] = float(elem.get('t'))
         g_temp[i] = float(elem.get('G'))
     
-    top_element = root.find('G_d-space-time-pair-correlation-function')
-    bin_length = float(top_element.get('bin-length'))
+    bin_length = float(root.get('bin-length'))    
     
     n_bin = int(np.ceil(np.max(r_temp) / bin_length))
     
@@ -64,7 +63,7 @@ def read_G_d(filename):
     ax.set_xlabel('r [AA]')
     ax.set_ylabel('t [10^-13 s]')
     ax.set_zlabel('"normalised" g_d (r,t)')
-    ax.set_title(top_element.get('title'))
+    ax.set_title(root.get('title'))
     
     plt.show()
     
@@ -75,3 +74,8 @@ if __name__ == '__main__':
     import sys
     if len(sys.argv) > 1:
         read_G_d(sys.argv[1])
+    else:
+        print("Usage: python read_G_d.py <mdmc results xml file>")
+        # for debugging purposes
+        print("Try reading from hardcoded file")
+        read_G_d('/root/mdmc/build/bin/output/first_g_d.xml')
