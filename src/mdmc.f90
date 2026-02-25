@@ -22,18 +22,15 @@ program mdmc
   integer :: exitstat
 
   ! set build in random generator function seeds
-  ! note only need to do this once 
-  !
-  ! Note I can't seem to force random_number to always
-  ! produce the same sequence of random numbers...
+  ! note only need to do this once
   
   integer :: n_seeds  
   logical :: output_dir_exist
   INTEGER, ALLOCATABLE :: new (:)
   call random_seed(size=n_seeds)
-  ALLOCATE (new(I))
+  ALLOCATE (new(n_seeds))
   new = 5
-  CALL RANDOM_SEED (PUT=new(1:I))
+  CALL RANDOM_SEED (PUT=new(1:n_seeds))
   
   ! A short welcome print to screen. Replace ... with release number and
   ! date for user releases
