@@ -31,7 +31,7 @@ To compile and test this Dec 2025 option follow the instructions below (needs an
 * download this repo to a folder, in this demo assumed this to be `/repo/mdmc/`
 * somewhere else : `mkdir build`
 * then : `cd build/`
-* then : `cmake /repo/mdmc/src`
+* then : `cmake /repo/mdmc/src -DCMAKE_BUILD_TYPE=Release`
 * then : `make`
 * then : `cp /repo/mdmc/src/input/mdmc_control_time_corr_argon.xml bin/`
 * then : `cp /repo/mdmc/data/Van_Well_thesis_Ag_data/Well_s_q_omega_Ag_data_unsymmetrised.xml bin/`
